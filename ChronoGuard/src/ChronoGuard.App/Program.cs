@@ -1,0 +1,78 @@
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using System.Windows;
+using ChronoGuard.App;
+using ChronoGuard.Domain.Interfaces;
+using ChronoGuard.Infrastructure.Services;
+using ChronoGuard.Application.Services;
+
+namespace ChronoGuard.App;
+
+/// <summary>
+/// Application entry point with dependency injection setup
+/// </summary>
+public static class Program
+{
+    [STAThread]
+    public static void Main(string[] args)
+    {
+        try
+        {
+            // Create host builder with DI container
+            var host = CreateHostBuilder(args).Build();
+
+            // Start the WPF application
+            var app = new App();
+            app.InitializeComponent();
+            
+            // Set service provider for the app
+            App.ServiceProvider = host.Services;
+            
+            // Run the application
+            app.Run();
+        }
+        catch (Exception ex)
+        {
+            // Log fatal errors
+            var logger = LoggerFactory.Create(builder => builder.AddConsole())
+                .CreateLogger<App>();
+            logger.LogCritical(ex, "Application failed to start");
+            
+            MessageBox.Show($"Error fatal al iniciar ChronoGuard:\n{ex.Message}", 
+                "ChronoGuard - Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureServices((context, services) =>
+            {
+                // Configure logging
+                services.AddLogging(builder =>
+                {
+                    builder.AddConsole();
+                    builder.AddDebug();
+                    builder.SetMinimumLevel(LogLevel.Information);
+                });
+
+                // Register HTTP client
+                services.AddHttpClient();
+
+                // Register domain services
+                services.AddSingleton<ILocationService, LocationService>();
+                services.AddSingleton<ISolarCalculatorService, SolarCalculatorService>();
+                services.AddSingleton<IColorTemperatureService, WindowsColorTemperatureService>();
+                services.AddSingleton<IProfileService, ProfileService>();
+                services.AddSingleton<IConfigurationService, ConfigurationService>();
+
+                // Register application services
+                services.AddSingleton<ChronoGuardBackgroundService>();                // Register ViewModels
+                services.AddTransient<MainWindowViewModel>();
+                services.AddTransient<SettingsViewModel>();
+
+                // Register Windows
+                services.AddTransient<MainWindow>();
+                services.AddTransient<SettingsWindow>();
+            });
+}

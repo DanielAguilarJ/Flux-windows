@@ -1,0 +1,235 @@
+<Window x:Class="ChronoGuard.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="ChronoGuard" 
+        Height="500" 
+        Width="400"
+        MinHeight="450"
+        MinWidth="380"
+        ResizeMode="CanResize"
+        WindowStartupLocation="CenterScreen"
+        Icon="Assets/chronoguard.ico">
+    
+    <Window.Resources>
+        <!-- Gradients for temperature visualization -->
+        <LinearGradientBrush x:Key="WarmGradient" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Color="#FF6B47" Offset="0"/>
+            <GradientStop Color="#FFA500" Offset="1"/>
+        </LinearGradientBrush>
+        
+        <LinearGradientBrush x:Key="CoolGradient" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Color="#87CEEB" Offset="0"/>
+            <GradientStop Color="#4169E1" Offset="1"/>
+        </LinearGradientBrush>
+        
+        <!-- Styles -->
+        <Style x:Key="HeaderTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#2C3E50"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,10"/>
+        </Style>
+        
+        <Style x:Key="StatusTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="#34495E"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,5"/>
+        </Style>
+        
+        <Style x:Key="ActionButtonStyle" TargetType="Button">
+            <Setter Property="Padding" Value="20,10"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Background" Value="#3498DB"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="5"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#2980B9"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#21618C"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <Style x:Key="SecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
+            <Setter Property="Background" Value="#95A5A6"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#7F8C8D"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#6C7B7D"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
+            <Image Source="Assets/chronoguard-32.png" Width="32" Height="32" Margin="0,0,10,0"/>
+            <TextBlock Text="ChronoGuard" Style="{StaticResource HeaderTextStyle}"/>
+        </StackPanel>
+        
+        <!-- Status Section -->
+        <Border Grid.Row="1" Background="#ECF0F1" CornerRadius="10" Padding="20" Margin="0,0,0,20">
+            <StackPanel>
+                <!-- Main Status -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,15">
+                    <Ellipse Width="12" Height="12" VerticalAlignment="Center" Margin="0,0,8,0">
+                        <Ellipse.Fill>
+                            <SolidColorBrush Color="{Binding IsActive, Converter={StaticResource BooleanToColorConverter}, ConverterParameter='Green|Red'}"/>
+                        </Ellipse.Fill>
+                    </Ellipse>
+                    <TextBlock Text="{Binding CurrentStatusText}" 
+                               FontSize="16" 
+                               FontWeight="SemiBold"
+                               Foreground="{Binding IsActive, Converter={StaticResource BooleanToColorConverter}, ConverterParameter='#27AE60|#E74C3C'}"/>
+                </StackPanel>
+                
+                <!-- Temperature Display -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
+                    <TextBlock Text="Temperatura actual: " Style="{StaticResource StatusTextStyle}"/>
+                    <TextBlock Text="{Binding CurrentTemperatureText}" 
+                               Style="{StaticResource StatusTextStyle}"
+                               FontWeight="Bold"/>
+                </StackPanel>
+                
+                <!-- Temperature Slider Visualization -->
+                <Grid Margin="0,10">
+                    <Rectangle Height="6" RadiusX="3" RadiusY="3">
+                        <Rectangle.Fill>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="#FF6B47" Offset="0"/>
+                                <GradientStop Color="#FFA500" Offset="0.3"/>
+                                <GradientStop Color="#FFFFFF" Offset="0.6"/>
+                                <GradientStop Color="#87CEEB" Offset="0.8"/>
+                                <GradientStop Color="#4169E1" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Rectangle.Fill>
+                    </Rectangle>
+                    <Ellipse Width="12" Height="12" Fill="#2C3E50" 
+                             HorizontalAlignment="Left"
+                             Margin="{Binding CurrentColorTemperature, Converter={StaticResource TemperatureToMarginConverter}}"/>
+                </Grid>
+                
+                <TextBlock Text="{Binding NextTransitionText}" 
+                           Style="{StaticResource StatusTextStyle}"
+                           FontStyle="Italic"
+                           Visibility="{Binding NextTransitionText, Converter={StaticResource StringToVisibilityConverter}}"/>
+            </StackPanel>
+        </Border>
+        
+        <!-- Information Section -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <!-- Location Info -->
+                <Border Background="#F8F9FA" CornerRadius="8" Padding="15" Margin="0,0,0,10">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                            <Path Data="M12,2C8.13,2 5,5.13 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9C19,5.13 15.87,2 12,2M12,6A3,3 0 0,1 15,9A3,3 0 0,1 12,12A3,3 0 0,1 9,9A3,3 0 0,1 12,6Z" 
+                                  Fill="#7F8C8D" 
+                                  Width="16" 
+                                  Height="16" 
+                                  Stretch="Uniform"
+                                  Margin="0,0,8,0"/>
+                            <TextBlock Text="Ubicación" FontWeight="SemiBold" Foreground="#2C3E50"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding CurrentLocationText}" 
+                                   Foreground="#7F8C8D" 
+                                   TextWrapping="Wrap"/>
+                        <Button Content="Actualizar ubicación" 
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                Command="{Binding UpdateLocationCommand}"
+                                HorizontalAlignment="Right"
+                                Margin="0,5,0,0"
+                                Padding="10,5"
+                                FontSize="12"/>
+                    </StackPanel>
+                </Border>
+                
+                <!-- Profile Info -->
+                <Border Background="#F8F9FA" CornerRadius="8" Padding="15" Margin="0,0,0,10">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                            <Path Data="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7H14A7,7 0 0,1 21,14H22A1,1 0 0,1 23,15V18A1,1 0 0,1 22,19H21V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V19H2A1,1 0 0,1 1,18V15A1,1 0 0,1 2,14H3A7,7 0 0,1 10,7H11V5.73C10.4,5.39 10,4.74 10,4A2,2 0 0,1 12,2M7.5,13A2.5,2.5 0 0,0 5,15.5A2.5,2.5 0 0,0 7.5,18A2.5,2.5 0 0,0 10,15.5A2.5,2.5 0 0,0 7.5,13M16.5,13A2.5,2.5 0 0,0 14,15.5A2.5,2.5 0 0,0 16.5,18A2.5,2.5 0 0,0 19,15.5A2.5,2.5 0 0,0 16.5,13Z" 
+                                  Fill="#7F8C8D" 
+                                  Width="16" 
+                                  Height="16" 
+                                  Stretch="Uniform"
+                                  Margin="0,0,8,0"/>
+                            <TextBlock Text="Perfil activo" FontWeight="SemiBold" Foreground="#2C3E50"/>
+                        </StackPanel>
+                        <TextBlock Text="{Binding CurrentProfileName}" 
+                                   Foreground="#7F8C8D"/>
+                    </StackPanel>
+                </Border>
+                
+                <!-- Quick Actions -->
+                <Border Background="#F8F9FA" CornerRadius="8" Padding="15">
+                    <StackPanel>
+                        <TextBlock Text="Acciones rápidas" FontWeight="SemiBold" Foreground="#2C3E50" Margin="0,0,0,10"/>
+                        <WrapPanel Orientation="Horizontal">
+                            <Button Content="⚙️ Configuración" 
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Command="{Binding OpenSettingsCommand}"
+                                    Margin="0,0,5,5"/>
+                            <Button Content="❓ Acerca de" 
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Command="{Binding ShowAboutCommand}"
+                                    Margin="0,0,5,5"/>
+                            <Button Content="🔽 Minimizar" 
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    Command="{Binding MinimizeToTrayCommand}"
+                                    Margin="0,0,5,5"/>
+                        </WrapPanel>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+        
+        <!-- Control Buttons -->
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
+            <Button Content="⏸️ Pausar" 
+                    Style="{StaticResource ActionButtonStyle}"
+                    Command="{Binding PauseCommand}"
+                    Visibility="{Binding PauseButtonVisibility}"/>
+            <Button Content="▶️ Reanudar" 
+                    Style="{StaticResource ActionButtonStyle}"
+                    Command="{Binding ResumeCommand}"
+                    Visibility="{Binding ResumeButtonVisibility}"
+                    Background="#27AE60"/>
+            <Button Content="❌ Salir" 
+                    Style="{StaticResource SecondaryButtonStyle}"
+                    Command="{Binding ExitApplicationCommand}"/>
+        </StackPanel>
+    </Grid>
+</Window>

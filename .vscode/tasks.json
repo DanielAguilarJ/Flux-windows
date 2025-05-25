@@ -1,0 +1,18 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"args": [
+				"run",
+				"--project",
+				"src/ChronoGuard.App"
+			],
+			"command": "dotnet",
+			"group": "build",
+			"isBackground": false,
+			"label": "run",
+			"problemMatcher": [],
+			"type": "shell"
+		}
+	]
+}

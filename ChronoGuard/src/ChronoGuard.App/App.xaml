@@ -1,0 +1,29 @@
+<Application x:Class="ChronoGuard.App.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:ChronoGuard.App.Converters"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <!-- Global application resources -->
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Styles -->
+                <ResourceDictionary Source="Resources/Styles/ButtonStyles.xaml"/>
+                <ResourceDictionary Source="Resources/Styles/TextStyles.xaml"/>
+                <ResourceDictionary Source="Resources/Styles/WindowStyles.xaml"/>
+                <!-- Colors -->
+                <ResourceDictionary Source="Resources/Colors/AppColors.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            
+            <!-- Global converters -->
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <converters:BooleanToColorConverter x:Key="BooleanToColorConverter"/>
+            <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
+            <converters:TemperatureToMarginConverter x:Key="TemperatureToMarginConverter"/>
+            <converters:NotNullToBooleanConverter x:Key="NotNullToBooleanConverter"/>
+            <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+            <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter"/>
+            
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
