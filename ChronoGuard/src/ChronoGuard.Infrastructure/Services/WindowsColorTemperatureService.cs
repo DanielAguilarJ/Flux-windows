@@ -2,6 +2,7 @@ using ChronoGuard.Domain.Entities;
 using ChronoGuard.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Runtime.InteropServices;
+using Timer = System.Threading.Timer;
 
 namespace ChronoGuard.Infrastructure.Services;
 
@@ -113,7 +114,7 @@ public class WindowsColorTemperatureService : IColorTemperatureService
         }
     }
 
-    public async Task<bool> ApplyTemperatureAsync(ColorTemperature temperature)
+    public Task<bool> ApplyTemperatureAsync(ColorTemperature temperature)
     {
         try
         {
@@ -136,23 +137,23 @@ public class WindowsColorTemperatureService : IColorTemperatureService
                 _logger.LogDebug("Applied color temperature: {Temperature}", temperature);
             }
 
-            return success;
+            return Task.FromResult(success);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error applying color temperature: {Temperature}", temperature);
-            return false;
+            return Task.FromResult(false);
         }
     }
 
-    public async Task<bool> ApplyTemperatureToMonitorAsync(string monitorId, ColorTemperature temperature)
+    public Task<bool> ApplyTemperatureToMonitorAsync(string monitorId, ColorTemperature temperature)
     {
         try
         {
             if (!_monitorHandles.TryGetValue(monitorId, out var handle))
             {
                 _logger.LogWarning("Monitor {MonitorId} not found", monitorId);
-                return false;
+                return Task.FromResult(false);
             }
 
             var ramp = CreateGammaRamp(temperature);
@@ -163,12 +164,12 @@ public class WindowsColorTemperatureService : IColorTemperatureService
                 _logger.LogDebug("Applied color temperature {Temperature} to monitor {MonitorId}", temperature, monitorId);
             }
 
-            return success;
+            return Task.FromResult(success);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error applying temperature to monitor {MonitorId}: {Temperature}", monitorId, temperature);
-            return false;
+            return Task.FromResult(false);
         }
     }
 
@@ -219,10 +220,11 @@ public class WindowsColorTemperatureService : IColorTemperatureService
         }
     }
 
-    public async Task StopTransitionAsync()
+    public Task StopTransitionAsync()
     {
         _transitionTimer?.Dispose();
         _transitionTimer = null;
+        return Task.CompletedTask;
     }
 
     public async Task RestoreOriginalSettingsAsync()
@@ -260,7 +262,7 @@ public class WindowsColorTemperatureService : IColorTemperatureService
         return _currentTemperature;
     }
 
-    public async Task<IEnumerable<MonitorInfo>> GetMonitorsAsync()
+    public Task<IEnumerable<MonitorInfo>> GetMonitorsAsync()
     {
         var monitors = new List<MonitorInfo>();
 
@@ -283,7 +285,7 @@ public class WindowsColorTemperatureService : IColorTemperatureService
             _logger.LogError(ex, "Error getting monitor information");
         }
 
-        return monitors;
+        return Task.FromResult<IEnumerable<MonitorInfo>>(monitors);
     }
 
     private RAMP CreateGammaRamp(ColorTemperature temperature)

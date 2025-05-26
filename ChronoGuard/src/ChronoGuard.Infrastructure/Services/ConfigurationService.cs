@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using LogLevel = ChronoGuard.Domain.Interfaces.LogLevel;
 
 namespace ChronoGuard.Infrastructure.Services;
 

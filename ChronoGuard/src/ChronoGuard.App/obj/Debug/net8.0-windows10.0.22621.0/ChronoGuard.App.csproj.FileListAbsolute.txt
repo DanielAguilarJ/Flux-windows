@@ -1,0 +1,12 @@
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.App/obj/Debug/net8.0-windows10.0.22621.0/ChronoGuard.App.csproj.AssemblyReference.cache
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.App/obj/Debug/net8.0-windows10.0.22621.0/MainWindow.baml
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.App/obj/Debug/net8.0-windows10.0.22621.0/Resources/Colors/AppColors.baml
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.App/obj/Debug/net8.0-windows10.0.22621.0/Resources/Styles/ButtonStyles.baml
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.App/obj/Debug/net8.0-windows10.0.22621.0/Resources/Styles/TextStyles.baml
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.App/obj/Debug/net8.0-windows10.0.22621.0/Resources/Styles/WindowStyles.baml
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.App/obj/Debug/net8.0-windows10.0.22621.0/MainWindow.g.cs
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.App/obj/Debug/net8.0-windows10.0.22621.0/SettingsWindow.g.cs
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.App/obj/Debug/net8.0-windows10.0.22621.0/App.g.cs
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.App/obj/Debug/net8.0-windows10.0.22621.0/GeneratedInternalTypeHelper.g.cs
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.App/obj/Debug/net8.0-windows10.0.22621.0/ChronoGuard.App_MarkupCompile.cache
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.App/obj/Debug/net8.0-windows10.0.22621.0/ChronoGuard.App_MarkupCompile.lref

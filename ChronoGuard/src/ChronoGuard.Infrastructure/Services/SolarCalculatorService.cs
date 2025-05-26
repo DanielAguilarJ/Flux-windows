@@ -18,12 +18,12 @@ public class SolarCalculatorService : ISolarCalculatorService
         _locationService = locationService;
     }
 
-    public async Task<SolarTimes> CalculateSolarTimesAsync(Location location, DateTime date)
+    public Task<SolarTimes> CalculateSolarTimesAsync(Location location, DateTime date)
     {
         try
         {
             var (sunrise, sunset) = CalculateSunriseSunset(location.Latitude, location.Longitude, date);
-            return new SolarTimes(sunrise, sunset, date, location);
+            return Task.FromResult(new SolarTimes(sunrise, sunset, date, location));
         }
         catch (Exception ex)
         {

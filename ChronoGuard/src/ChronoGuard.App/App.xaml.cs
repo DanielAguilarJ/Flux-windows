@@ -1,19 +1,25 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using ChronoGuard.Application.Services;
+// using ChronoGuard.App.Services;
 
 namespace ChronoGuard.App;
 
 /// <summary>
 /// WPF Application class with dependency injection support
 /// </summary>
-public partial class App : Application
+public partial class App : System.Windows.Application
 {
     public static IServiceProvider? ServiceProvider { get; set; }
     
     private ILogger<App>? _logger;
     private ChronoGuardBackgroundService? _backgroundService;
+    // private SystemTrayService? _systemTrayService;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -35,6 +41,9 @@ public partial class App : Application
             _backgroundService = ServiceProvider.GetRequiredService<ChronoGuardBackgroundService>();
             _ = Task.Run(() => _backgroundService.StartAsync(CancellationToken.None));
 
+            // Initialize system tray
+            // _systemTrayService = ServiceProvider.GetRequiredService<SystemTrayService>();
+
             // Create and show main window
             var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();
             MainWindow = mainWindow;
@@ -53,7 +62,7 @@ public partial class App : Application
         catch (Exception ex)
         {
             _logger?.LogCritical(ex, "Failed to start ChronoGuard application");
-            MessageBox.Show($"Error al iniciar ChronoGuard:\n{ex.Message}", 
+            System.Windows.MessageBox.Show($"Error al iniciar ChronoGuard:\n{ex.Message}", 
                 "ChronoGuard - Error", MessageBoxButton.OK, MessageBoxImage.Error);
             Shutdown();
         }

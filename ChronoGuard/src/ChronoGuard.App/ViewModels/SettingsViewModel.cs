@@ -6,6 +6,8 @@ using System.Windows;
 using ChronoGuard.Domain.Entities;
 using ChronoGuard.Domain.Interfaces;
 using static ChronoGuard.Domain.Interfaces.IConfigurationService;
+using WpfApp = System.Windows.Application;
+using DomainLogLevel = ChronoGuard.Domain.Interfaces.LogLevel;
 
 namespace ChronoGuard.App.ViewModels;
 
@@ -83,7 +85,7 @@ public partial class SettingsViewModel : ObservableObject
     private bool _useHardwareAcceleration;
 
     [ObservableProperty]
-    private LogLevel _logLevel;
+    private DomainLogLevel _logLevel;
 
     [ObservableProperty]
     private string _newExcludedApp = "";
@@ -95,7 +97,7 @@ public partial class SettingsViewModel : ObservableObject
 
     public Array LocationMethods => Enum.GetValues<LocationMethod>();
     public Array NotificationLevels => Enum.GetValues<NotificationLevel>();
-    public Array LogLevels => Enum.GetValues<LogLevel>();
+    public Array LogLevels => Enum.GetValues<DomainLogLevel>();
 
     public SettingsViewModel(
         ILogger<SettingsViewModel> logger,
@@ -157,14 +159,14 @@ public partial class SettingsViewModel : ObservableObject
             }
 
             _logger.LogInformation("Settings saved successfully");
-            MessageBox.Show("Configuración guardada correctamente.", "ChronoGuard", 
-                MessageBoxButton.OK, MessageBoxImage.Information);
+            System.Windows.MessageBox.Show("Configuración guardada correctamente.", "ChronoGuard", 
+                System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error saving settings");
-            MessageBox.Show($"Error al guardar configuración:\n{ex.Message}", "ChronoGuard - Error", 
-                MessageBoxButton.OK, MessageBoxImage.Error);
+            System.Windows.MessageBox.Show($"Error al guardar configuración:\n{ex.Message}", "ChronoGuard - Error", 
+                System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
         }
     }
 
@@ -174,13 +176,13 @@ public partial class SettingsViewModel : ObservableObject
     [RelayCommand]
     private async Task ResetToDefaultsAsync()
     {
-        var result = MessageBox.Show(
+        var result = System.Windows.MessageBox.Show(
             "¿Está seguro de que desea restablecer todas las configuraciones a los valores predeterminados?",
             "Confirmar restablecimiento",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Question);
+            System.Windows.MessageBoxButton.YesNo,
+            System.Windows.MessageBoxImage.Question);
 
-        if (result == MessageBoxResult.Yes)
+        if (result == System.Windows.MessageBoxResult.Yes)
         {
             try
             {
@@ -188,14 +190,14 @@ public partial class SettingsViewModel : ObservableObject
                 await LoadDataAsync();
                 
                 _logger.LogInformation("Settings reset to defaults");
-                MessageBox.Show("Configuración restablecida a valores predeterminados.", "ChronoGuard", 
-                    MessageBoxButton.OK, MessageBoxImage.Information);
+                System.Windows.MessageBox.Show("Configuración restablecida a valores predeterminados.", "ChronoGuard", 
+                    System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error resetting settings to defaults");
-                MessageBox.Show($"Error al restablecer configuración:\n{ex.Message}", "ChronoGuard - Error", 
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Windows.MessageBox.Show($"Error al restablecer configuración:\n{ex.Message}", "ChronoGuard - Error", 
+                    System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
             }
         }
     }
@@ -219,8 +221,8 @@ public partial class SettingsViewModel : ObservableObject
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error creating new profile");
-            MessageBox.Show($"Error al crear perfil:\n{ex.Message}", "ChronoGuard - Error", 
-                MessageBoxButton.OK, MessageBoxImage.Error);
+            System.Windows.MessageBox.Show($"Error al crear perfil:\n{ex.Message}", "ChronoGuard - Error", 
+                System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
         }
     }
 
@@ -245,8 +247,8 @@ public partial class SettingsViewModel : ObservableObject
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error duplicating profile");
-            MessageBox.Show($"Error al duplicar perfil:\n{ex.Message}", "ChronoGuard - Error", 
-                MessageBoxButton.OK, MessageBoxImage.Error);
+            System.Windows.MessageBox.Show($"Error al duplicar perfil:\n{ex.Message}", "ChronoGuard - Error", 
+                System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
         }
     }
 
@@ -258,13 +260,13 @@ public partial class SettingsViewModel : ObservableObject
     {
         if (SelectedProfile == null || SelectedProfile.IsBuiltIn) return;
 
-        var result = MessageBox.Show(
+        var result = System.Windows.MessageBox.Show(
             $"¿Está seguro de que desea eliminar el perfil '{SelectedProfile.Name}'?",
             "Confirmar eliminación",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Question);
+            System.Windows.MessageBoxButton.YesNo,
+            System.Windows.MessageBoxImage.Question);
 
-        if (result == MessageBoxResult.Yes)
+        if (result == System.Windows.MessageBoxResult.Yes)
         {
             try
             {
@@ -277,8 +279,8 @@ public partial class SettingsViewModel : ObservableObject
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error deleting profile");
-                MessageBox.Show($"Error al eliminar perfil:\n{ex.Message}", "ChronoGuard - Error", 
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Windows.MessageBox.Show($"Error al eliminar perfil:\n{ex.Message}", "ChronoGuard - Error", 
+                    System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
             }
         }
     }
@@ -299,20 +301,20 @@ public partial class SettingsViewModel : ObservableObject
                             $"Ciudad: {location.City ?? "No disponible"}\n" +
                             $"País: {location.Country ?? "No disponible"}";
                 
-                MessageBox.Show(message, "Prueba de ubicación", 
-                    MessageBoxButton.OK, MessageBoxImage.Information);
+                System.Windows.MessageBox.Show(message, "Prueba de ubicación", 
+                    System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
             }
             else
             {
-                MessageBox.Show("No se pudo detectar la ubicación.", "Prueba de ubicación", 
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                System.Windows.MessageBox.Show("No se pudo detectar la ubicación.", "Prueba de ubicación", 
+                    System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
             }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error testing location");
-            MessageBox.Show($"Error al probar ubicación:\n{ex.Message}", "ChronoGuard - Error", 
-                MessageBoxButton.OK, MessageBoxImage.Error);
+            System.Windows.MessageBox.Show($"Error al probar ubicación:\n{ex.Message}", "ChronoGuard - Error", 
+                System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
         }
     }
 
@@ -353,7 +355,7 @@ public partial class SettingsViewModel : ObservableObject
             var profiles = await _profileService.GetProfilesAsync();
             var activeProfile = await _profileService.GetActiveProfileAsync();
 
-            Application.Current.Dispatcher.Invoke(() =>
+            WpfApp.Current.Dispatcher.Invoke(() =>
             {
                 Profiles.Clear();
                 foreach (var profile in profiles)
@@ -376,7 +378,7 @@ public partial class SettingsViewModel : ObservableObject
         {
             var config = await _configurationService.GetConfigurationAsync();
 
-            Application.Current.Dispatcher.Invoke(() =>
+            WpfApp.Current.Dispatcher.Invoke(() =>
             {
                 Configuration = config;
 

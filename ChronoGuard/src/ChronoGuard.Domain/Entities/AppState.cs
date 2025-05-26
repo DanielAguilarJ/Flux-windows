@@ -83,6 +83,33 @@ public class AppState
         
         LastUpdate = DateTime.UtcNow;
     }
+    
+    /// <summary>
+    /// Gets the current color temperature (alias for CurrentTemperature)
+    /// </summary>
+    public int CurrentColorTemperature => CurrentTemperature?.Kelvin ?? ColorTemperature.DefaultDayKelvin;
+    
+    /// <summary>
+    /// Gets whether a transition is currently in progress
+    /// </summary>
+    public bool IsTransitioning => ActiveTransition != null;
+    
+    /// <summary>
+    /// Gets the time of the next scheduled transition
+    /// </summary>
+    public DateTime? NextTransitionTime
+    {
+        get
+        {
+            // Si hay una transición activa, devolver su tiempo de finalización
+            if (ActiveTransition != null)
+            {
+                return ActiveTransition.StartTime.Add(ActiveTransition.Duration);
+            }
+            
+            return null;
+        }
+    }
 }
 
 /// <summary>

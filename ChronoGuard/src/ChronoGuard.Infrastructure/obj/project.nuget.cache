@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "NAIt7VC9Qj8=",
+  "dgSpecHash": "1TXcOZvGqG8=",
   "success": true,
   "projectFilePath": "/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/ChronoGuard.Infrastructure.csproj",
   "expectedPackageFiles": [
@@ -17,9 +17,8 @@
     "/home/codespace/.nuget/packages/microsoft.extensions.options/8.0.0/microsoft.extensions.options.8.0.0.nupkg.sha512",
     "/home/codespace/.nuget/packages/microsoft.extensions.options.configurationextensions/8.0.0/microsoft.extensions.options.configurationextensions.8.0.0.nupkg.sha512",
     "/home/codespace/.nuget/packages/microsoft.extensions.primitives/8.0.0/microsoft.extensions.primitives.8.0.0.nupkg.sha512",
-    "/home/codespace/.nuget/packages/microsoft.netcore.platforms/3.0.0/microsoft.netcore.platforms.3.0.0.nupkg.sha512",
+    "/home/codespace/.nuget/packages/microsoft.netcore.platforms/1.1.1/microsoft.netcore.platforms.1.1.1.nupkg.sha512",
     "/home/codespace/.nuget/packages/microsoft.netcore.targets/1.1.0/microsoft.netcore.targets.1.1.0.nupkg.sha512",
-    "/home/codespace/.nuget/packages/microsoft.windows.sdk.contracts/10.0.22621.2428/microsoft.windows.sdk.contracts.10.0.22621.2428.nupkg.sha512",
     "/home/codespace/.nuget/packages/runtime.debian.8-x64.runtime.native.system.security.cryptography.openssl/4.3.2/runtime.debian.8-x64.runtime.native.system.security.cryptography.openssl.4.3.2.nupkg.sha512",
     "/home/codespace/.nuget/packages/runtime.fedora.23-x64.runtime.native.system.security.cryptography.openssl/4.3.2/runtime.fedora.23-x64.runtime.native.system.security.cryptography.openssl.4.3.2.nupkg.sha512",
     "/home/codespace/.nuget/packages/runtime.fedora.24-x64.runtime.native.system.security.cryptography.openssl/4.3.2/runtime.fedora.24-x64.runtime.native.system.security.cryptography.openssl.4.3.2.nupkg.sha512",
@@ -56,10 +55,7 @@
     "/home/codespace/.nuget/packages/system.runtime.extensions/4.3.0/system.runtime.extensions.4.3.0.nupkg.sha512",
     "/home/codespace/.nuget/packages/system.runtime.handles/4.3.0/system.runtime.handles.4.3.0.nupkg.sha512",
     "/home/codespace/.nuget/packages/system.runtime.interopservices/4.3.0/system.runtime.interopservices.4.3.0.nupkg.sha512",
-    "/home/codespace/.nuget/packages/system.runtime.interopservices.windowsruntime/4.3.0/system.runtime.interopservices.windowsruntime.4.3.0.nupkg.sha512",
     "/home/codespace/.nuget/packages/system.runtime.numerics/4.3.0/system.runtime.numerics.4.3.0.nupkg.sha512",
-    "/home/codespace/.nuget/packages/system.runtime.windowsruntime/4.6.0/system.runtime.windowsruntime.4.6.0.nupkg.sha512",
-    "/home/codespace/.nuget/packages/system.runtime.windowsruntime.ui.xaml/4.6.0/system.runtime.windowsruntime.ui.xaml.4.6.0.nupkg.sha512",
     "/home/codespace/.nuget/packages/system.security.cryptography.algorithms/4.3.0/system.security.cryptography.algorithms.4.3.0.nupkg.sha512",
     "/home/codespace/.nuget/packages/system.security.cryptography.cng/4.3.0/system.security.cryptography.cng.4.3.0.nupkg.sha512",
     "/home/codespace/.nuget/packages/system.security.cryptography.csp/4.3.0/system.security.cryptography.csp.4.3.0.nupkg.sha512",
@@ -71,7 +67,8 @@
     "/home/codespace/.nuget/packages/system.text.json/8.0.5/system.text.json.8.0.5.nupkg.sha512",
     "/home/codespace/.nuget/packages/system.threading/4.3.0/system.threading.4.3.0.nupkg.sha512",
     "/home/codespace/.nuget/packages/system.threading.tasks/4.3.0/system.threading.tasks.4.3.0.nupkg.sha512",
-    "/home/codespace/.nuget/packages/microsoft.windowsdesktop.app.ref/8.0.14/microsoft.windowsdesktop.app.ref.8.0.14.nupkg.sha512"
+    "/home/codespace/.nuget/packages/microsoft.windowsdesktop.app.ref/8.0.14/microsoft.windowsdesktop.app.ref.8.0.14.nupkg.sha512",
+    "/home/codespace/.nuget/packages/microsoft.windows.sdk.net.ref/10.0.22621.56/microsoft.windows.sdk.net.ref.10.0.22621.56.nupkg.sha512"
   ],
   "logs": []
 }

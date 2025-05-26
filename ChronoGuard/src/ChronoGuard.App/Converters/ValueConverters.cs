@@ -23,7 +23,10 @@ public class BooleanToColorConverter : IValueConverter
         
         try
         {
-            return (SolidColorBrush)new BrushConverter().ConvertFromString(colorString);
+            var brushObj = new BrushConverter().ConvertFromString(colorString);
+            if (brushObj is SolidColorBrush brush)
+                return brush;
+            return DependencyProperty.UnsetValue;
         }
         catch
         {

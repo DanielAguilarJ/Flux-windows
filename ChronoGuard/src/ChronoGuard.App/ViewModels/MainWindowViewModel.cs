@@ -6,6 +6,7 @@ using System.Windows;
 using ChronoGuard.Domain.Entities;
 using ChronoGuard.Domain.Interfaces;
 using ChronoGuard.Application.Services;
+using WpfApp = System.Windows.Application;
 
 namespace ChronoGuard.App.ViewModels;
 
@@ -119,6 +120,7 @@ public partial class MainWindowViewModel : ObservableObject
             _logger.LogError(ex, "Error resuming ChronoGuard");
             ShowErrorMessage("Error al reanudar ChronoGuard");
         }
+        return;
     }
 
     /// <summary>
@@ -178,8 +180,8 @@ Características:
 
 Más información: https://github.com/chronoguard/chronoguard";
 
-        MessageBox.Show(aboutText, "Acerca de ChronoGuard", 
-            MessageBoxButton.OK, MessageBoxImage.Information);
+        System.Windows.MessageBox.Show(aboutText, "Acerca de ChronoGuard", 
+            System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
     }
 
     /// <summary>
@@ -216,10 +218,10 @@ Más información: https://github.com/chronoguard/chronoguard";
     [RelayCommand]
     private void MinimizeToTray()
     {
-        if (Application.Current.MainWindow != null)
+        if (WpfApp.Current.MainWindow != null)
         {
-            Application.Current.MainWindow.WindowState = WindowState.Minimized;
-            Application.Current.MainWindow.ShowInTaskbar = false;
+            WpfApp.Current.MainWindow.WindowState = WindowState.Minimized;
+            WpfApp.Current.MainWindow.ShowInTaskbar = false;
         }
     }
 
@@ -229,7 +231,7 @@ Más información: https://github.com/chronoguard/chronoguard";
     [RelayCommand]
     private void ExitApplication()
     {
-        Application.Current.Shutdown();
+        WpfApp.Current.Shutdown();
     }
 
     private async Task InitializeAsync()
@@ -265,7 +267,7 @@ Más información: https://github.com/chronoguard/chronoguard";
 
     private void OnLocationChanged(object? sender, Location location)
     {
-        Application.Current.Dispatcher.Invoke(() =>
+        WpfApp.Current.Dispatcher.Invoke(() =>
         {
             UpdateLocationDisplay(location);
         });
@@ -273,7 +275,7 @@ Más información: https://github.com/chronoguard/chronoguard";
 
     private void OnActiveProfileChanged(object? sender, ColorProfile profile)
     {
-        Application.Current.Dispatcher.Invoke(() =>
+        WpfApp.Current.Dispatcher.Invoke(() =>
         {
             CurrentProfileName = profile.Name;
         });
@@ -281,7 +283,7 @@ Más información: https://github.com/chronoguard/chronoguard";
 
     private void OnBackgroundServiceStateChanged(object? sender, AppState state)
     {
-        Application.Current.Dispatcher.Invoke(() =>
+        WpfApp.Current.Dispatcher.Invoke(() =>
         {
             UpdateFromAppState(state);
         });
@@ -305,11 +307,8 @@ Más información: https://github.com/chronoguard/chronoguard";
         CurrentStatusText = state.IsPaused ? "Pausado" : "Activo";
         IsTransitioning = state.IsTransitioning;
         
-        if (state.CurrentColorTemperature != null)
-        {
-            CurrentColorTemperature = state.CurrentColorTemperature.Kelvin;
-            CurrentTemperatureText = $"{state.CurrentColorTemperature.Kelvin}K";
-        }
+        CurrentColorTemperature = state.CurrentColorTemperature;
+        CurrentTemperatureText = $"{state.CurrentColorTemperature}K";
 
         if (state.NextTransitionTime.HasValue)
         {
@@ -341,7 +340,7 @@ Más información: https://github.com/chronoguard/chronoguard";
 
     private static void ShowErrorMessage(string message)
     {
-        MessageBox.Show(message, "ChronoGuard - Error", 
-            MessageBoxButton.OK, MessageBoxImage.Error);
+        System.Windows.MessageBox.Show(message, "ChronoGuard - Error", 
+            System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
     }
 }

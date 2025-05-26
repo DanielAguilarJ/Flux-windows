@@ -23,6 +23,11 @@ public class ChronoGuardBackgroundService : BackgroundService
 
     public event EventHandler<AppState>? StateChanged;
 
+    /// <summary>
+    /// Gets the current application state
+    /// </summary>
+    public AppState CurrentState => _appState;
+
     public ChronoGuardBackgroundService(
         ILocationService locationService,
         ISolarCalculatorService solarCalculator,
@@ -118,7 +123,7 @@ public class ChronoGuardBackgroundService : BackgroundService
         }
     }
 
-    private async Task UpdateActiveTransitionAsync()
+    private Task UpdateActiveTransitionAsync()
     {
         try
         {
@@ -132,6 +137,7 @@ public class ChronoGuardBackgroundService : BackgroundService
         {
             _logger.LogError(ex, "Error updating active transition");
         }
+        return Task.CompletedTask;
     }
 
     private async Task UpdateLocationAsync()
@@ -242,9 +248,9 @@ public class ChronoGuardBackgroundService : BackgroundService
         };
     }
 
-    public async Task<AppState> GetCurrentStateAsync()
+    public Task<AppState> GetCurrentStateAsync()
     {
-        return _appState;
+        return Task.FromResult(_appState);
     }
 
     public async Task PauseAsync(TimeSpan? duration = null)

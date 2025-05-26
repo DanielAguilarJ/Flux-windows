@@ -194,7 +194,7 @@ public class ProfileService : IProfileService
     /// <summary>
     /// Creates built-in profiles if they don't exist
     /// </summary>
-    public async Task InitializeBuiltInProfilesAsync()
+    public Task InitializeBuiltInProfilesAsync()
     {
         var builtInProfiles = new[]
         {
@@ -210,16 +210,10 @@ public class ProfileService : IProfileService
                 if (!_profiles.ContainsKey(profile.Id))
                 {
                     _profiles[profile.Id] = profile;
-                    _logger.LogDebug("Initialized built-in profile: {ProfileName}", profile.Name);
                 }
             }
         }
-
-        // Set default active profile if none is set
-        if (_activeProfileId == null)
-        {
-            _activeProfileId = "classic";
-        }
+        return Task.CompletedTask;
     }
 
     /// <summary>

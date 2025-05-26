@@ -1,8 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Windows;
 using ChronoGuard.App;
+// using ChronoGuard.App.Services;
+using ChronoGuard.App.ViewModels;
 using ChronoGuard.Domain.Interfaces;
 using ChronoGuard.Infrastructure.Services;
 using ChronoGuard.Application.Services;
@@ -38,9 +41,8 @@ public static class Program
             var logger = LoggerFactory.Create(builder => builder.AddConsole())
                 .CreateLogger<App>();
             logger.LogCritical(ex, "Application failed to start");
-            
-            MessageBox.Show($"Error fatal al iniciar ChronoGuard:\n{ex.Message}", 
-                "ChronoGuard - Error", MessageBoxButton.OK, MessageBoxImage.Error);
+              System.Windows.MessageBox.Show($"Error fatal al iniciar ChronoGuard:\n{ex.Message}", 
+                "ChronoGuard - Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
         }
     }
 
@@ -53,7 +55,7 @@ public static class Program
                 {
                     builder.AddConsole();
                     builder.AddDebug();
-                    builder.SetMinimumLevel(LogLevel.Information);
+                    builder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Information);
                 });
 
                 // Register HTTP client
@@ -64,10 +66,9 @@ public static class Program
                 services.AddSingleton<ISolarCalculatorService, SolarCalculatorService>();
                 services.AddSingleton<IColorTemperatureService, WindowsColorTemperatureService>();
                 services.AddSingleton<IProfileService, ProfileService>();
-                services.AddSingleton<IConfigurationService, ConfigurationService>();
-
-                // Register application services
-                services.AddSingleton<ChronoGuardBackgroundService>();                // Register ViewModels
+                services.AddSingleton<IConfigurationService, ConfigurationService>();                // Register application services
+                services.AddSingleton<ChronoGuardBackgroundService>();
+                // services.AddSingleton<SystemTrayService>();// Register ViewModels
                 services.AddTransient<MainWindowViewModel>();
                 services.AddTransient<SettingsViewModel>();
 
