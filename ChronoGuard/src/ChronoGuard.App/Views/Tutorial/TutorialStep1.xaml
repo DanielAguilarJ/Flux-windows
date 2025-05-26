@@ -1,0 +1,10 @@
+<Page x:Class="ChronoGuard.App.Views.Tutorial.TutorialStep1"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="TutorialStep1">
+    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="420">
+        <TextBlock Text="¡Bienvenido al tutorial interactivo de ChronoGuard!" FontSize="22" FontWeight="Bold" Margin="0,0,0,16"/>
+        <TextBlock Text="Aquí aprenderás a usar las funciones principales de la aplicación." Margin="0,0,0,12"/>
+        <Button Content="Siguiente" Click="Next_Click" Width="120" HorizontalAlignment="Right"/>
+    </StackPanel>
+</Page>

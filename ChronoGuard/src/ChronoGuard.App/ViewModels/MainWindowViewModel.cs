@@ -7,6 +7,7 @@ using ChronoGuard.Domain.Entities;
 using ChronoGuard.Domain.Interfaces;
 using ChronoGuard.Application.Services;
 using WpfApp = System.Windows.Application;
+using ChronoGuard.App.Views.Tutorial;
 
 namespace ChronoGuard.App.ViewModels;
 
@@ -232,6 +233,16 @@ Más información: https://github.com/chronoguard/chronoguard";
     private void ExitApplication()
     {
         WpfApp.Current.Shutdown();
+    }
+
+    /// <summary>
+    /// Shows the interactive tutorial
+    /// </summary>
+    [RelayCommand]
+    private void ShowTutorial()
+    {
+        var tutorial = new TutorialWindow();
+        tutorial.ShowDialog();
     }
 
     private async Task InitializeAsync()

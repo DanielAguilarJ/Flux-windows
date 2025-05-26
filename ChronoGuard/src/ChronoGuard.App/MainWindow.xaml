@@ -221,15 +221,26 @@
             <Button Content="⏸️ Pausar" 
                     Style="{StaticResource ActionButtonStyle}"
                     Command="{Binding PauseCommand}"
+                    ToolTip="Pausa temporalmente el filtro de luz azul (Ctrl+Alt+F)"
                     Visibility="{Binding PauseButtonVisibility}"/>
             <Button Content="▶️ Reanudar" 
                     Style="{StaticResource ActionButtonStyle}"
                     Command="{Binding ResumeCommand}"
+                    ToolTip="Reanuda el filtro de luz azul"
                     Visibility="{Binding ResumeButtonVisibility}"
                     Background="#27AE60"/>
             <Button Content="❌ Salir" 
                     Style="{StaticResource SecondaryButtonStyle}"
-                    Command="{Binding ExitApplicationCommand}"/>
+                    Command="{Binding ExitApplicationCommand}"
+                    ToolTip="Cierra ChronoGuard completamente"/>
         </StackPanel>
+        
+        <!-- Menu -->
+        <Menu VerticalAlignment="Top" Height="24">
+            <MenuItem Header="Ayuda">
+                <MenuItem Header="Ver tutorial interactivo" Command="{Binding ShowTutorialCommand}"/>
+                <MenuItem Header="Acerca de" Command="{Binding ShowAboutCommand}"/>
+            </MenuItem>
+        </Menu>
     </Grid>
 </Window>

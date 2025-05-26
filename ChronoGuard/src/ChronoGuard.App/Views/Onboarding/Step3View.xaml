@@ -1,0 +1,24 @@
+<UserControl x:Class="ChronoGuard.App.Views.Onboarding.Step3View"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="400" d:DesignWidth="600">
+    <Grid>
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="420">
+            <TextBlock Text="Elige tu perfil inicial" FontSize="22" FontWeight="Bold" Margin="0,0,0,16"/>
+            <TextBlock Text="Selecciona uno de los perfiles recomendados. Puedes cambiarlo después en la configuración." TextWrapping="Wrap" Margin="0,0,0,12"/>
+            <ComboBox Width="300" Margin="0,0,0,8">
+                <ComboBoxItem Content="Clásico (Día: 6500K, Noche: 2700K)"/>
+                <ComboBoxItem Content="Trabajo Nocturno (Día: 3000K, Noche: 1900K)"/>
+                <ComboBoxItem Content="Multimedia (Colores más neutros)"/>
+            </ComboBox>
+            <TextBlock Text="Puedes cambiar esto después." FontStyle="Italic" Margin="0,8,0,0"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,24,0,0">
+                <Button Content="Atrás" Command="{Binding BackCommand}" Width="100" Margin="0,0,8,0"/>
+                <Button Content="Siguiente" Command="{Binding NextCommand}" Width="120"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

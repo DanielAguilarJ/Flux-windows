@@ -1,0 +1,8 @@
+<Window x:Class="ChronoGuard.App.Views.Tutorial.TutorialWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Tutorial Interactivo ChronoGuard" Height="480" Width="600" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Frame x:Name="TutorialFrame" NavigationUIVisibility="Hidden"/>
+    </Grid>
+</Window>

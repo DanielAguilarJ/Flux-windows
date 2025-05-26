@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -56,6 +57,15 @@ public partial class App : System.Windows.Application
             }
             
             mainWindow.Show();
+
+            // Onboarding for first-time users
+            string configPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ChronoGuard", "config.json");
+            bool isFirstRun = !File.Exists(configPath);
+            if (isFirstRun)
+            {
+                var onboarding = new OnboardingWindow();
+                onboarding.ShowDialog();
+            }
 
             _logger?.LogInformation("ChronoGuard application started successfully");
         }

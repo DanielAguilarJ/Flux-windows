@@ -1,0 +1,9 @@
+<Page x:Class="ChronoGuard.App.Views.Tutorial.TutorialStep3"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="TutorialStep3">
+    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="420">
+        <TextBlock Text="Accede a la configuración avanzada y perfiles desde el menú ⚙️ Configuración." Margin="0,0,0,12"/>
+        <Button Content="Finalizar" Click="Finish_Click" Width="120" HorizontalAlignment="Right"/>
+    </StackPanel>
+</Page>

@@ -1,0 +1,22 @@
+<UserControl x:Class="ChronoGuard.App.Views.Onboarding.Step2View"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="400" d:DesignWidth="600">
+    <Grid>
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="420">
+            <TextBlock Text="Configuración de Ubicación" FontSize="22" FontWeight="Bold" Margin="0,0,0,16"/>
+            <TextBlock Text="ChronoGuard necesita tu ubicación para calcular los horarios de luz natural y proteger tu ritmo circadiano." TextWrapping="Wrap" Margin="0,0,0,12"/>
+            <RadioButton Content="Detectar automáticamente (recomendado)" GroupName="Location" Margin="0,0,0,8"/>
+            <RadioButton Content="Configurar manualmente" GroupName="Location" Margin="0,0,0,8"/>
+            <TextBox Width="200" Margin="0,0,0,8" PlaceholderText="Ciudad o coordenadas"/>
+            <CheckBox Content="Recordar mi elección"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,24,0,0">
+                <Button Content="Atrás" Command="{Binding BackCommand}" Width="100" Margin="0,0,8,0"/>
+                <Button Content="Siguiente" Command="{Binding NextCommand}" Width="120"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>
