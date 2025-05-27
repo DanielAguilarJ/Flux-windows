@@ -1,4 +1,5 @@
 using ChronoGuard.Domain.Interfaces;
+using ChronoGuard.Domain.Configuration;
 using Microsoft.Extensions.Logging;
 using System.IO;
 using System.Text.Json;
@@ -194,7 +195,8 @@ public class ConfigurationService : IConfigurationService
                 TransitionUpdateIntervalMs = 30000,
                 UseHardwareAcceleration = true,
                 LogLevel = LogLevel.Information
-            }
+            },
+            Performance = new PerformanceSettings()
         };
     }
 
@@ -240,6 +242,24 @@ public class ConfigurationService : IConfigurationService
                 TransitionUpdateIntervalMs = loaded.Advanced?.TransitionUpdateIntervalMs ?? defaults.Advanced.TransitionUpdateIntervalMs,
                 UseHardwareAcceleration = loaded.Advanced?.UseHardwareAcceleration ?? defaults.Advanced.UseHardwareAcceleration,
                 LogLevel = loaded.Advanced?.LogLevel ?? defaults.Advanced.LogLevel
+            },
+            Performance = new PerformanceSettings
+            {
+                CurrentPerformanceLevel = loaded.Performance?.CurrentPerformanceLevel ?? defaults.Performance.CurrentPerformanceLevel,
+                UpdateIntervalMs = loaded.Performance?.UpdateIntervalMs ?? defaults.Performance.UpdateIntervalMs,
+                TransitionSmoothness = loaded.Performance?.TransitionSmoothness ?? defaults.Performance.TransitionSmoothness,
+                EnableAutoOptimization = loaded.Performance?.EnableAutoOptimization ?? defaults.Performance.EnableAutoOptimization,
+                EnableMonitoring = loaded.Performance?.EnableMonitoring ?? defaults.Performance.EnableMonitoring,
+                MonitoringIntervalSeconds = loaded.Performance?.MonitoringIntervalSeconds ?? defaults.Performance.MonitoringIntervalSeconds,
+                CpuAlertThreshold = loaded.Performance?.CpuAlertThreshold ?? defaults.Performance.CpuAlertThreshold,
+                MemoryAlertThreshold = loaded.Performance?.MemoryAlertThreshold ?? defaults.Performance.MemoryAlertThreshold,
+                GpuAlertThreshold = loaded.Performance?.GpuAlertThreshold ?? defaults.Performance.GpuAlertThreshold,
+                ColorAdjustmentThreshold = loaded.Performance?.ColorAdjustmentThreshold ?? defaults.Performance.ColorAdjustmentThreshold,
+                MaxHistoryEntries = loaded.Performance?.MaxHistoryEntries ?? defaults.Performance.MaxHistoryEntries,
+                AdjustmentCooldownMinutes = loaded.Performance?.AdjustmentCooldownMinutes ?? defaults.Performance.AdjustmentCooldownMinutes,
+                EnableGpuMonitoring = loaded.Performance?.EnableGpuMonitoring ?? defaults.Performance.EnableGpuMonitoring,
+                EnableProcessMonitoring = loaded.Performance?.EnableProcessMonitoring ?? defaults.Performance.EnableProcessMonitoring,
+                EnableAlerts = loaded.Performance?.EnableAlerts ?? defaults.Performance.EnableAlerts
             },
             LastModified = loaded.LastModified
         };

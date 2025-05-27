@@ -1,3 +1,5 @@
+using ChronoGuard.Domain.Configuration;
+
 namespace ChronoGuard.Domain.Interfaces;
 
 /// <summary>
@@ -45,6 +47,7 @@ public class AppConfiguration
     public LocationSettings Location { get; set; } = new();
     public NotificationSettings Notifications { get; set; } = new();
     public AdvancedSettings Advanced { get; set; } = new();
+    public PerformanceSettings Performance { get; set; } = new();
     public DateTime LastModified { get; set; } = DateTime.UtcNow;
 }
 

@@ -43,6 +43,11 @@ public interface IColorTemperatureService
     Task<IEnumerable<MonitorInfo>> GetMonitorsAsync();
 
     /// <summary>
+    /// Gets extended information about available monitors with advanced capabilities
+    /// </summary>
+    Task<IEnumerable<ExtendedMonitorInfo>> GetExtendedMonitorsAsync();
+
+    /// <summary>
     /// Event raised when color temperature changes
     /// </summary>
     event EventHandler<ColorTemperature>? TemperatureChanged;
@@ -64,4 +69,21 @@ public class MonitorInfo
     public int Width { get; set; }
     public int Height { get; set; }
     public string DevicePath { get; set; } = string.Empty;
+}
+
+/// <summary>
+/// Extended monitor information with advanced capabilities
+/// </summary>
+public class ExtendedMonitorInfo : MonitorInfo
+{
+    public string ManufacturerName { get; set; } = string.Empty;
+    public string ModelName { get; set; } = string.Empty;
+    public bool SupportsHardwareGamma { get; set; } = true;
+    public bool SupportsICCProfiles { get; set; } = false;
+    public bool SupportsDDCCI { get; set; } = false;
+    public int BitDepth { get; set; } = 8;
+    public double MaxLuminance { get; set; } = 250.0; // cd/m²
+    public string ColorGamut { get; set; } = "sRGB";
+    public DateTime LastCalibrationDate { get; set; } = DateTime.MinValue;
+    public string? ICCProfilePath { get; set; }
 }

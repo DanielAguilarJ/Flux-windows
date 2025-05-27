@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Application/ChronoGuard.Application.csproj": {}
+    "/Users/msc/Documents/GitHub/Flux-windows/ChronoGuard/src/ChronoGuard.Application/ChronoGuard.Application.csproj": {}
   },
   "projects": {
-    "/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Application/ChronoGuard.Application.csproj": {
+    "/Users/msc/Documents/GitHub/Flux-windows/ChronoGuard/src/ChronoGuard.Application/ChronoGuard.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Application/ChronoGuard.Application.csproj",
+        "projectUniqueName": "/Users/msc/Documents/GitHub/Flux-windows/ChronoGuard/src/ChronoGuard.Application/ChronoGuard.Application.csproj",
         "projectName": "ChronoGuard.Application",
-        "projectPath": "/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Application/ChronoGuard.Application.csproj",
-        "packagesPath": "/home/codespace/.nuget/packages/",
-        "outputPath": "/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Application/obj/",
+        "projectPath": "/Users/msc/Documents/GitHub/Flux-windows/ChronoGuard/src/ChronoGuard.Application/ChronoGuard.Application.csproj",
+        "packagesPath": "/Users/msc/.nuget/packages/",
+        "outputPath": "/Users/msc/Documents/GitHub/Flux-windows/ChronoGuard/src/ChronoGuard.Application/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/codespace/.nuget/NuGet/NuGet.Config"
+          "/Users/msc/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0-windows10.0.22621.0"
@@ -26,11 +26,11 @@
           "net8.0-windows10.0.22621": {
             "targetAlias": "net8.0-windows10.0.22621.0",
             "projectReferences": {
-              "/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Domain/ChronoGuard.Domain.csproj": {
-                "projectPath": "/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Domain/ChronoGuard.Domain.csproj"
+              "/Users/msc/Documents/GitHub/Flux-windows/ChronoGuard/src/ChronoGuard.Domain/ChronoGuard.Domain.csproj": {
+                "projectPath": "/Users/msc/Documents/GitHub/Flux-windows/ChronoGuard/src/ChronoGuard.Domain/ChronoGuard.Domain.csproj"
               },
-              "/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/ChronoGuard.Infrastructure.csproj": {
-                "projectPath": "/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/ChronoGuard.Infrastructure.csproj"
+              "/Users/msc/Documents/GitHub/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/ChronoGuard.Infrastructure.csproj": {
+                "projectPath": "/Users/msc/Documents/GitHub/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/ChronoGuard.Infrastructure.csproj"
               }
             }
           }
@@ -44,7 +44,8 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0-windows10.0.22621": {
@@ -80,40 +81,48 @@
           "warn": true,
           "downloadDependencies": [
             {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.16, 8.0.16]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.16, 8.0.16]"
+            },
+            {
               "name": "Microsoft.Windows.SDK.NET.Ref",
-              "version": "[10.0.22621.56, 10.0.22621.56]"
+              "version": "[10.0.22621.57, 10.0.22621.57]"
             },
             {
               "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[8.0.14, 8.0.14]"
+              "version": "[8.0.16, 8.0.16]"
             }
           ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             },
-            "Microsoft.Windows.SDK.NET.Ref": {
+            "Microsoft.Windows.SDK.NET.Ref.Windows": {
               "privateAssets": "all"
             },
             "Microsoft.WindowsDesktop.App.WindowsForms": {
               "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.407/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.300/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Domain/ChronoGuard.Domain.csproj": {
+    "/Users/msc/Documents/GitHub/Flux-windows/ChronoGuard/src/ChronoGuard.Domain/ChronoGuard.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Domain/ChronoGuard.Domain.csproj",
+        "projectUniqueName": "/Users/msc/Documents/GitHub/Flux-windows/ChronoGuard/src/ChronoGuard.Domain/ChronoGuard.Domain.csproj",
         "projectName": "ChronoGuard.Domain",
-        "projectPath": "/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Domain/ChronoGuard.Domain.csproj",
-        "packagesPath": "/home/codespace/.nuget/packages/",
-        "outputPath": "/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Domain/obj/",
+        "projectPath": "/Users/msc/Documents/GitHub/Flux-windows/ChronoGuard/src/ChronoGuard.Domain/ChronoGuard.Domain.csproj",
+        "packagesPath": "/Users/msc/.nuget/packages/",
+        "outputPath": "/Users/msc/Documents/GitHub/Flux-windows/ChronoGuard/src/ChronoGuard.Domain/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/codespace/.nuget/NuGet/NuGet.Config"
+          "/Users/msc/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -136,7 +145,8 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0": {
@@ -152,26 +162,36 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.16, 8.0.16]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.16, 8.0.16]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.407/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.300/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/ChronoGuard.Infrastructure.csproj": {
+    "/Users/msc/Documents/GitHub/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/ChronoGuard.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/ChronoGuard.Infrastructure.csproj",
+        "projectUniqueName": "/Users/msc/Documents/GitHub/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/ChronoGuard.Infrastructure.csproj",
         "projectName": "ChronoGuard.Infrastructure",
-        "projectPath": "/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/ChronoGuard.Infrastructure.csproj",
-        "packagesPath": "/home/codespace/.nuget/packages/",
-        "outputPath": "/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/obj/",
+        "projectPath": "/Users/msc/Documents/GitHub/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/ChronoGuard.Infrastructure.csproj",
+        "packagesPath": "/Users/msc/.nuget/packages/",
+        "outputPath": "/Users/msc/Documents/GitHub/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/codespace/.nuget/NuGet/NuGet.Config"
+          "/Users/msc/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0-windows10.0.22621.0"
@@ -183,8 +203,8 @@
           "net8.0-windows10.0.22621": {
             "targetAlias": "net8.0-windows10.0.22621.0",
             "projectReferences": {
-              "/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Domain/ChronoGuard.Domain.csproj": {
-                "projectPath": "/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Domain/ChronoGuard.Domain.csproj"
+              "/Users/msc/Documents/GitHub/Flux-windows/ChronoGuard/src/ChronoGuard.Domain/ChronoGuard.Domain.csproj": {
+                "projectPath": "/Users/msc/Documents/GitHub/Flux-windows/ChronoGuard/src/ChronoGuard.Domain/ChronoGuard.Domain.csproj"
               }
             }
           }
@@ -198,7 +218,8 @@
           "enableAudit": "true",
           "auditLevel": "low",
           "auditMode": "direct"
-        }
+        },
+        "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
         "net8.0-windows10.0.22621": {
@@ -213,6 +234,10 @@
               "version": "[8.0.0, )"
             },
             "Microsoft.Extensions.Logging.Abstractions": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "System.Management": {
               "target": "Package",
               "version": "[8.0.0, )"
             },
@@ -238,26 +263,34 @@
           "warn": true,
           "downloadDependencies": [
             {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.16, 8.0.16]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.16, 8.0.16]"
+            },
+            {
               "name": "Microsoft.Windows.SDK.NET.Ref",
-              "version": "[10.0.22621.56, 10.0.22621.56]"
+              "version": "[10.0.22621.57, 10.0.22621.57]"
             },
             {
               "name": "Microsoft.WindowsDesktop.App.Ref",
-              "version": "[8.0.14, 8.0.14]"
+              "version": "[8.0.16, 8.0.16]"
             }
           ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             },
-            "Microsoft.Windows.SDK.NET.Ref": {
+            "Microsoft.Windows.SDK.NET.Ref.Windows": {
               "privateAssets": "all"
             },
             "Microsoft.WindowsDesktop.App.WindowsForms": {
               "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.407/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.300/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

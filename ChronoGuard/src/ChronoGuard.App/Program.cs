@@ -62,16 +62,17 @@ public static class Program
                 services.AddSingleton<IColorTemperatureService, WindowsColorTemperatureService>();
                 services.AddSingleton<IProfileService, ChronoGuard.Infrastructure.Services.ProfileService>();
                 services.AddSingleton<IConfigurationService, ConfigurationService>();
-                services.AddSingleton<INotificationService, NotificationService>();
-                services.AddSingleton<IStartupManager, StartupManager>();
+                services.AddSingleton<INotificationService, NotificationService>();                services.AddSingleton<IStartupManager, StartupManager>();
                 services.AddSingleton<IForegroundApplicationService, ChronoGuard.Infrastructure.Services.WindowsForegroundApplicationService>();
-                  // Register application services
+                services.AddSingleton<IPerformanceMonitoringService, ChronoGuard.Infrastructure.Services.PerformanceMonitoringService>();
+                
+                // Register application services
                 services.AddSingleton<ChronoGuardBackgroundService>();
                 services.AddSingleton<SystemTrayService>();
-                
-                // Register ViewModels
+                  // Register ViewModels
                 services.AddTransient<MainWindowViewModel>();
                 services.AddTransient<SettingsViewModel>();
+                services.AddTransient<PerformanceMonitoringViewModel>();
 
                 // Register Windows
                 services.AddTransient<MainWindow>();
