@@ -5,65 +5,150 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="ChronoGuard" 
-        Height="500" 
-        Width="400"
-        MinHeight="450"
-        MinWidth="380"
+        Height="900" 
+        Width="1400"
+        MinHeight="800"
+        MinWidth="1200"
         ResizeMode="CanResize"
         WindowStartupLocation="CenterScreen"
-        Icon="Assets/chronoguard.ico">
+        Icon="Assets/chronoguard.ico"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent">
     
     <Window.Resources>
-        <!-- Gradients for temperature visualization -->
-        <LinearGradientBrush x:Key="WarmGradient" StartPoint="0,0" EndPoint="1,0">
-            <GradientStop Color="#FF6B47" Offset="0"/>
-            <GradientStop Color="#FFA500" Offset="1"/>
+        <!-- Modern Color Palette -->
+        <SolidColorBrush x:Key="PrimaryBrush" Color="#667EEA"/>
+        <SolidColorBrush x:Key="SecondaryBrush" Color="#764BA2"/>
+        <SolidColorBrush x:Key="AccentBrush" Color="#F093FB"/>
+        <SolidColorBrush x:Key="SurfaceBrush" Color="#1E1E2E"/>
+        <SolidColorBrush x:Key="OnSurfaceBrush" Color="#CDD6F4"/>
+        <SolidColorBrush x:Key="CardBrush" Color="#313244"/>
+        <SolidColorBrush x:Key="SuccessBrush" Color="#A6E3A1"/>
+        <SolidColorBrush x:Key="WarningBrush" Color="#F9E2AF"/>
+        <SolidColorBrush x:Key="ErrorBrush" Color="#F38BA8"/>
+        
+        <!-- Modern Gradients -->
+        <LinearGradientBrush x:Key="WindowGradient" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#1E1E2E" Offset="0"/>
+            <GradientStop Color="#181825" Offset="0.5"/>
+            <GradientStop Color="#11111B" Offset="1"/>
         </LinearGradientBrush>
         
-        <LinearGradientBrush x:Key="CoolGradient" StartPoint="0,0" EndPoint="1,0">
-            <GradientStop Color="#87CEEB" Offset="0"/>
+        <LinearGradientBrush x:Key="CardGradient" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#313244" Offset="0"/>
+            <GradientStop Color="#292A3A" Offset="1"/>
+        </LinearGradientBrush>
+        
+        <LinearGradientBrush x:Key="PrimaryGradient" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Color="#667EEA" Offset="0"/>
+            <GradientStop Color="#764BA2" Offset="1"/>
+        </LinearGradientBrush>
+        
+        <LinearGradientBrush x:Key="AccentGradient" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Color="#F093FB" Offset="0"/>
+            <GradientStop Color="#F5576C" Offset="1"/>
+        </LinearGradientBrush>
+        
+        <LinearGradientBrush x:Key="TemperatureGradient" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Color="#FF6B47" Offset="0"/>
+            <GradientStop Color="#FFA500" Offset="0.25"/>
+            <GradientStop Color="#FFD700" Offset="0.5"/>
+            <GradientStop Color="#87CEEB" Offset="0.75"/>
             <GradientStop Color="#4169E1" Offset="1"/>
         </LinearGradientBrush>
         
-        <!-- Styles -->
-        <Style x:Key="HeaderTextStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="24"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Foreground" Value="#2C3E50"/>
-            <Setter Property="HorizontalAlignment" Value="Center"/>
-            <Setter Property="Margin" Value="0,10"/>
+        <!-- Glassmorphism Effect -->
+        <Style x:Key="GlassCard" TargetType="Border">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <SolidColorBrush Color="#40313244" />
+                </Setter.Value>
+            </Setter>
+            <Setter Property="BorderBrush" Value="#30FFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="#000000" BlurRadius="20" Opacity="0.3" ShadowDepth="0"/>
+                </Setter.Value>
+            </Setter>
         </Style>
         
-        <Style x:Key="StatusTextStyle" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Foreground" Value="#34495E"/>
-            <Setter Property="HorizontalAlignment" Value="Center"/>
-            <Setter Property="Margin" Value="0,5"/>
-        </Style>
-        
-        <Style x:Key="ActionButtonStyle" TargetType="Button">
-            <Setter Property="Padding" Value="20,10"/>
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="FontSize" Value="14"/>
+        <!-- Modern Typography -->
+        <Style x:Key="HeadingLarge" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI Variable Display"/>
+            <Setter Property="FontSize" Value="32"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Background" Value="#3498DB"/>
+            <Setter Property="Foreground" Value="{StaticResource OnSurfaceBrush}"/>
+        </Style>
+        
+        <Style x:Key="HeadingMedium" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI Variable Display"/>
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Foreground" Value="{StaticResource OnSurfaceBrush}"/>
+        </Style>
+        
+        <Style x:Key="HeadingSmall" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI Variable Display"/>
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Foreground" Value="{StaticResource OnSurfaceBrush}"/>
+        </Style>
+        
+        <Style x:Key="BodyText" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI Variable Text"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="Foreground" Value="#B4BEFE"/>
+        </Style>
+        
+        <Style x:Key="CaptionText" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI Variable Text"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="Foreground" Value="#9399B2"/>
+        </Style>
+        
+        <!-- Modern Button Styles -->
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource PrimaryGradient}"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="24,12"/>
+            <Setter Property="FontFamily" Value="Segoe UI Variable Display"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Medium"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border Background="{TemplateBinding Background}" 
-                                CornerRadius="5"
+                                CornerRadius="8"
                                 Padding="{TemplateBinding Padding}">
+                            <Border.Effect>
+                                <DropShadowEffect Color="#667EEA" BlurRadius="16" Opacity="0.4" ShadowDepth="0"/>
+                            </Border.Effect>
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#2980B9"/>
+                                <Setter Property="Background">
+                                    <Setter.Value>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                            <GradientStop Color="#7B8EF7" Offset="0"/>
+                                            <GradientStop Color="#8558B7" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Background" Value="#21618C"/>
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.98" ScaleY="0.98"/>
+                                    </Setter.Value>
+                                </Setter>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -71,176 +156,305 @@
             </Setter>
         </Style>
         
-        <Style x:Key="SecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource ActionButtonStyle}">
-            <Setter Property="Background" Value="#95A5A6"/>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#7F8C8D"/>
-                </Trigger>
-                <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Background" Value="#6C7B7D"/>
-                </Trigger>
-            </Style.Triggers>
+        <Style x:Key="SecondaryButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{StaticResource OnSurfaceBrush}"/>
+            <Setter Property="BorderBrush" Value="#30FFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="20,10"/>
+            <Setter Property="FontFamily" Value="Segoe UI Variable Display"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#20FFFFFF"/>
+                                <Setter Property="BorderBrush" Value="#50FFFFFF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#10FFFFFF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
+        
+        <!-- Status Indicator Animation -->
+        <Storyboard x:Key="PulseAnimation" RepeatBehavior="Forever">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity">
+                <EasingDoubleKeyFrame KeyTime="0:0:0" Value="1"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:1" Value="0.5"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:2" Value="1"/>
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
     </Window.Resources>
     
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <!-- Main Window Container -->
+    <Border Background="{StaticResource WindowGradient}" CornerRadius="16">
+        <Border.Effect>
+            <DropShadowEffect Color="#000000" BlurRadius="32" Opacity="0.5" ShadowDepth="0"/>
+        </Border.Effect>
         
-        <!-- Header -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
-            <Image Source="Assets/chronoguard-32.png" Width="32" Height="32" Margin="0,0,10,0"/>
-            <TextBlock Text="ChronoGuard" Style="{StaticResource HeaderTextStyle}"/>
-        </StackPanel>
-        
-        <!-- Status Section -->
-        <Border Grid.Row="1" Background="#ECF0F1" CornerRadius="10" Padding="20" Margin="0,0,0,20">
-            <StackPanel>
-                <!-- Main Status -->
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,15">
-                    <Ellipse Width="12" Height="12" VerticalAlignment="Center" Margin="0,0,8,0">
-                        <Ellipse.Fill>
-                            <SolidColorBrush Color="{Binding IsActive, Converter={StaticResource BooleanToColorConverter}, ConverterParameter='Green|Red'}"/>
-                        </Ellipse.Fill>
-                    </Ellipse>
-                    <TextBlock Text="{Binding CurrentStatusText}" 
-                               FontSize="16" 
-                               FontWeight="SemiBold"
-                               Foreground="{Binding IsActive, Converter={StaticResource BooleanToColorConverter}, ConverterParameter='#27AE60|#E74C3C'}"/>
-                </StackPanel>
-                
-                <!-- Temperature Display -->
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
-                    <TextBlock Text="Temperatura actual: " Style="{StaticResource StatusTextStyle}"/>
-                    <TextBlock Text="{Binding CurrentTemperatureText}" 
-                               Style="{StaticResource StatusTextStyle}"
-                               FontWeight="Bold"/>
-                </StackPanel>
-                
-                <!-- Temperature Slider Visualization -->
-                <Grid Margin="0,10">
-                    <Rectangle Height="6" RadiusX="3" RadiusY="3">
-                        <Rectangle.Fill>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                <GradientStop Color="#FF6B47" Offset="0"/>
-                                <GradientStop Color="#FFA500" Offset="0.3"/>
-                                <GradientStop Color="#FFFFFF" Offset="0.6"/>
-                                <GradientStop Color="#87CEEB" Offset="0.8"/>
-                                <GradientStop Color="#4169E1" Offset="1"/>
-                            </LinearGradientBrush>
-                        </Rectangle.Fill>
-                    </Rectangle>
-                    <Ellipse Width="12" Height="12" Fill="#2C3E50" 
-                             HorizontalAlignment="Left"
-                             Margin="{Binding CurrentColorTemperature, Converter={StaticResource TemperatureToMarginConverter}}"/>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <!-- Title Bar -->
+            <Border Grid.Row="0" Background="Transparent" Height="40" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <Grid>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,0">
+                        <Ellipse Width="12" Height="12" Fill="{StaticResource SuccessBrush}" Margin="0,0,12,0">
+                            <Ellipse.Triggers>
+                                <EventTrigger RoutedEvent="Loaded">
+                                    <BeginStoryboard Storyboard="{StaticResource PulseAnimation}"/>
+                                </EventTrigger>
+                            </Ellipse.Triggers>
+                        </Ellipse>
+                        <TextBlock Text="ChronoGuard" Style="{StaticResource HeadingSmall}"/>
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,20,0">
+                        <Button Content="−" Style="{StaticResource SecondaryButton}" 
+                                Width="30" Height="30" Padding="0" 
+                                Click="MinimizeButton_Click" Margin="5,0"/>
+                        <Button Content="🗖" Style="{StaticResource SecondaryButton}" 
+                                Width="30" Height="30" Padding="0" 
+                                Click="MaximizeButton_Click" Margin="5,0"/>
+                        <Button Content="✕" Style="{StaticResource SecondaryButton}" 
+                                Width="30" Height="30" Padding="0" 
+                                Click="CloseButton_Click" Margin="5,0"/>
+                    </StackPanel>
                 </Grid>
+            </Border>
+            
+            <!-- Main Content -->
+            <Grid Grid.Row="1" Margin="32">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="400"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
                 
-                <TextBlock Text="{Binding NextTransitionText}" 
-                           Style="{StaticResource StatusTextStyle}"
-                           FontStyle="Italic"
-                           Visibility="{Binding NextTransitionText, Converter={StaticResource StringToVisibilityConverter}}"/>
-            </StackPanel>
-        </Border>
-        
-        <!-- Information Section -->
-        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
-            <StackPanel>
-                <!-- Location Info -->
-                <Border Background="#F8F9FA" CornerRadius="8" Padding="15" Margin="0,0,0,10">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                            <Path Data="M12,2C8.13,2 5,5.13 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9C19,5.13 15.87,2 12,2M12,6A3,3 0 0,1 15,9A3,3 0 0,1 12,12A3,3 0 0,1 9,9A3,3 0 0,1 12,6Z" 
-                                  Fill="#7F8C8D" 
-                                  Width="16" 
-                                  Height="16" 
-                                  Stretch="Uniform"
-                                  Margin="0,0,8,0"/>
-                            <TextBlock Text="Ubicación" FontWeight="SemiBold" Foreground="#2C3E50"/>
+                <!-- Left Panel - Main Status -->
+                <StackPanel Grid.Column="0">
+                    <!-- Hero Card -->
+                    <Border Style="{StaticResource GlassCard}" Padding="32" Margin="0,0,0,24">
+                        <StackPanel>
+                            <!-- Status Header -->
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,24">
+                                <Ellipse Width="16" Height="16" VerticalAlignment="Center" Margin="0,0,12,0">
+                                    <Ellipse.Fill>
+                                        <SolidColorBrush Color="#A6E3A1"/>
+                                    </Ellipse.Fill>
+                                </Ellipse>
+                                <TextBlock Text="Filtro Activo" Style="{StaticResource HeadingMedium}"/>
+                            </StackPanel>
+                            
+                            <!-- Temperature Display -->
+                            <Grid Margin="0,0,0,24">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                
+                                <TextBlock Grid.Row="0" Text="Temperatura de Color" Style="{StaticResource CaptionText}" Margin="0,0,0,8"/>
+                                
+                                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <TextBlock Text="3200" Style="{StaticResource HeadingLarge}"/>
+                                    <TextBlock Text="K" Style="{StaticResource HeadingMedium}" VerticalAlignment="Bottom" Margin="4,0,0,4"/>
+                                </StackPanel>
+                                
+                                <!-- Temperature Visualization -->
+                                <Grid Grid.Row="2" Height="8" Margin="0,16,0,0">
+                                    <Rectangle Fill="{StaticResource TemperatureGradient}" RadiusX="4" RadiusY="4"/>
+                                    <Ellipse Width="16" Height="16" Fill="White" HorizontalAlignment="Left" Margin="120,0,0,0">
+                                        <Ellipse.Effect>
+                                            <DropShadowEffect Color="#000000" BlurRadius="8" Opacity="0.3" ShadowDepth="0"/>
+                                        </Ellipse.Effect>
+                                    </Ellipse>
+                                </Grid>
+                            </Grid>
+                            
+                            <!-- Next Transition -->
+                            <TextBlock Text="Siguiente ajuste en 2h 15m" 
+                                       Style="{StaticResource BodyText}"
+                                       HorizontalAlignment="Center"/>
                         </StackPanel>
-                        <TextBlock Text="{Binding CurrentLocationText}" 
-                                   Foreground="#7F8C8D" 
-                                   TextWrapping="Wrap"/>
-                        <Button Content="Actualizar ubicación" 
-                                Style="{StaticResource SecondaryButtonStyle}"
-                                Command="{Binding UpdateLocationCommand}"
-                                HorizontalAlignment="Right"
-                                Margin="0,5,0,0"
-                                Padding="10,5"
-                                FontSize="12"/>
+                    </Border>
+                    
+                    <!-- Control Buttons -->
+                    <StackPanel Margin="0,0,0,24">
+                        <Button Content="⏸️ Pausar Filtro" 
+                                Style="{StaticResource PrimaryButton}"
+                                Margin="0,0,0,12"/>
+                        <Button Content="⚙️ Configuración Avanzada" 
+                                Style="{StaticResource SecondaryButton}"/>
                     </StackPanel>
-                </Border>
-                
-                <!-- Profile Info -->
-                <Border Background="#F8F9FA" CornerRadius="8" Padding="15" Margin="0,0,0,10">
+                    
+                    <!-- Quick Info Cards -->
                     <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
-                            <Path Data="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7H14A7,7 0 0,1 21,14H22A1,1 0 0,1 23,15V18A1,1 0 0,1 22,19H21V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V19H2A1,1 0 0,1 1,18V15A1,1 0 0,1 2,14H3A7,7 0 0,1 10,7H11V5.73C10.4,5.39 10,4.74 10,4A2,2 0 0,1 12,2M7.5,13A2.5,2.5 0 0,0 5,15.5A2.5,2.5 0 0,0 7.5,18A2.5,2.5 0 0,0 10,15.5A2.5,2.5 0 0,0 7.5,13M16.5,13A2.5,2.5 0 0,0 14,15.5A2.5,2.5 0 0,0 16.5,18A2.5,2.5 0 0,0 19,15.5A2.5,2.5 0 0,0 16.5,13Z" 
-                                  Fill="#7F8C8D" 
-                                  Width="16" 
-                                  Height="16" 
-                                  Stretch="Uniform"
-                                  Margin="0,0,8,0"/>
-                            <TextBlock Text="Perfil activo" FontWeight="SemiBold" Foreground="#2C3E50"/>
-                        </StackPanel>
-                        <TextBlock Text="{Binding CurrentProfileName}" 
-                                   Foreground="#7F8C8D"/>
+                        <!-- Location Card -->
+                        <Border Style="{StaticResource GlassCard}" Padding="20" Margin="0,0,0,16">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                    <Path Data="M12,2C8.13,2 5,5.13 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9C19,5.13 15.87,2 12,2M12,6A3,3 0 0,1 15,9A3,3 0 0,1 12,12A3,3 0 0,1 9,9A3,3 0 0,1 12,6Z" 
+                                          Fill="{StaticResource AccentBrush}" 
+                                          Width="16" Height="16" 
+                                          Stretch="Uniform"
+                                          Margin="0,0,8,0"/>
+                                    <TextBlock Text="Ubicación" Style="{StaticResource HeadingSmall}"/>
+                                </StackPanel>
+                                <TextBlock Text="Madrid, España" Style="{StaticResource BodyText}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+                        
+                        <!-- Profile Card -->
+                        <Border Style="{StaticResource GlassCard}" Padding="20">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                    <Path Data="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7H14A7,7 0 0,1 21,14H22A1,1 0 0,1 23,15V18A1,1 0 0,1 22,19H21V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V19H2A1,1 0 0,1 1,18V15A1,1 0 0,1 2,14H3A7,7 0 0,1 10,7H11V5.73C10.4,5.39 10,4.74 10,4A2,2 0 0,1 12,2M7.5,13A2.5,2.5 0 0,0 5,15.5A2.5,2.5 0 0,0 7.5,18A2.5,2.5 0 0,0 10,15.5A2.5,2.5 0 0,0 7.5,13M16.5,13A2.5,2.5 0 0,0 14,15.5A2.5,2.5 0 0,0 16.5,18A2.5,2.5 0 0,0 19,15.5A2.5,2.5 0 0,0 16.5,13Z" 
+                                          Fill="{StaticResource AccentBrush}" 
+                                          Width="16" Height="16" 
+                                          Stretch="Uniform"
+                                          Margin="0,0,8,0"/>
+                                    <TextBlock Text="Perfil Activo" Style="{StaticResource HeadingSmall}"/>
+                                </StackPanel>
+                                <TextBlock Text="Automático (Recomendado)" Style="{StaticResource BodyText}"/>
+                            </StackPanel>
+                        </Border>
                     </StackPanel>
-                </Border>
+                </StackPanel>
                 
-                <!-- Quick Actions -->
-                <Border Background="#F8F9FA" CornerRadius="8" Padding="15">
+                <!-- Right Panel - Dashboard -->
+                <ScrollViewer Grid.Column="1" Margin="24,0,0,0" VerticalScrollBarVisibility="Auto">
                     <StackPanel>
-                        <TextBlock Text="Acciones rápidas" FontWeight="SemiBold" Foreground="#2C3E50" Margin="0,0,0,10"/>
-                        <WrapPanel Orientation="Horizontal">
-                            <Button Content="⚙️ Configuración" 
-                                    Style="{StaticResource SecondaryButtonStyle}"
-                                    Command="{Binding OpenSettingsCommand}"
-                                    Margin="0,0,5,5"/>
-                            <Button Content="❓ Acerca de" 
-                                    Style="{StaticResource SecondaryButtonStyle}"
-                                    Command="{Binding ShowAboutCommand}"
-                                    Margin="0,0,5,5"/>
-                            <Button Content="🔽 Minimizar" 
-                                    Style="{StaticResource SecondaryButtonStyle}"
-                                    Command="{Binding MinimizeToTrayCommand}"
-                                    Margin="0,0,5,5"/>
-                        </WrapPanel>
+                        <!-- Dashboard Header -->
+                        <TextBlock Text="Panel de Control" Style="{StaticResource HeadingMedium}" Margin="0,0,0,24"/>
+                        
+                        <!-- Metrics Grid -->
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <!-- Solar Position Card -->
+                            <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource GlassCard}" 
+                                    Padding="24" Margin="0,0,12,12">
+                                <StackPanel>
+                                    <TextBlock Text="Posición Solar" Style="{StaticResource CaptionText}" Margin="0,0,0,8"/>
+                                    <TextBlock Text="42.3°" Style="{StaticResource HeadingMedium}"/>
+                                    <TextBlock Text="Elevación" Style="{StaticResource BodyText}"/>
+                                </StackPanel>
+                            </Border>
+                            
+                            <!-- Time to Sunset Card -->
+                            <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource GlassCard}" 
+                                    Padding="24" Margin="6,0,6,12">
+                                <StackPanel>
+                                    <TextBlock Text="Tiempo hasta Sunset" Style="{StaticResource CaptionText}" Margin="0,0,0,8"/>
+                                    <TextBlock Text="5h 23m" Style="{StaticResource HeadingMedium}"/>
+                                    <TextBlock Text="Horas restantes" Style="{StaticResource BodyText}"/>
+                                </StackPanel>
+                            </Border>
+                            
+                            <!-- Active Time Card -->
+                            <Border Grid.Row="0" Grid.Column="2" Style="{StaticResource GlassCard}" 
+                                    Padding="24" Margin="12,0,0,12">
+                                <StackPanel>
+                                    <TextBlock Text="Tiempo Activo" Style="{StaticResource CaptionText}" Margin="0,0,0,8"/>
+                                    <TextBlock Text="8h 42m" Style="{StaticResource HeadingMedium}"/>
+                                    <TextBlock Text="Hoy" Style="{StaticResource BodyText}"/>
+                                </StackPanel>
+                            </Border>
+                            
+                            <!-- Solar Chart -->
+                            <Border Grid.Row="1" Grid.ColumnSpan="3" Style="{StaticResource GlassCard}" 
+                                    Padding="24" Margin="0,0,0,12" Height="200">
+                                <Grid>
+                                    <TextBlock Text="Curva Solar del Día" Style="{StaticResource HeadingSmall}" 
+                                               HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                    <!-- Placeholder for solar curve chart -->
+                                    <Canvas Background="Transparent">
+                                        <Path Data="M 0,150 Q 150,50 300,100 Q 450,75 600,130" 
+                                              Stroke="{StaticResource AccentGradient}" 
+                                              StrokeThickness="3"
+                                              Fill="Transparent"/>
+                                    </Canvas>
+                                </Grid>
+                            </Border>
+                            
+                            <!-- System Information -->
+                            <Border Grid.Row="2" Grid.ColumnSpan="3" Style="{StaticResource GlassCard}" 
+                                    Padding="24">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Información del Sistema" Style="{StaticResource HeadingSmall}" Margin="0,0,0,16"/>
+                                        
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                            <TextBlock Text="Monitores detectados:" Style="{StaticResource BodyText}" Width="150"/>
+                                            <TextBlock Text="2" Style="{StaticResource BodyText}" FontWeight="SemiBold"/>
+                                        </StackPanel>
+                                        
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                            <TextBlock Text="Versión:" Style="{StaticResource BodyText}" Width="150"/>
+                                            <TextBlock Text="1.0.0" Style="{StaticResource BodyText}" FontWeight="SemiBold"/>
+                                        </StackPanel>
+                                        
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                            <TextBlock Text="Última actualización:" Style="{StaticResource BodyText}" Width="150"/>
+                                            <TextBlock Text="Hoy" Style="{StaticResource BodyText}" FontWeight="SemiBold"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                    
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="Acciones Rápidas" Style="{StaticResource HeadingSmall}" Margin="0,0,0,16"/>
+                                        
+                                        <StackPanel>
+                                            <Button Content="🔄 Actualizar Ubicación" 
+                                                    Style="{StaticResource SecondaryButton}"
+                                                    HorizontalAlignment="Stretch" Margin="0,0,0,8"/>
+                                            <Button Content="📊 Estadísticas Detalladas" 
+                                                    Style="{StaticResource SecondaryButton}"
+                                                    HorizontalAlignment="Stretch" Margin="0,0,0,8"/>
+                                            <Button Content="❓ Ayuda y Tutorial" 
+                                                    Style="{StaticResource SecondaryButton}"
+                                                    HorizontalAlignment="Stretch" Margin="0,0,0,8"/>
+                                            <Button Content="🔽 Minimizar a Bandeja" 
+                                                    Style="{StaticResource SecondaryButton}"
+                                                    HorizontalAlignment="Stretch"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </Grid>
                     </StackPanel>
-                </Border>
-            </StackPanel>
-        </ScrollViewer>
-        
-        <!-- Control Buttons -->
-        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
-            <Button Content="⏸️ Pausar" 
-                    Style="{StaticResource ActionButtonStyle}"
-                    Command="{Binding PauseCommand}"
-                    ToolTip="Pausa temporalmente el filtro de luz azul (Ctrl+Alt+F)"
-                    Visibility="{Binding PauseButtonVisibility}"/>
-            <Button Content="▶️ Reanudar" 
-                    Style="{StaticResource ActionButtonStyle}"
-                    Command="{Binding ResumeCommand}"
-                    ToolTip="Reanuda el filtro de luz azul"
-                    Visibility="{Binding ResumeButtonVisibility}"
-                    Background="#27AE60"/>
-            <Button Content="❌ Salir" 
-                    Style="{StaticResource SecondaryButtonStyle}"
-                    Command="{Binding ExitApplicationCommand}"
-                    ToolTip="Cierra ChronoGuard completamente"/>
-        </StackPanel>
-        
-        <!-- Menu -->
-        <Menu VerticalAlignment="Top" Height="24">
-            <MenuItem Header="Ayuda">
-                <MenuItem Header="Ver tutorial interactivo" Command="{Binding ShowTutorialCommand}"/>
-                <MenuItem Header="Acerca de" Command="{Binding ShowAboutCommand}"/>
-            </MenuItem>
-        </Menu>
-    </Grid>
+                </ScrollViewer>
+            </Grid>
+        </Grid>
+    </Border>
 </Window>

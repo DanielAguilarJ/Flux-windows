@@ -53,7 +53,7 @@ public class PerformanceMonitoringViewModel : INotifyPropertyChanged
         
         // Subscribe to performance service events
         _performanceService.PerformanceLevelChanged += OnPerformanceLevelChanged;
-        _performanceService.PerformanceAlert += OnPerformanceAlert;
+        _performanceService.PerformanceAlertTriggered += OnPerformanceAlert;
         
         _ = Task.Run(InitializeAsync);
     }
@@ -136,8 +136,8 @@ public class PerformanceMonitoringViewModel : INotifyPropertyChanged
 
     public string CpuUsageText => CurrentMetrics?.CpuUsagePercent.ToString("F1") + "%" ?? "N/A";
     public string MemoryUsageText => CurrentMetrics?.MemoryUsagePercent.ToString("F1") + "%" ?? "N/A";
-    public string GpuUsageText => CurrentMetrics?.GpuUsagePercent?.ToString("F1") + "%" ?? "N/A";
-    public string ColorAdjustmentTimeText => CurrentMetrics?.ColorAdjustmentTime.ToString("F1") + "ms" ?? "N/A";
+    public string GpuUsageText => CurrentMetrics?.GpuUsagePercent.ToString("F1") + "%" ?? "N/A";
+    public string ColorAdjustmentTimeText => CurrentMetrics?.AverageColorAdjustmentTime.ToString("F1") + "ms" ?? "N/A";
     public string MonitoringStatusText => IsMonitoring ? "Active" : "Stopped";
     public string PerformanceLevelText => CurrentPerformanceLevel.ToString();
 
@@ -162,8 +162,8 @@ public class PerformanceMonitoringViewModel : INotifyPropertyChanged
     {
         try
         {
-            CurrentPerformanceLevel = await _performanceService.GetCurrentPerformanceLevelAsync();
-            IsMonitoring = _performanceService.IsMonitoring;
+            CurrentPerformanceLevel = _performanceService.CurrentPerformanceLevel;
+            IsMonitoring = true; // Default to monitoring
             
             StatusMessage = "Ready";
             
@@ -171,6 +171,8 @@ public class PerformanceMonitoringViewModel : INotifyPropertyChanged
             {
                 _updateTimer.Start();
             }
+            
+            await Task.CompletedTask;
         }
         catch (Exception ex)
         {
@@ -328,12 +330,12 @@ public class PerformanceMonitoringViewModel : INotifyPropertyChanged
     public void Dispose()
     {
         _updateTimer?.Stop();
-        _updateTimer?.Dispose();
+        // DispatcherTimer doesn't implement IDisposable, just stop it
         
         if (_performanceService != null)
         {
             _performanceService.PerformanceLevelChanged -= OnPerformanceLevelChanged;
-            _performanceService.PerformanceAlert -= OnPerformanceAlert;
+            _performanceService.PerformanceAlertTriggered -= OnPerformanceAlert;
         }
     }
 

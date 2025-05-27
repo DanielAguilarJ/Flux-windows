@@ -137,10 +137,8 @@
                              Fill="{Binding StatusIndicatorColor, FallbackValue='Orange'}"/>
                     <TextBlock Text="{Binding StatusMessage, FallbackValue='Detectando monitores...'}" 
                                VerticalAlignment="Center" FontWeight="SemiBold"/>
-                </StackPanel>
-
-                <TextBlock Grid.Column="2" 
-                           Text="{Binding DetectedMonitorsCount, StringFormat='Monitores detectados: {0}', FallbackValue='Monitores detectados: 0'}"
+                </StackPanel>                        <TextBlock Grid.Column="2" 
+                           Text="{Binding DetectedMonitorsCount, StringFormat={}Monitores detectados: {0}, FallbackValue=Monitores detectados: 0}"
                            VerticalAlignment="Center" FontStyle="Italic"/>
             </Grid>
         </Border>
@@ -210,11 +208,11 @@
 
                                         <TextBlock Grid.Row="2" Grid.Column="0" Text="Resolución:" FontWeight="Bold"/>
                                         <TextBlock Grid.Row="2" Grid.Column="1" 
-                                                   Text="{Binding CurrentResolution, StringFormat='{0}'}"/>
+                                                   Text="{Binding CurrentResolution}"/>
 
                                         <TextBlock Grid.Row="3" Grid.Column="0" Text="Tamaño:" FontWeight="Bold"/>
                                         <TextBlock Grid.Row="3" Grid.Column="1" 
-                                                   Text="{Binding PhysicalSize, StringFormat='{0}'}"/>
+                                                   Text="{Binding PhysicalSize}"/>
 
                                         <TextBlock Grid.Row="4" Grid.Column="0" Text="Conectividad:" FontWeight="Bold"/>
                                         <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding ConnectionType}"/>
@@ -247,13 +245,13 @@
                                             <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding NativeResolution}" Margin="8,2"/>
 
                                             <TextBlock Grid.Row="1" Grid.Column="0" Text="Profundidad de color:" FontWeight="Bold" Margin="0,2"/>
-                                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding ColorDepth, StringFormat='{0} bits'}" Margin="8,2"/>
+                                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding ColorDepth, StringFormat={}{0} bits}" Margin="8,2"/>
 
                                             <TextBlock Grid.Row="2" Grid.Column="0" Text="Frecuencia de refresco:" FontWeight="Bold" Margin="0,2"/>
-                                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding RefreshRate, StringFormat='{0} Hz'}" Margin="8,2"/>
+                                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding RefreshRate, StringFormat={}{0} Hz}" Margin="8,2"/>
 
                                             <TextBlock Grid.Row="3" Grid.Column="0" Text="Luminancia máxima:" FontWeight="Bold" Margin="0,2"/>
-                                            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding MaxLuminance, StringFormat='{0} cd/m²'}" Margin="8,2"/>
+                                            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding MaxLuminance, StringFormat={}{0} cd/m²}" Margin="8,2"/>
 
                                             <TextBlock Grid.Row="4" Grid.Column="0" Text="Gamut de color:" FontWeight="Bold" Margin="0,2"/>
                                             <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding ColorGamut}" Margin="8,2"/>
@@ -316,7 +314,7 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Column="0" 
-                           Text="{Binding LastUpdateTime, StringFormat='Última actualización: {0:HH:mm:ss}'}" 
+                           Text="{Binding LastUpdateTime, StringFormat={}Última actualización: {0:HH:mm:ss}}" 
                            VerticalAlignment="Center" FontStyle="Italic"/>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal">

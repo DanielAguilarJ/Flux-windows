@@ -808,6 +808,126 @@ public class ConfigurationPersistenceService : IConfigurationPersistenceService
     }
 
     #endregion
+
+    #region IConfigurationPersistenceService Implementation
+
+    /// <summary>
+    /// Generic method to load configuration of any type
+    /// </summary>
+    public async Task<T?> LoadConfigurationAsync<T>() where T : class
+    {
+        var typeName = typeof(T).Name;
+        string fileName = typeName switch
+        {
+            nameof(ChronoGuardConfiguration) => MAIN_CONFIG_FILE,
+            nameof(AdvancedColorManagementConfig) => ADVANCED_CONFIG_FILE,
+            nameof(UserPreferences) => USER_PREFERENCES_FILE,
+            nameof(PerformanceConfig) => PERFORMANCE_CONFIG_FILE,
+            nameof(GeographicLocation) => LOCATION_CONFIG_FILE,
+            _ => $"{typeName.ToLowerInvariant()}_config.json"
+        };
+        
+        var filePath = Path.Combine(_configurationDirectory, fileName);
+        if (!File.Exists(filePath))
+        {
+            return null;
+        }
+
+        return await LoadConfigurationAsync<T>(filePath);
+    }
+
+    /// <summary>
+    /// Generic method to save configuration of any type
+    /// </summary>
+    public async Task SaveConfigurationAsync<T>(T configuration) where T : class
+    {
+        var typeName = typeof(T).Name;
+        string fileName = typeName switch
+        {
+            nameof(ChronoGuardConfiguration) => MAIN_CONFIG_FILE,
+            nameof(AdvancedColorManagementConfig) => ADVANCED_CONFIG_FILE,
+            nameof(UserPreferences) => USER_PREFERENCES_FILE,
+            nameof(PerformanceConfig) => PERFORMANCE_CONFIG_FILE,
+            nameof(GeographicLocation) => LOCATION_CONFIG_FILE,
+            _ => $"{typeName.ToLowerInvariant()}_config.json"
+        };
+        
+        var filePath = Path.Combine(_configurationDirectory, fileName);
+        await SaveConfigurationAsync(configuration, filePath);
+    }
+
+    /// <summary>
+    /// Check if configuration exists for the specified type
+    /// </summary>
+    public async Task<bool> ConfigurationExistsAsync<T>() where T : class
+    {
+        var typeName = typeof(T).Name;
+        string fileName = typeName switch
+        {
+            nameof(ChronoGuardConfiguration) => MAIN_CONFIG_FILE,
+            nameof(AdvancedColorManagementConfig) => ADVANCED_CONFIG_FILE,
+            nameof(UserPreferences) => USER_PREFERENCES_FILE,
+            nameof(PerformanceConfig) => PERFORMANCE_CONFIG_FILE,
+            nameof(GeographicLocation) => LOCATION_CONFIG_FILE,
+            _ => $"{typeName.ToLowerInvariant()}_config.json"
+        };
+        
+        var filePath = Path.Combine(_configurationDirectory, fileName);
+        return await Task.FromResult(File.Exists(filePath));
+    }
+
+    /// <summary>
+    /// Delete configuration for the specified type
+    /// </summary>
+    public async Task DeleteConfigurationAsync<T>() where T : class
+    {
+        var typeName = typeof(T).Name;
+        string fileName = typeName switch
+        {
+            nameof(ChronoGuardConfiguration) => MAIN_CONFIG_FILE,
+            nameof(AdvancedColorManagementConfig) => ADVANCED_CONFIG_FILE,
+            nameof(UserPreferences) => USER_PREFERENCES_FILE,
+            nameof(PerformanceConfig) => PERFORMANCE_CONFIG_FILE,
+            nameof(GeographicLocation) => LOCATION_CONFIG_FILE,
+            _ => $"{typeName.ToLowerInvariant()}_config.json"
+        };
+        
+        var filePath = Path.Combine(_configurationDirectory, fileName);
+        if (File.Exists(filePath))
+        {
+            await Task.Run(() => File.Delete(filePath));
+        }
+    }
+
+    /// <summary>
+    /// Create backup of all configurations
+    /// </summary>
+    public async Task CreateBackupAsync()
+    {
+        await ExportConfigurationAsync(Path.Combine(_backupDirectory, $"backup_{DateTime.Now:yyyyMMdd_HHmmss}.json"));
+    }
+
+    /// <summary>
+    /// Restore configuration from backup
+    /// </summary>
+    public async Task RestoreFromBackupAsync(string backupPath)
+    {
+        await ImportConfigurationAsync(backupPath);
+    }
+
+    /// <summary>
+    /// Get available backup files
+    /// </summary>
+    public async Task<IEnumerable<string>> GetAvailableBackupsAsync()
+    {
+        return await Task.FromResult(
+            Directory.Exists(_backupDirectory) 
+                ? Directory.GetFiles(_backupDirectory, "*.json").OrderByDescending(f => f)
+                : Enumerable.Empty<string>()
+        );
+    }
+
+    #endregion
 }
 
 /// <summary>

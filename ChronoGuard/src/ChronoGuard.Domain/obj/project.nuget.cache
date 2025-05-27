@@ -1,11 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "yazIz8EioHU=",
+  "dgSpecHash": "mKKiC5eqSTw=",
   "success": true,
-  "projectFilePath": "/Users/msc/Documents/GitHub/Flux-windows/ChronoGuard/src/ChronoGuard.Domain/ChronoGuard.Domain.csproj",
-  "expectedPackageFiles": [
-    "/Users/msc/.nuget/packages/microsoft.netcore.app.ref/8.0.16/microsoft.netcore.app.ref.8.0.16.nupkg.sha512",
-    "/Users/msc/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.16/microsoft.aspnetcore.app.ref.8.0.16.nupkg.sha512"
-  ],
+  "projectFilePath": "/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Domain/ChronoGuard.Domain.csproj",
+  "expectedPackageFiles": [],
   "logs": []
 }

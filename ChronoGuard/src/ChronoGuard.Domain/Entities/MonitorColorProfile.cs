@@ -24,7 +24,7 @@ public class MonitorColorProfile
     
     // Color space information
     public ColorGamut NativeGamut { get; set; } = ColorGamut.sRGB;
-    public WhitePoint NativeWhitePoint { get; set; } = new WhitePoint(6500); // D65
+    public ColorTemperatureWhitePoint NativeWhitePoint { get; set; } = new ColorTemperatureWhitePoint(6500); // D65
     public double[] RedPrimary { get; set; } = new double[] { 0.64, 0.33 }; // sRGB red
     public double[] GreenPrimary { get; set; } = new double[] { 0.30, 0.60 }; // sRGB green
     public double[] BluePrimary { get; set; } = new double[] { 0.15, 0.06 }; // sRGB blue
@@ -244,13 +244,13 @@ public enum ColorGamut
 /// <summary>
 /// White point information for color temperature calculations
 /// </summary>
-public class WhitePoint
+public class ColorTemperatureWhitePoint
 {
     public int TemperatureKelvin { get; set; }
     public double ChromaticityX { get; set; }
     public double ChromaticityY { get; set; }
 
-    public WhitePoint(int temperatureKelvin)
+    public ColorTemperatureWhitePoint(int temperatureKelvin)
     {
         TemperatureKelvin = temperatureKelvin;
         var (x, y) = CalculateChromaticity(temperatureKelvin);

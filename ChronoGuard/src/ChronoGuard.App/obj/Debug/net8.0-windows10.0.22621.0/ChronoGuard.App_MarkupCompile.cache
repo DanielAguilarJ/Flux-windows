@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET8_0;NETCOREAPP
 /workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.App/App.xaml
-16-1122479476
+18315587748
 
-22-735821983
-240702722183
-MainWindow.xaml;OnboardingWindow.xaml;Resources/Colors/AppColors.xaml;Resources/Styles/ButtonStyles.xaml;Resources/Styles/SliderStyles.xaml;Resources/Styles/TextStyles.xaml;Resources/Styles/WindowStyles.xaml;SettingsWindow.xaml;Views/Onboarding/Step1View.xaml;Views/Onboarding/Step2View.xaml;Views/Onboarding/Step3View.xaml;Views/Onboarding/Step4View.xaml;Views/Tutorial/TutorialStep1.xaml;Views/Tutorial/TutorialStep2.xaml;Views/Tutorial/TutorialStep3.xaml;Views/Tutorial/TutorialWindow.xaml;
+26335932317
+259-1017278270
+MainWindow.xaml;OnboardingWindow.xaml;Resources/Colors/AppColors.xaml;Resources/Styles/ButtonStyles.xaml;Resources/Styles/SliderStyles.xaml;Resources/Styles/TextStyles.xaml;Resources/Styles/WindowStyles.xaml;SettingsWindow.xaml;Views/MonitorManagementView.xaml;Views/Onboarding/Step1View.xaml;Views/Onboarding/Step2View.xaml;Views/Onboarding/Step3View.xaml;Views/Onboarding/Step4View.xaml;Views/PerformanceMonitoringView.xaml;Views/Tutorial/TutorialStep1.xaml;Views/Tutorial/TutorialStep2.xaml;Views/Tutorial/TutorialStep3.xaml;Views/Tutorial/TutorialWindow.xaml;
 
 False
 

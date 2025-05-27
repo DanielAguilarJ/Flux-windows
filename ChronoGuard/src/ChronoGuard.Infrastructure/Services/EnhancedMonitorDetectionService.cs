@@ -257,7 +257,7 @@ public class EnhancedMonitorDetectionService : IMonitorDetectionService
             displayDevice.cb = Marshal.SizeOf(displayDevice);
 
             // Get adapter information
-            if (EnumDisplayDevices(null, 0, ref displayDevice, 0))
+            if (EnumDisplayDevices(null!, 0, ref displayDevice, 0))
             {
                 monitor.AdapterName = displayDevice.DeviceString;
                 monitor.AdapterKey = displayDevice.DeviceKey;
@@ -736,8 +736,8 @@ public class EnhancedMonitorDetectionService : IMonitorDetectionService
                     try
                     {
                         // Get EDID descriptor
-                        var result = obj.InvokeMethod("WmiGetMonitorRawEEdidV1Block", new object[] { 0 });
-                        if (result != null && result["BlockContent"] is byte[] edidData)
+                        var result = obj.InvokeMethod("WmiGetMonitorRawEEdidV1Block", new object[] { 0 }) as ManagementBaseObject;
+                        if (result?.Properties["BlockContent"]?.Value is byte[] edidData)
                         {
                             return ParseEDID(edidData);
                         }
@@ -787,7 +787,8 @@ public class EnhancedMonitorDetectionService : IMonitorDetectionService
             edid.YearOfManufacture = (ushort)(1990 + edidData[17]);
             
             // EDID version (bytes 18-19)
-            edid.EDIDVersion = $"{edidData[18]}.{edidData[19]}";
+            edid.EDIDVersion = edidData[18];
+            edid.EDIDRevision = edidData[19];
             
             // Parse detailed timing descriptors for native resolution
             for (int i = 54; i < 126; i += 18)
@@ -832,35 +833,4 @@ public class EnhancedMonitorDetectionService : IMonitorDetectionService
             return "UNK";
         }
     }
-}
-
-/// <summary>
-/// Display mode information
-/// </summary>
-public class DisplayMode
-{
-    public int Width { get; set; }
-    public int Height { get; set; }
-    public int RefreshRate { get; set; }
-    public int BitsPerPixel { get; set; }
-
-    public override string ToString()
-    {
-        return $"{Width}x{Height} @ {RefreshRate}Hz ({BitsPerPixel}-bit)";
-    }
-}
-
-/// <summary>
-/// EDID (Extended Display Identification Data) information
-/// </summary>
-public class EDIDInfo
-{
-    public string ManufacturerID { get; set; } = string.Empty;
-    public ushort ProductCode { get; set; }
-    public uint SerialNumber { get; set; }
-    public byte WeekOfManufacture { get; set; }
-    public ushort YearOfManufacture { get; set; }
-    public string EDIDVersion { get; set; } = string.Empty;
-    public int HorizontalResolution { get; set; }
-    public int VerticalResolution { get; set; }
 }
