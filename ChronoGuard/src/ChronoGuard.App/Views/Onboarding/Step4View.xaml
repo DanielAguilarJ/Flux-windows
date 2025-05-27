@@ -6,19 +6,73 @@
              mc:Ignorable="d"
              d:DesignHeight="400" d:DesignWidth="600">
     <Grid>
-        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="420">
-            <TextBlock Text="Configuración final" FontSize="22" FontWeight="Bold" Margin="0,0,0,16"/>
-            <CheckBox Content="Iniciar automáticamente con Windows" Margin="0,0,0,8"/>
-            <CheckBox Content="Habilitar notificaciones" Margin="0,0,0,8"/>
-            <ComboBox Width="200" Margin="0,0,0,8">
-                <ComboBoxItem Content="Notificaciones básicas"/>
-                <ComboBoxItem Content="Notificaciones completas"/>
-                <ComboBoxItem Content="Modo silencioso"/>
-            </ComboBox>
-            <TextBlock Text="Resumen de configuración elegida" Margin="0,12,0,0"/>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,24,0,0">
-                <Button Content="Atrás" Command="{Binding BackCommand}" Width="100" Margin="0,0,8,0"/>
-                <Button Content="Finalizar" Command="{Binding FinishCommand}" Width="120"/>
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="450">
+            <TextBlock Text="Configuración Final" FontSize="22" FontWeight="Bold" Margin="0,0,0,16" HorizontalAlignment="Center"/>
+            
+            <Border Background="#F8F9FA" CornerRadius="8" Padding="16" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Text="⚙️ Últimos ajustes" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                    <TextBlock Text="Configura las opciones adicionales para una experiencia óptima. Puedes modificar todas estas opciones después en Configuración." 
+                               TextWrapping="Wrap" FontSize="14" Foreground="#6C757D"/>
+                </StackPanel>
+            </Border>
+
+            <StackPanel Margin="0,0,0,16">
+                <CheckBox Content="🚀 Iniciar automáticamente con Windows" 
+                          IsChecked="{Binding AutoStart}"
+                          Margin="0,0,0,12" 
+                          FontSize="14"/>
+                
+                <StackPanel Margin="0,0,0,12">
+                    <TextBlock Text="Nivel de notificaciones:" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                    <ComboBox ItemsSource="{Binding NotificationLevels}" 
+                              SelectedItem="{Binding NotificationLevel}"
+                              Width="200" 
+                              Height="30"
+                              HorizontalAlignment="Left">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding}" Margin="0,0,8,0"/>
+                                    <TextBlock FontSize="10" Foreground="#6C757D">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding}" Value="Silent">
+                                                        <Setter Property="Text" Value="(Sin notificaciones)"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding}" Value="Basic">
+                                                        <Setter Property="Text" Value="(Solo importantes)"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding}" Value="Detailed">
+                                                        <Setter Property="Text" Value="(Todas las notificaciones)"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Resumen de configuración -->
+            <Border Background="#E8F5E8" CornerRadius="8" Padding="16" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Text="📋 Resumen de tu configuración:" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                    <TextBlock Text="{Binding ResumenConfiguracion}" 
+                               FontSize="12" 
+                               FontFamily="Consolas"
+                               TextWrapping="Wrap"
+                               Foreground="#2D5A2D"/>
+                </StackPanel>
+            </Border>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,32,0,0">
+                <Button Content="← Atrás" Command="{Binding BackCommand}" Width="100" Height="35" Margin="0,0,12,0"/>
+                <Button Content="🎉 ¡Finalizar!" Command="{Binding FinishCommand}" Width="140" Height="35" Background="#28A745" Foreground="White" FontWeight="SemiBold"/>
             </StackPanel>
         </StackPanel>
     </Grid>

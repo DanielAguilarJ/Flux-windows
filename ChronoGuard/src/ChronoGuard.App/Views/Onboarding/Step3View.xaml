@@ -6,18 +6,54 @@
              mc:Ignorable="d"
              d:DesignHeight="400" d:DesignWidth="600">
     <Grid>
-        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="420">
-            <TextBlock Text="Elige tu perfil inicial" FontSize="22" FontWeight="Bold" Margin="0,0,0,16"/>
-            <TextBlock Text="Selecciona uno de los perfiles recomendados. Puedes cambiarlo después en la configuración." TextWrapping="Wrap" Margin="0,0,0,12"/>
-            <ComboBox Width="300" Margin="0,0,0,8">
-                <ComboBoxItem Content="Clásico (Día: 6500K, Noche: 2700K)"/>
-                <ComboBoxItem Content="Trabajo Nocturno (Día: 3000K, Noche: 1900K)"/>
-                <ComboBoxItem Content="Multimedia (Colores más neutros)"/>
-            </ComboBox>
-            <TextBlock Text="Puedes cambiar esto después." FontStyle="Italic" Margin="0,8,0,0"/>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,24,0,0">
-                <Button Content="Atrás" Command="{Binding BackCommand}" Width="100" Margin="0,0,8,0"/>
-                <Button Content="Siguiente" Command="{Binding NextCommand}" Width="120"/>
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Width="450">
+            <TextBlock Text="Perfil de Color Inicial" FontSize="22" FontWeight="Bold" Margin="0,0,0,16" HorizontalAlignment="Center"/>
+            
+            <Border Background="#F8F9FA" CornerRadius="8" Padding="16" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock Text="🎨 ¿Qué es un perfil de color?" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                    <TextBlock Text="Los perfiles determinan cómo se ajusta la temperatura de color durante el día. Puedes cambiar esto después en la configuración." 
+                               TextWrapping="Wrap" FontSize="14" Foreground="#6C757D"/>
+                </StackPanel>
+            </Border>
+
+            <StackPanel Margin="0,0,0,16">
+                <TextBlock Text="Selecciona un perfil inicial:" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                <ComboBox ItemsSource="{Binding AvailableProfiles}" 
+                          SelectedValue="{Binding SelectedProfileId}"
+                          SelectedValuePath="Id"
+                          DisplayMemberPath="Name"
+                          Width="350" 
+                          Height="35"
+                          HorizontalAlignment="Left"
+                          Margin="0,0,0,8"/>
+                
+                <!-- Preview del perfil seleccionado -->
+                <Border Background="#F8F9FA" CornerRadius="4" Padding="12" Margin="0,8,0,0" Width="350" HorizontalAlignment="Left">
+                    <StackPanel>
+                        <TextBlock Text="Vista previa:" FontWeight="SemiBold" FontSize="12" Margin="0,0,0,4"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🌅 Día:" FontSize="12" Width="50"/>
+                            <TextBlock Text="{Binding SelectedProfile.DayTemperature, StringFormat={}{0}K}" FontSize="12" FontWeight="SemiBold"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🌙 Noche:" FontSize="12" Width="50"/>
+                            <TextBlock Text="{Binding SelectedProfile.NightTemperature, StringFormat={}{0}K}" FontSize="12" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+                
+                <TextBlock Text="💡 Puedes crear perfiles personalizados después en Configuración" 
+                           FontSize="12" 
+                           FontStyle="Italic" 
+                           Foreground="#6C757D" 
+                           Margin="0,12,0,0"
+                           TextWrapping="Wrap"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,32,0,0">
+                <Button Content="← Atrás" Command="{Binding BackCommand}" Width="100" Height="35" Margin="0,0,12,0"/>
+                <Button Content="Siguiente →" Command="{Binding NextCommand}" Width="120" Height="35" Background="#007ACC" Foreground="White"/>
             </StackPanel>
         </StackPanel>
     </Grid>

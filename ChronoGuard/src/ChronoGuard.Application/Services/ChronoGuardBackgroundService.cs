@@ -2,6 +2,8 @@ using ChronoGuard.Domain.Entities;
 using ChronoGuard.Domain.Interfaces;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System.Threading;
+using Timer = System.Threading.Timer;
 
 namespace ChronoGuard.Application.Services;
 
@@ -15,11 +17,13 @@ public class ChronoGuardBackgroundService : BackgroundService
     private readonly IColorTemperatureService _colorService;
     private readonly IProfileService _profileService;
     private readonly IConfigurationService _configService;
+    private readonly IForegroundApplicationService _foregroundAppService;
     private readonly ILogger<ChronoGuardBackgroundService> _logger;
     
     private AppState _appState = new();
     private Timer? _updateTimer;
     private Timer? _transitionTimer;
+    private string? _currentForegroundApp;
 
     public event EventHandler<AppState>? StateChanged;
 
@@ -34,6 +38,7 @@ public class ChronoGuardBackgroundService : BackgroundService
         IColorTemperatureService colorService,
         IProfileService profileService,
         IConfigurationService configService,
+        IForegroundApplicationService foregroundAppService,
         ILogger<ChronoGuardBackgroundService> logger)
     {
         _locationService = locationService;
@@ -41,6 +46,7 @@ public class ChronoGuardBackgroundService : BackgroundService
         _colorService = colorService;
         _profileService = profileService;
         _configService = configService;
+        _foregroundAppService = foregroundAppService;
         _logger = logger;
     }
 
@@ -281,6 +287,14 @@ public class ChronoGuardBackgroundService : BackgroundService
         _appState.ActiveProfileId = profileId;
         await UpdateColorTemperatureAsync();
         _logger.LogInformation("Active profile changed to: {ProfileId}", profileId);
+    }
+
+    /// <summary>
+    /// Triggers an immediate color temperature update
+    /// </summary>
+    public async Task TriggerUpdateAsync()
+    {
+        await UpdateColorTemperatureAsync();
     }
 
     public override async Task StopAsync(CancellationToken cancellationToken)

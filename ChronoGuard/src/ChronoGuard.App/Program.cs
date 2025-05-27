@@ -4,7 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Windows;
 using ChronoGuard.App;
-// using ChronoGuard.App.Services;
+using ChronoGuard.App.Services;
 using ChronoGuard.App.ViewModels;
 using ChronoGuard.Domain.Interfaces;
 using ChronoGuard.Infrastructure.Services;
@@ -23,11 +23,8 @@ public static class Program
         try
         {
             // Create host builder with DI container
-            var host = CreateHostBuilder(args).Build();
-
-            // Start the WPF application
+            var host = CreateHostBuilder(args).Build();            // Start the WPF application
             var app = new App();
-            app.InitializeComponent();
             
             // Set service provider for the app
             App.ServiceProvider = host.Services;
@@ -56,19 +53,23 @@ public static class Program
                     builder.AddConsole();
                     builder.AddDebug();
                     builder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Information);
-                });
-
-                // Register HTTP client
+                });                // Register HTTP client
                 services.AddHttpClient();
-
+                
                 // Register domain services
                 services.AddSingleton<ILocationService, LocationService>();
                 services.AddSingleton<ISolarCalculatorService, SolarCalculatorService>();
                 services.AddSingleton<IColorTemperatureService, WindowsColorTemperatureService>();
-                services.AddSingleton<IProfileService, ProfileService>();
-                services.AddSingleton<IConfigurationService, ConfigurationService>();                // Register application services
+                services.AddSingleton<IProfileService, ChronoGuard.Infrastructure.Services.ProfileService>();
+                services.AddSingleton<IConfigurationService, ConfigurationService>();
+                services.AddSingleton<INotificationService, NotificationService>();
+                services.AddSingleton<IStartupManager, StartupManager>();
+                services.AddSingleton<IForegroundApplicationService, ChronoGuard.Infrastructure.Services.WindowsForegroundApplicationService>();
+                  // Register application services
                 services.AddSingleton<ChronoGuardBackgroundService>();
-                // services.AddSingleton<SystemTrayService>();// Register ViewModels
+                services.AddSingleton<SystemTrayService>();
+                
+                // Register ViewModels
                 services.AddTransient<MainWindowViewModel>();
                 services.AddTransient<SettingsViewModel>();
 

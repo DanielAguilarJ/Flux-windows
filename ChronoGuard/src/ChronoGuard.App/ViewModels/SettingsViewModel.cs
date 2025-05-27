@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows;
 using ChronoGuard.Domain.Entities;
 using ChronoGuard.Domain.Interfaces;
@@ -90,6 +91,12 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private string _newExcludedApp = "";
 
+    [ObservableProperty]
+    private bool _isLoading = false;
+
+    [ObservableProperty]
+    private bool _hasUnsavedChanges = false;
+
     public ObservableCollection<string> AvailableLanguages { get; } = new()
     {
         "es-ES", "en-US", "fr-FR", "de-DE", "it-IT", "pt-BR"
@@ -98,6 +105,31 @@ public partial class SettingsViewModel : ObservableObject
     public Array LocationMethods => Enum.GetValues<LocationMethod>();
     public Array NotificationLevels => Enum.GetValues<NotificationLevel>();
     public Array LogLevels => Enum.GetValues<DomainLogLevel>();
+
+    /// <summary>
+    /// Gets a value indicating whether manual location fields should be enabled
+    /// </summary>
+    public bool IsManualLocationEnabled => LocationMethod == LocationMethod.Manual;
+
+    /// <summary>
+    /// Gets the current location summary for display
+    /// </summary>
+    public string LocationSummary
+    {
+        get
+        {
+            return LocationMethod switch
+            {
+                LocationMethod.Auto => "Detección automática",
+                LocationMethod.WindowsLocationApi => "API de ubicación de Windows",
+                LocationMethod.IpAddress => "Ubicación por IP",
+                LocationMethod.Manual => string.IsNullOrWhiteSpace(ManualCity) 
+                    ? $"{ManualLatitude:F2}°, {ManualLongitude:F2}°"
+                    : ManualCity,
+                _ => "No configurado"
+            };
+        }
+    }
 
     public SettingsViewModel(
         ILogger<SettingsViewModel> logger,
@@ -113,8 +145,19 @@ public partial class SettingsViewModel : ObservableObject
         // Subscribe to events
         _profileService.ProfilesChanged += OnProfilesChanged;
 
+        // Subscribe to property changes to track unsaved changes
+        PropertyChanged += OnPropertyChanged;
+
         // Load data
         _ = Task.Run(LoadDataAsync);
+    }
+
+    /// <summary>
+    /// Called when the settings window is loaded
+    /// </summary>
+    public async Task InitializeAsync()
+    {
+        await LoadDataAsync();
     }
 
     /// <summary>
@@ -125,6 +168,12 @@ public partial class SettingsViewModel : ObservableObject
     {
         try
         {
+            // Validate settings before saving
+            if (!ValidateSettings())
+            {
+                return;
+            }
+
             // Update configuration object
             Configuration.General.AutoStart = AutoStart;
             Configuration.General.MinimizeToTray = MinimizeToTray;
@@ -159,6 +208,7 @@ public partial class SettingsViewModel : ObservableObject
             }
 
             _logger.LogInformation("Settings saved successfully");
+            HasUnsavedChanges = false;
             System.Windows.MessageBox.Show("Configuración guardada correctamente.", "ChronoGuard", 
                 System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
         }
@@ -168,6 +218,60 @@ public partial class SettingsViewModel : ObservableObject
             System.Windows.MessageBox.Show($"Error al guardar configuración:\n{ex.Message}", "ChronoGuard - Error", 
                 System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
         }
+    }
+
+    /// <summary>
+    /// Validates the current settings
+    /// </summary>
+    private bool ValidateSettings()
+    {
+        // Validate manual location settings
+        if (LocationMethod == LocationMethod.Manual)
+        {
+            if (string.IsNullOrWhiteSpace(ManualCity) && 
+                (!ManualLatitude.HasValue || !ManualLongitude.HasValue))
+            {
+                System.Windows.MessageBox.Show(
+                    "Para ubicación manual, debe proporcionar una ciudad o coordenadas (latitud y longitud).",
+                    "Configuración incompleta", 
+                    System.Windows.MessageBoxButton.OK, 
+                    System.Windows.MessageBoxImage.Warning);
+                return false;
+            }
+
+            if (ManualLatitude.HasValue && (ManualLatitude < -90 || ManualLatitude > 90))
+            {
+                System.Windows.MessageBox.Show(
+                    "La latitud debe estar entre -90 y 90 grados.",
+                    "Latitud inválida", 
+                    System.Windows.MessageBoxButton.OK, 
+                    System.Windows.MessageBoxImage.Warning);
+                return false;
+            }
+
+            if (ManualLongitude.HasValue && (ManualLongitude < -180 || ManualLongitude > 180))
+            {
+                System.Windows.MessageBox.Show(
+                    "La longitud debe estar entre -180 y 180 grados.",
+                    "Longitud inválida", 
+                    System.Windows.MessageBoxButton.OK, 
+                    System.Windows.MessageBoxImage.Warning);
+                return false;
+            }
+        }
+
+        // Validate quiet hours
+        if (QuietHoursStart == QuietHoursEnd)
+        {
+            System.Windows.MessageBox.Show(
+                "Las horas de inicio y fin del período silencioso no pueden ser iguales.",
+                "Horas silenciosas inválidas", 
+                System.Windows.MessageBoxButton.OK, 
+                System.Windows.MessageBoxImage.Warning);
+            return false;
+        }
+
+        return true;
     }
 
     /// <summary>
@@ -376,6 +480,7 @@ public partial class SettingsViewModel : ObservableObject
     {
         try
         {
+            IsLoading = true;
             var config = await _configurationService.GetConfigurationAsync();
 
             WpfApp.Current.Dispatcher.Invoke(() =>
@@ -412,11 +517,41 @@ public partial class SettingsViewModel : ObservableObject
                 MultiMonitorSupport = config.Advanced.MultiMonitorSupport;
                 UseHardwareAcceleration = config.Advanced.UseHardwareAcceleration;
                 LogLevel = config.Advanced.LogLevel;
+
+                // Reset unsaved changes flag after loading
+                HasUnsavedChanges = false;
             });
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error loading configuration");
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        // Skip setting HasUnsavedChanges for certain properties
+        var excludedProperties = new[] { nameof(HasUnsavedChanges), nameof(IsLoading), nameof(LocationSummary), nameof(IsManualLocationEnabled) };
+        
+        if (!excludedProperties.Contains(e.PropertyName))
+        {
+            HasUnsavedChanges = true;
+        }
+
+        // Update dependent properties
+        switch (e.PropertyName)
+        {
+            case nameof(LocationMethod):
+            case nameof(ManualLatitude):
+            case nameof(ManualLongitude):
+            case nameof(ManualCity):
+                OnPropertyChanged(nameof(LocationSummary));
+                OnPropertyChanged(nameof(IsManualLocationEnabled));
+                break;
         }
     }
 

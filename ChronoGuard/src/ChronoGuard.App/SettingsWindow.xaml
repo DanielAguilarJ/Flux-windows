@@ -19,11 +19,23 @@
         
         <!-- Header -->
         <StackPanel Grid.Row="0" Margin="0,0,0,20">
-            <TextBlock Text="Configuración de ChronoGuard" 
-                       Style="{StaticResource Heading2Style}"/>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Configuración de ChronoGuard" 
+                           Style="{StaticResource Heading2Style}"/>
+                <TextBlock Text=" *" 
+                           Foreground="{DynamicResource ErrorBrush}"
+                           FontSize="18"
+                           FontWeight="Bold"
+                           Visibility="{Binding HasUnsavedChanges, Converter={StaticResource BooleanToVisibilityConverter}}"
+                           ToolTip="Cambios no guardados"/>
+            </StackPanel>
             <TextBlock Text="Personaliza el comportamiento del filtro de luz azul"
                        Style="{StaticResource SubtitleTextStyle}"
                        Foreground="{DynamicResource TextSecondaryBrush}"/>
+            <ProgressBar IsIndeterminate="True"
+                         Height="3"
+                         Margin="0,8,0,0"
+                         Visibility="{Binding IsLoading, Converter={StaticResource BooleanToVisibilityConverter}}"/>
         </StackPanel>
         
         <!-- Settings TabControl -->
@@ -240,8 +252,12 @@
                         
                         <GroupBox Header="Ubicación manual" 
                                   Padding="12"
-                                  IsEnabled="{Binding LocationMethod, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Manual}">
+                                  IsEnabled="{Binding IsManualLocationEnabled}">
                             <StackPanel>
+                                <TextBlock Text="{Binding LocationSummary}"
+                                           FontWeight="SemiBold"
+                                           Margin="0,0,0,8"
+                                           Foreground="{DynamicResource PrimaryBrush}"/>
                                 <Grid Margin="0,0,0,8">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
@@ -249,16 +265,16 @@
                                     </Grid.ColumnDefinitions>
                                     <StackPanel Grid.Column="0" Margin="0,0,10,0">
                                         <Label Content="Latitud:" Margin="0,0,0,4"/>
-                                        <TextBox Text="{Binding ManualLatitude}"/>
+                                        <TextBox Text="{Binding ManualLatitude, UpdateSourceTrigger=PropertyChanged}"/>
                                     </StackPanel>
                                     <StackPanel Grid.Column="1" Margin="10,0,0,0">
                                         <Label Content="Longitud:" Margin="0,0,0,4"/>
-                                        <TextBox Text="{Binding ManualLongitude}"/>
+                                        <TextBox Text="{Binding ManualLongitude, UpdateSourceTrigger=PropertyChanged}"/>
                                     </StackPanel>
                                 </Grid>
                                 <StackPanel Margin="0,0,0,8">
                                     <Label Content="Ciudad (opcional):" Margin="0,0,0,4"/>
-                                    <TextBox Text="{Binding ManualCity}"/>
+                                    <TextBox Text="{Binding ManualCity, UpdateSourceTrigger=PropertyChanged}"/>
                                 </StackPanel>
                                 <Button Content="Probar ubicación"
                                         Style="{StaticResource SecondaryButtonStyle}"
@@ -427,13 +443,21 @@
             
             <StackPanel Grid.Column="1" 
                         Orientation="Horizontal">
-                <Button Content="Guardar"
-                        Style="{StaticResource PrimaryButtonStyle}"
+                <Button Style="{StaticResource PrimaryButtonStyle}"
                         Command="{Binding SaveSettingsCommand}"
-                        Margin="0,0,10,0"/>
+                        IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBooleanConverter}}"
+                        Margin="0,0,10,0">
+                    <Button.Content>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="💾 " Visibility="{Binding HasUnsavedChanges, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            <TextBlock Text="Guardar"/>
+                        </StackPanel>
+                    </Button.Content>
+                </Button>
                 <Button Content="Cancelar"
                         Style="{StaticResource SecondaryButtonStyle}"
-                        IsCancel="True"/>
+                        IsCancel="True"
+                        IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBooleanConverter}}"/>
             </StackPanel>
         </Grid>
         

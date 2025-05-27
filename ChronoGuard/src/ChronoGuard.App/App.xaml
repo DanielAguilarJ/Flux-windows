@@ -10,6 +10,7 @@
                 <ResourceDictionary Source="Resources/Styles/ButtonStyles.xaml"/>
                 <ResourceDictionary Source="Resources/Styles/TextStyles.xaml"/>
                 <ResourceDictionary Source="Resources/Styles/WindowStyles.xaml"/>
+                <ResourceDictionary Source="Resources/Styles/SliderStyles.xaml"/>
                 <!-- Colors -->
                 <ResourceDictionary Source="Resources/Colors/AppColors.xaml"/>
             </ResourceDictionary.MergedDictionaries>
@@ -22,6 +23,7 @@
             <converters:NotNullToBooleanConverter x:Key="NotNullToBooleanConverter"/>
             <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
             <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter"/>
+            <converters:EnumToVisibilityConverter x:Key="EnumToVisibilityConverter"/>
             
         </ResourceDictionary>
     </Application.Resources>

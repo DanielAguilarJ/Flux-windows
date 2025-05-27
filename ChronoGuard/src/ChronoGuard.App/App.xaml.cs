@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using ChronoGuard.Application.Services;
-// using ChronoGuard.App.Services;
+using ChronoGuard.App.Services;
 
 namespace ChronoGuard.App;
 
@@ -20,7 +20,7 @@ public partial class App : System.Windows.Application
     
     private ILogger<App>? _logger;
     private ChronoGuardBackgroundService? _backgroundService;
-    // private SystemTrayService? _systemTrayService;
+    private SystemTrayService? _systemTrayService;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -43,7 +43,7 @@ public partial class App : System.Windows.Application
             _ = Task.Run(() => _backgroundService.StartAsync(CancellationToken.None));
 
             // Initialize system tray
-            // _systemTrayService = ServiceProvider.GetRequiredService<SystemTrayService>();
+            _systemTrayService = ServiceProvider.GetRequiredService<SystemTrayService>();
 
             // Create and show main window
             var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();
@@ -90,6 +90,9 @@ public partial class App : System.Windows.Application
                 _backgroundService.StopAsync(CancellationToken.None).Wait(TimeSpan.FromSeconds(5));
                 _backgroundService.Dispose();
             }
+
+            // Dispose system tray service
+            _systemTrayService?.Dispose();
 
             _logger?.LogInformation("ChronoGuard application shut down successfully");
         }

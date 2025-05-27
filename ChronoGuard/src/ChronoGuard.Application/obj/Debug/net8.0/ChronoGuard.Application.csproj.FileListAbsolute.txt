@@ -4,3 +4,13 @@
 /workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Application/obj/Debug/net8.0/ChronoGuard.Application.AssemblyInfo.cs
 /workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Application/obj/Debug/net8.0/ChronoGuard.Application.csproj.CoreCompileInputs.cache
 /workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Application/obj/Debug/net8.0/ChronoGuard.Application.sourcelink.json
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Application/bin/Debug/net8.0/ChronoGuard.Application.deps.json
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Application/bin/Debug/net8.0/ChronoGuard.Application.dll
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Application/bin/Debug/net8.0/ChronoGuard.Application.pdb
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Application/bin/Debug/net8.0/ChronoGuard.Domain.dll
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Application/bin/Debug/net8.0/ChronoGuard.Domain.pdb
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Application/obj/Debug/net8.0/ChronoGu.30776DA2.Up2Date
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Application/obj/Debug/net8.0/ChronoGuard.Application.dll
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Application/obj/Debug/net8.0/refint/ChronoGuard.Application.dll
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Application/obj/Debug/net8.0/ChronoGuard.Application.pdb
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Application/obj/Debug/net8.0/ref/ChronoGuard.Application.dll

@@ -1,0 +1,106 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="clr-namespace:ChronoGuard.App.Controls">
+
+    <!-- Estilo para el slider de temperatura accesible -->
+    <Style TargetType="{x:Type controls:AccessibleTemperatureSlider}">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:AccessibleTemperatureSlider}">
+                    <Border Background="{TemplateBinding Background}" 
+                            BorderBrush="{TemplateBinding BorderBrush}" 
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="4">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto" MinHeight="{TemplateBinding MinHeight}"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            
+                            <!-- Etiqueta superior con valor actual -->
+                            <TextBlock Grid.Row="0" 
+                                       Text="{Binding Value, RelativeSource={RelativeSource TemplatedParent}, StringFormat={}{0:F0}K}"
+                                       HorizontalAlignment="Center"
+                                       FontWeight="SemiBold"
+                                       Margin="0,0,0,4"/>
+                            
+                            <!-- Track del slider -->
+                            <Border Grid.Row="1" 
+                                    Name="TrackBackground"
+                                    Height="8"
+                                    BorderBrush="{DynamicResource SliderTrackBorder}"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    VerticalAlignment="Center">
+                                
+                                <!-- Gradiente que representa el espectro de temperatura -->
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                        <GradientStop Color="#FF8B00" Offset="0"/>
+                                        <GradientStop Color="#FFB347" Offset="0.2"/>
+                                        <GradientStop Color="#FFF8DC" Offset="0.4"/>
+                                        <GradientStop Color="#F5F5DC" Offset="0.6"/>
+                                        <GradientStop Color="#E6F3FF" Offset="0.8"/>
+                                        <GradientStop Color="#87CEEB" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                            </Border>
+                            
+                            <!-- Indicador del valor actual -->
+                            <Canvas Grid.Row="1" VerticalAlignment="Center">
+                                <Ellipse Name="ThumbIndicator"
+                                         Width="20" 
+                                         Height="20"
+                                         Fill="{DynamicResource SliderThumbBackground}"
+                                         Stroke="{DynamicResource SliderThumbBorder}"
+                                         StrokeThickness="2"
+                                         Canvas.Top="-10"/>
+                            </Canvas>
+                            
+                            <!-- Etiquetas de mínimo y máximo -->
+                            <Grid Grid.Row="2" Margin="0,4,0,0">
+                                <TextBlock Text="{Binding Minimum, RelativeSource={RelativeSource TemplatedParent}, StringFormat={}{0:F0}K}"
+                                           HorizontalAlignment="Left"
+                                           FontSize="10"
+                                           Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                                <TextBlock Text="{Binding Maximum, RelativeSource={RelativeSource TemplatedParent}, StringFormat={}{0:F0}K}"
+                                           HorizontalAlignment="Right"
+                                           FontSize="10"
+                                           Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                    
+                    <ControlTemplate.Triggers>
+                        <!-- Estados de focus para accesibilidad -->
+                        <Trigger Property="IsFocused" Value="True">
+                            <Setter TargetName="TrackBackground" Property="BorderBrush" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                            <Setter TargetName="TrackBackground" Property="BorderThickness" Value="2"/>
+                        </Trigger>
+                        
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ThumbIndicator" Property="Fill" Value="{DynamicResource SliderThumbHoverBackground}"/>
+                        </Trigger>
+                        
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Recursos para el slider -->
+    <SolidColorBrush x:Key="SliderTrackBackground" Color="#F0F0F0"/>
+    <SolidColorBrush x:Key="SliderTrackBorder" Color="#D0D0D0"/>
+    <SolidColorBrush x:Key="SliderThumbBackground" Color="White"/>
+    <SolidColorBrush x:Key="SliderThumbBorder" Color="#007ACC"/>
+    <SolidColorBrush x:Key="SliderThumbHoverBackground" Color="#E3F2FD"/>
+
+</ResourceDictionary>

@@ -142,3 +142,27 @@ public class EnumToBooleanConverter : IValueConverter
         return DependencyProperty.UnsetValue;
     }
 }
+
+/// <summary>
+/// Converts enum value to visibility based on parameter
+/// </summary>
+public class EnumToVisibilityConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value == null || parameter == null)
+            return Visibility.Collapsed;
+
+        var enumValue = value.ToString();
+        var targetValue = parameter.ToString();
+        
+        return string.Equals(enumValue, targetValue, StringComparison.InvariantCultureIgnoreCase) 
+            ? Visibility.Visible 
+            : Visibility.Collapsed;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}

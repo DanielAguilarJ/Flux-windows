@@ -1,6 +1,16 @@
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/bin/Debug/net8.0-windows10.0.22621.0/ChronoGuard.Infrastructure.deps.json
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/bin/Debug/net8.0-windows10.0.22621.0/ChronoGuard.Infrastructure.dll
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/bin/Debug/net8.0-windows10.0.22621.0/ChronoGuard.Infrastructure.pdb
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/bin/Debug/net8.0-windows10.0.22621.0/ChronoGuard.Domain.dll
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/bin/Debug/net8.0-windows10.0.22621.0/ChronoGuard.Domain.pdb
 /workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/obj/Debug/net8.0-windows10.0.22621.0/ChronoGuard.Infrastructure.csproj.AssemblyReference.cache
 /workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/obj/Debug/net8.0-windows10.0.22621.0/ChronoGuard.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
 /workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/obj/Debug/net8.0-windows10.0.22621.0/ChronoGuard.Infrastructure.AssemblyInfoInputs.cache
 /workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/obj/Debug/net8.0-windows10.0.22621.0/ChronoGuard.Infrastructure.AssemblyInfo.cs
 /workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/obj/Debug/net8.0-windows10.0.22621.0/ChronoGuard.Infrastructure.csproj.CoreCompileInputs.cache
 /workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/obj/Debug/net8.0-windows10.0.22621.0/ChronoGuard.Infrastructure.sourcelink.json
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/obj/Debug/net8.0-windows10.0.22621.0/ChronoGu.90F90352.Up2Date
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/obj/Debug/net8.0-windows10.0.22621.0/ChronoGuard.Infrastructure.dll
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/obj/Debug/net8.0-windows10.0.22621.0/refint/ChronoGuard.Infrastructure.dll
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/obj/Debug/net8.0-windows10.0.22621.0/ChronoGuard.Infrastructure.pdb
+/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/obj/Debug/net8.0-windows10.0.22621.0/ref/ChronoGuard.Infrastructure.dll

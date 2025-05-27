@@ -7,6 +7,7 @@ using ChronoGuard.Domain.Interfaces;
 using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using System.IO;
+using Timer = System.Threading.Timer;
 
 namespace ChronoGuard.App.Services;
 
@@ -19,20 +20,25 @@ public class SystemTrayService : IDisposable
     private readonly ChronoGuardBackgroundService _backgroundService;
     private readonly IProfileService _profileService;
     private readonly ILocationService _locationService;
+    private readonly IForegroundApplicationService _foregroundAppService;
     private NotifyIcon? _notifyIcon;
     private ContextMenuStrip? _contextMenu;
     private bool _disposed = false;
+    private Timer? _pauseTimer;
+    private Timer? _disableUntilTomorrowTimer;
 
     public SystemTrayService(
         ILogger<SystemTrayService> logger,
         ChronoGuardBackgroundService backgroundService,
         IProfileService profileService,
-        ILocationService locationService)
+        ILocationService locationService,
+        IForegroundApplicationService foregroundAppService)
     {
         _logger = logger;
         _backgroundService = backgroundService;
         _profileService = profileService;
         _locationService = locationService;
+        _foregroundAppService = foregroundAppService;
 
         InitializeSystemTray();
         SubscribeToEvents();
@@ -351,7 +357,26 @@ public class SystemTrayService : IDisposable
         try
         {
             await _backgroundService.PauseAsync();
-            // TODO: Implement timed resume after 1 hour
+            
+            // Set up timer to resume after 1 hour
+            _pauseTimer?.Dispose();
+            _pauseTimer = new Timer(async _ =>
+            {
+                try
+                {
+                    await _backgroundService.ResumeAsync();
+                    _logger.LogInformation("Automatically resumed ChronoGuard after 1 hour pause");
+                    
+                    // Clean up timer
+                    _pauseTimer?.Dispose();
+                    _pauseTimer = null;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to automatically resume after 1 hour pause");
+                }
+            }, null, TimeSpan.FromHours(1), Timeout.InfiniteTimeSpan);
+            
             _logger.LogInformation("Paused ChronoGuard for 1 hour");
         }
         catch (Exception ex)
@@ -365,8 +390,60 @@ public class SystemTrayService : IDisposable
         try
         {
             await _backgroundService.PauseAsync();
-            // TODO: Implement resume at sunrise tomorrow
-            _logger.LogInformation("Disabled ChronoGuard until tomorrow");
+            
+            // Calculate time until next sunrise (tomorrow)
+            var tomorrow = DateTime.Now.Date.AddDays(1);
+            var timeUntilSunrise = tomorrow.AddHours(7) - DateTime.Now; // Default to 7 AM if solar calc fails
+            
+            // Try to get accurate sunrise time if location is available
+            try
+            {
+                var location = await _locationService.GetCurrentLocationAsync();
+                if (location != null)
+                {
+                    var solarService = App.ServiceProvider?.GetService<ISolarCalculatorService>();
+                    if (solarService != null)
+                    {
+                        var solarTimes = await solarService.CalculateSolarTimesAsync(location, tomorrow);
+                        if (solarTimes != null)
+                        {
+                            timeUntilSunrise = solarTimes.Sunrise - DateTime.Now;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to calculate exact sunrise time, using default");
+            }
+            
+            // Ensure minimum delay of 1 minute and maximum of 24 hours
+            if (timeUntilSunrise.TotalMinutes < 1)
+                timeUntilSunrise = TimeSpan.FromMinutes(1);
+            else if (timeUntilSunrise.TotalHours > 24)
+                timeUntilSunrise = TimeSpan.FromHours(24);
+            
+            // Set up timer to resume at sunrise tomorrow
+            _disableUntilTomorrowTimer?.Dispose();
+            _disableUntilTomorrowTimer = new Timer(async _ =>
+            {
+                try
+                {
+                    await _backgroundService.ResumeAsync();
+                    _logger.LogInformation("Automatically resumed ChronoGuard at sunrise");
+                    
+                    // Clean up timer
+                    _disableUntilTomorrowTimer?.Dispose();
+                    _disableUntilTomorrowTimer = null;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to automatically resume at sunrise");
+                }
+            }, null, timeUntilSunrise, Timeout.InfiniteTimeSpan);
+            
+            _logger.LogInformation("Disabled ChronoGuard until tomorrow sunrise (in {Hours}h {Minutes}m)", 
+                (int)timeUntilSunrise.TotalHours, timeUntilSunrise.Minutes);
         }
         catch (Exception ex)
         {
@@ -374,16 +451,56 @@ public class SystemTrayService : IDisposable
         }
     }
 
-    private void OnPauseForCurrentApp(object? sender, EventArgs e)
+    private async void OnPauseForCurrentApp(object? sender, EventArgs e)
     {
         try
         {
-            // TODO: Implement app-specific pause functionality
-            _logger.LogInformation("Pause for current app requested (not implemented yet)");
+            // Get the current foreground application
+            var foregroundAppName = _foregroundAppService.GetForegroundApplicationName();
+            
+            if (string.IsNullOrEmpty(foregroundAppName))
+            {
+                _logger.LogWarning("Could not detect current application for app-specific pause");
+                ShowNotification("ChronoGuard", "No se pudo detectar la aplicación actual", 3000);
+                return;
+            }
+
+            // Get current configuration to modify excluded applications
+            var configService = App.ServiceProvider?.GetService<IConfigurationService>();
+            if (configService == null)
+            {
+                _logger.LogError("Configuration service not available for app exclusion");
+                return;
+            }
+
+            var config = await configService.GetConfigurationAsync();
+            
+            // Add current app to excluded list if not already present
+            if (!config.Advanced.ExcludedApplications.Contains(foregroundAppName))
+            {
+                config.Advanced.ExcludedApplications.Add(foregroundAppName);
+                await configService.SaveConfigurationAsync(config);
+                
+                // Update background service to immediately apply the exclusion
+                await _backgroundService.TriggerUpdateAsync();
+                
+                ShowNotification("ChronoGuard", 
+                    $"Pausado para '{foregroundAppName}'. Se reactiva automáticamente al cambiar de aplicación.", 
+                    5000);
+                
+                _logger.LogInformation("Added {AppName} to excluded applications list", foregroundAppName);
+            }
+            else
+            {
+                ShowNotification("ChronoGuard", 
+                    $"'{foregroundAppName}' ya está en la lista de aplicaciones excluidas.", 
+                    3000);
+            }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to pause for current app");
+            ShowNotification("ChronoGuard", "Error al pausar para la aplicación actual", 3000);
         }
     }
 
@@ -450,6 +567,8 @@ public class SystemTrayService : IDisposable
             _profileService.ActiveProfileChanged -= OnActiveProfileChanged;
             _locationService.LocationChanged -= OnLocationChanged;
 
+            _pauseTimer?.Dispose();
+            _disableUntilTomorrowTimer?.Dispose();
             _notifyIcon?.Dispose();
             _contextMenu?.Dispose();
         }

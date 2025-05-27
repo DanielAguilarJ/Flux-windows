@@ -1,9 +1,12 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ChronoGuard.Domain.Interfaces;
+using ChronoGuard.Domain.Entities;
 using System.Collections.ObjectModel;
 using System.Windows;
 using ChronoGuard.App.Views.Onboarding;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace ChronoGuard.App.ViewModels
 {
@@ -12,6 +15,7 @@ namespace ChronoGuard.App.ViewModels
         private readonly Window _window;
         private readonly IConfigurationService _configurationService;
         private readonly IProfileService _profileService;
+        private readonly ILogger<OnboardingViewModel> _logger;
         private int _step = 0;
         public ObservableCollection<object> Steps { get; } = new();
         [ObservableProperty] private object currentStepView;
@@ -27,6 +31,13 @@ namespace ChronoGuard.App.ViewModels
         [ObservableProperty] private NotificationLevel notificationLevel = NotificationLevel.Basic;
         [ObservableProperty] private string? resumenConfiguracion;
 
+        // Colecciones para las vistas
+        public ObservableCollection<ColorProfile> AvailableProfiles { get; } = new();
+        public ObservableCollection<NotificationLevel> NotificationLevels { get; } = new();
+
+        // Propiedades calculadas
+        public ColorProfile? SelectedProfile => AvailableProfiles.FirstOrDefault(p => p.Id == SelectedProfileId);
+
         public OnboardingViewModel(Window window)
         {
             _window = window;
@@ -34,11 +45,47 @@ namespace ChronoGuard.App.ViewModels
                 ?? throw new InvalidOperationException("No se pudo obtener IConfigurationService");
             _profileService = App.ServiceProvider?.GetService(typeof(IProfileService)) as IProfileService
                 ?? throw new InvalidOperationException("No se pudo obtener IProfileService");
+            _logger = App.ServiceProvider?.GetService(typeof(ILogger<OnboardingViewModel>)) as ILogger<OnboardingViewModel>
+                ?? throw new InvalidOperationException("No se pudo obtener ILogger");
+
+            // Inicializar datos
+            InitializeData();
+
             Steps.Add(new Step1View(this));
             Steps.Add(new Step2View(this));
             Steps.Add(new Step3View(this));
             Steps.Add(new Step4View(this));
             CurrentStepView = Steps[0];
+        }
+
+        private async void InitializeData()
+        {
+            try
+            {
+                // Cargar perfiles disponibles
+                var profiles = await _profileService.GetProfilesAsync();
+                AvailableProfiles.Clear();
+                foreach (var profile in profiles)
+                {
+                    AvailableProfiles.Add(profile);
+                }
+
+                // Configurar niveles de notificación
+                NotificationLevels.Clear();
+                NotificationLevels.Add(NotificationLevel.Silent);
+                NotificationLevels.Add(NotificationLevel.Basic);
+                NotificationLevels.Add(NotificationLevel.Detailed);
+
+                // Seleccionar primer perfil por defecto
+                if (AvailableProfiles.Any())
+                {
+                    SelectedProfileId = AvailableProfiles.First().Id;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error initializing onboarding data");
+            }
         }
 
         [RelayCommand]
@@ -63,10 +110,7 @@ namespace ChronoGuard.App.ViewModels
                 _step++;
                 if (_step == 3) // Paso resumen
                 {
-                    ResumenConfiguracion = $"Ubicación: {LocationMethod}{(LocationMethod == LocationMethod.Manual ? $" ({ManualCity ?? $"{ManualLatitude},{ManualLongitude}"})" : "")}\n" +
-                        $"Perfil: {SelectedProfileId}\n" +
-                        $"Autoinicio: {(AutoStart ? "Sí" : "No")}\n" +
-                        $"Notificaciones: {NotificationLevel}";
+                    UpdateResumen();
                 }
                 CurrentStepView = Steps[_step];
             }
@@ -104,6 +148,56 @@ namespace ChronoGuard.App.ViewModels
             // TODO: Configurar autoinicio real (StartupManager)
             _window.DialogResult = true;
             _window.Close();
+        }
+
+        partial void OnSelectedProfileIdChanged(string? value)
+        {
+            OnPropertyChanged(nameof(SelectedProfile));
+            UpdateResumen();
+        }
+
+        partial void OnLocationMethodChanged(LocationMethod value)
+        {
+            UpdateResumen();
+        }
+
+        partial void OnAutoStartChanged(bool value)
+        {
+            UpdateResumen();
+        }
+
+        partial void OnNotificationLevelChanged(NotificationLevel value)
+        {
+            UpdateResumen();
+        }
+
+        private void UpdateResumen()
+        {
+            if (_step == 3) // Solo actualizar en el paso de resumen
+            {
+                var locationText = LocationMethod switch
+                {
+                    LocationMethod.Auto => "Automática",
+                    LocationMethod.Manual when !string.IsNullOrEmpty(ManualCity) => $"Manual - {ManualCity}",
+                    LocationMethod.Manual => $"Manual - {ManualLatitude:F2}, {ManualLongitude:F2}",
+                    _ => LocationMethod.ToString()
+                };
+
+                var profileText = SelectedProfile?.Name ?? SelectedProfileId ?? "No seleccionado";
+                var autoStartText = AutoStart ? "Sí" : "No";
+                var notificationText = NotificationLevel switch
+                {
+                    NotificationLevel.Silent => "Silencioso",
+                    NotificationLevel.Basic => "Básico",
+                    NotificationLevel.Detailed => "Detallado",
+                    _ => NotificationLevel.ToString()
+                };
+
+                ResumenConfiguracion = $"📍 Ubicación: {locationText}\n" +
+                                     $"🎨 Perfil: {profileText}\n" +
+                                     $"🚀 Autoinicio: {autoStartText}\n" +
+                                     $"🔔 Notificaciones: {notificationText}";
+            }
         }
     }
 }

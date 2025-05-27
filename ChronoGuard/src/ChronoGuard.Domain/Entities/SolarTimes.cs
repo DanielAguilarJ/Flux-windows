@@ -13,7 +13,7 @@ public record SolarTimes
     /// <summary>
     /// Solar noon time (when sun is highest)
     /// </summary>
-    public DateTime SolarNoon => Date.Date.AddTicks((Sunrise.Ticks + Sunset.Ticks) / 2);
+    public DateTime SolarNoon => Date.Date.Add(TimeSpan.FromTicks((Sunrise.TimeOfDay.Ticks + Sunset.TimeOfDay.Ticks) / 2));
     
     /// <summary>
     /// Day length in hours
