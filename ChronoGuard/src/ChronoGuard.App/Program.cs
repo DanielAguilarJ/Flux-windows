@@ -61,8 +61,9 @@ public static class Program
                 services.AddSingleton<ISolarCalculatorService, SolarCalculatorService>();
                 services.AddSingleton<IColorTemperatureService, WindowsColorTemperatureService>();
                 services.AddSingleton<IProfileService, ChronoGuard.Infrastructure.Services.ProfileService>();
-                services.AddSingleton<IConfigurationService, ConfigurationService>();
-                services.AddSingleton<INotificationService, NotificationService>();                services.AddSingleton<IStartupManager, StartupManager>();
+                services.AddSingleton<IConfigurationService, ConfigurationService>();                services.AddSingleton<INotificationService, NotificationService>();
+                services.AddSingleton<IUpdateService, UpdateService>();
+                services.AddHostedService<UpdateNotificationService>();                services.AddSingleton<IStartupManager, StartupManager>();
                 services.AddSingleton<IForegroundApplicationService, ChronoGuard.Infrastructure.Services.WindowsForegroundApplicationService>();
                 services.AddSingleton<IPerformanceMonitoringService, ChronoGuard.Infrastructure.Services.PerformanceMonitoringService>();
                 

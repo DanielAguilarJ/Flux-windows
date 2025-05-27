@@ -1153,6 +1153,7 @@
         "dependencies": {
           "ChronoGuard.Domain": "1.0.0",
           "Microsoft.Extensions.Configuration.Abstractions": "8.0.0",
+          "Microsoft.Extensions.Hosting.Abstractions": "8.0.0",
           "Microsoft.Extensions.Http": "8.0.0",
           "Microsoft.Extensions.Logging.Abstractions": "8.0.0",
           "System.Management": "8.0.0",

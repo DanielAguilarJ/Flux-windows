@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyCopyrightAttribute("Copyright © 2025 ChronoGuard Technologies")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6ce6a7db7b9fd5dfa9950a4f072c2dec8ebbb40a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+44b8951ca02949f08ab40ee311074ecbced23b48")]
 [assembly: System.Reflection.AssemblyProductAttribute("ChronoGuard")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ChronoGuard")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ChronoGuard.Domain")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4e3c4081cd46a77f9e9a3dc2feb83ccb58674f7f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+44b8951ca02949f08ab40ee311074ecbced23b48")]
 [assembly: System.Reflection.AssemblyProductAttribute("ChronoGuard.Domain")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ChronoGuard.Domain")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

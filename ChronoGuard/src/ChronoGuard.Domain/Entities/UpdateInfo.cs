@@ -16,6 +16,9 @@ public class UpdateInfo
     public bool IsSecurityUpdate { get; set; }
     public bool IsMandatory { get; set; }
     public UpdateType Type { get; set; } = UpdateType.Minor;
+    public string Description { get; set; } = string.Empty;
+    public bool IsPreRelease { get; set; }
+    public string ChangelogUrl { get; set; } = string.Empty;
 }
 
 /// <summary>

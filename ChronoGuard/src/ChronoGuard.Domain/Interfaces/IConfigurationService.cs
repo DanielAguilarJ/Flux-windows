@@ -58,6 +58,11 @@ public class GeneralSettings
     public bool CheckForUpdates { get; set; } = true;
     public string Language { get; set; } = "es-ES";
     public string GlobalHotkey { get; set; } = "Ctrl+Alt+F";
+    
+    // Configuración de actualizaciones automáticas
+    public bool AutoUpdateEnabled { get; set; } = true;
+    public bool CheckPreReleases { get; set; } = false;
+    public int UpdateCheckInterval { get; set; } = 24; // horas
 }
 
 public class LocationSettings
