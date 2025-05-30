@@ -9,13 +9,12 @@ namespace ChronoGuard.Infrastructure.Services
         public ConfigManager(string appDataPath)
         {
             configPath = Path.Combine(appDataPath, "config.json");
-        }
-        public async Task<AppConfig> LoadConfigAsync()
+        }        public async Task<AppConfig> LoadConfigAsync()
         {
             if (!File.Exists(configPath))
                 return new AppConfig();
             var json = await File.ReadAllTextAsync(configPath);
-            return JsonSerializer.Deserialize<AppConfig>(json);
+            return JsonSerializer.Deserialize<AppConfig>(json) ?? new AppConfig();
         }
         public async Task SaveConfigAsync(AppConfig config)
         {
@@ -36,13 +35,12 @@ namespace ChronoGuard.Infrastructure.Services
         public bool AutoStart { get; set; } = true;
         public bool MinimizeToTray { get; set; } = true;
         public bool CheckForUpdates { get; set; } = true;
-    }
-    public class LocationConfig
+    }    public class LocationConfig
     {
         public string Method { get; set; } = "auto";
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }
-        public string City { get; set; }
+        public string? City { get; set; }
         public string UpdateFrequency { get; set; } = "daily";
     }
     public class NotificationConfig

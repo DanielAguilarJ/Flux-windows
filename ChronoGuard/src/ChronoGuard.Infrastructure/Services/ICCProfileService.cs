@@ -495,11 +495,9 @@ namespace ChronoGuard.Infrastructure.Services
             }
 
             return (x, y);
-        }
-
-        private async Task ModifyWhitePointTagAsync(ICCProfile profile, ColorTemperature targetTemperature)
+        }        private Task ModifyWhitePointTagAsync(ICCProfile profile, ColorTemperature targetTemperature)
         {
-            if (!profile.Tags.ContainsKey("wtpt")) return;
+            if (!profile.Tags.ContainsKey("wtpt")) return Task.CompletedTask;
 
             var newWhitePoint = CalculateWhitePointFromTemperature(targetTemperature);
             var tag = profile.Tags["wtpt"];
@@ -510,6 +508,7 @@ namespace ChronoGuard.Infrastructure.Services
             WriteFixedPoint(tag.Data, 16, newWhitePoint.Z);
 
             profile.WhitePoint = newWhitePoint;
+            return Task.CompletedTask;
         }
 
         private async Task ModifyGammaTagsAsync(ICCProfile profile, ColorTemperature targetTemperature)
@@ -520,18 +519,14 @@ namespace ChronoGuard.Infrastructure.Services
             await ModifyTRCTagAsync(profile, "rTRC", gammaAdjustment.Red);
             await ModifyTRCTagAsync(profile, "gTRC", gammaAdjustment.Green);
             await ModifyTRCTagAsync(profile, "bTRC", gammaAdjustment.Blue);
-        }
-
-        private async Task ModifyTRCTagsAsync(ICCProfile profile, ColorTemperature targetTemperature)
+        }        private Task ModifyTRCTagsAsync(ICCProfile profile, ColorTemperature targetTemperature)
         {
             // This would implement tone reproduction curve adjustments
             // for the target color temperature
-            await Task.CompletedTask; // Placeholder
-        }
-
-        private async Task ModifyTRCTagAsync(ICCProfile profile, string tagName, double gamma)
+            return Task.CompletedTask; // Placeholder
+        }        private Task ModifyTRCTagAsync(ICCProfile profile, string tagName, double gamma)
         {
-            if (!profile.Tags.ContainsKey(tagName)) return;
+            if (!profile.Tags.ContainsKey(tagName)) return Task.CompletedTask;
 
             var tag = profile.Tags[tagName];
             if (tag.Data.Length >= 12)
@@ -551,6 +546,7 @@ namespace ChronoGuard.Infrastructure.Services
                     BitConverter.GetBytes(gammaValue).CopyTo(tag.Data, 12);
                 }
             }
+            return Task.CompletedTask;
         }
 
         private (double Red, double Green, double Blue) CalculateGammaAdjustment(ColorTemperature temperature)
@@ -683,9 +679,7 @@ namespace ChronoGuard.Infrastructure.Services
             System.Text.Encoding.ASCII.GetBytes("cprt").CopyTo(data, offset);
             BitConverter.GetBytes(ReverseBytes(dataOffset)).CopyTo(data, offset + 4);
             BitConverter.GetBytes(ReverseBytes(50u)).CopyTo(data, offset + 8);
-        }
-
-        private async Task WriteRequiredTagsAsync(byte[] data, ICCProfile profile, ColorTemperature temperature)
+        }        private Task WriteRequiredTagsAsync(byte[] data, ICCProfile profile, ColorTemperature temperature)
         {
             // White point tag at offset 200
             System.Text.Encoding.ASCII.GetBytes("XYZ ").CopyTo(data, 200);
@@ -712,6 +706,8 @@ namespace ChronoGuard.Infrastructure.Services
             var copyright = "Copyright ChronoGuard";
             var copyrightBytes = System.Text.Encoding.ASCII.GetBytes(copyright);
             Array.Copy(copyrightBytes, 0, data, 328, Math.Min(copyrightBytes.Length, 40));
+            
+            return Task.CompletedTask;
         }
 
         private async Task<bool> ApplyProfileViaWCSAsync(string profilePath, string monitorDeviceName)

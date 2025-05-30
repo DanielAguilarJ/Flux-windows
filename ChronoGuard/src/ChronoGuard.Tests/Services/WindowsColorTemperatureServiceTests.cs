@@ -1,21 +1,24 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ChronoGuard.Infrastructure.Services;
 using ChronoGuard.Domain.Entities;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 using System.Linq;
 
 namespace ChronoGuard.Tests.Services
-{
-    [TestClass]
+{    [TestClass]
     public class WindowsColorTemperatureServiceTests
     {
-        private WindowsColorTemperatureService _colorService;
+        private WindowsColorTemperatureService _colorService = null!;
+        private ILogger<WindowsColorTemperatureService> _logger = null!;
 
         [TestInitialize]
         public void Setup()
         {
-            _colorService = new WindowsColorTemperatureService();
+            _logger = LoggerFactory.Create(builder => { })
+                .CreateLogger<WindowsColorTemperatureService>();
+            _colorService = new WindowsColorTemperatureService(_logger);
         }
 
         [TestMethod]
@@ -27,11 +30,10 @@ namespace ChronoGuard.Tests.Services
             // Assert
             Assert.IsNotNull(monitors, "Monitors collection should not be null");
             Assert.IsTrue(monitors.Any(), "Should detect at least one monitor");
-            
-            foreach (var monitor in monitors)
+              foreach (var monitor in monitors)
             {
-                Assert.IsFalse(string.IsNullOrEmpty(monitor.DeviceName), 
-                    "Monitor should have a device name");
+                Assert.IsFalse(string.IsNullOrEmpty(monitor.DevicePath), 
+                    "Monitor should have a device path");
                 Assert.IsTrue(monitor.IsPrimary || !monitor.IsPrimary, 
                     "IsPrimary should be a valid boolean");
             }
@@ -45,12 +47,10 @@ namespace ChronoGuard.Tests.Services
 
             // Assert
             Assert.IsNotNull(extendedMonitors, "Extended monitors collection should not be null");
-            Assert.IsTrue(extendedMonitors.Any(), "Should detect at least one extended monitor");
-
-            foreach (var monitor in extendedMonitors)
+            Assert.IsTrue(extendedMonitors.Any(), "Should detect at least one extended monitor");            foreach (var monitor in extendedMonitors)
             {
-                Assert.IsFalse(string.IsNullOrEmpty(monitor.DeviceName), 
-                    "Extended monitor should have device name");
+                Assert.IsFalse(string.IsNullOrEmpty(monitor.DevicePath), 
+                    "Extended monitor should have device path");
                 Assert.IsTrue(monitor.BitDepth >= 16 && monitor.BitDepth <= 32,
                     $"Bit depth should be reasonable (16-32), got {monitor.BitDepth}");
                 
@@ -85,10 +85,8 @@ namespace ChronoGuard.Tests.Services
             // Arrange
             var monitors = await _colorService.GetMonitorsAsync();
             var firstMonitor = monitors.First();
-            var temperature = new ColorTemperature(4000);
-
-            // Act & Assert - Should not throw
-            await _colorService.ApplyTemperatureToMonitorAsync(firstMonitor.DeviceName, temperature);
+            var temperature = new ColorTemperature(4000);            // Act & Assert - Should not throw
+            await _colorService.ApplyTemperatureToMonitorAsync(firstMonitor.DevicePath, temperature);
         }
 
         [TestMethod]
@@ -181,10 +179,8 @@ namespace ChronoGuard.Tests.Services
                 
                 // Brief delay to allow system to settle
                 await Task.Delay(100);
-            }
-
-            // Reset to neutral
-            await _colorService.ResetToDefaultAsync();
+            }            // Reset to neutral
+            await _colorService.RestoreOriginalSettingsAsync();
         }
 
         [TestMethod]
@@ -202,17 +198,13 @@ namespace ChronoGuard.Tests.Services
             var monitor1 = monitors.First();
             var monitor2 = monitors.Skip(1).First();
             var warmTemp = new ColorTemperature(3000);
-            var coolTemp = new ColorTemperature(6000);
-
-            // Act - Apply different temperatures to different monitors
-            await _colorService.ApplyTemperatureToMonitorAsync(monitor1.DeviceName, warmTemp);
-            await _colorService.ApplyTemperatureToMonitorAsync(monitor2.DeviceName, coolTemp);
-
-            // Assert - Should complete without errors
+            var coolTemp = new ColorTemperature(6000);            // Act - Apply different temperatures to different monitors
+            await _colorService.ApplyTemperatureToMonitorAsync(monitor1.DevicePath, warmTemp);
+            await _colorService.ApplyTemperatureToMonitorAsync(monitor2.DevicePath, coolTemp);            // Assert - Should complete without errors
             Assert.IsTrue(true, "Independent monitor temperature adjustment completed");
 
             // Cleanup
-            await _colorService.ResetToDefaultAsync();
+            await _colorService.RestoreOriginalSettingsAsync();
         }
 
         [TestMethod]
@@ -239,11 +231,10 @@ namespace ChronoGuard.Tests.Services
 
                 // Verify the temperature was applied (no exception thrown)
                 Assert.IsTrue(true, $"Chromatic adaptation succeeded for {temperature.Kelvin}K");
-                
-                await Task.Delay(50); // Brief settling time
+                  await Task.Delay(50); // Brief settling time
             }
 
-            await _colorService.ResetToDefaultAsync();
+            await _colorService.RestoreOriginalSettingsAsync();
         }
 
         [TestMethod]
@@ -293,11 +284,10 @@ namespace ChronoGuard.Tests.Services
                 
                 // Verify no exceptions were thrown (gamma ramp was valid)
                 Assert.IsTrue(true, $"Valid gamma ramp generated for {temperature.Kelvin}K");
-                
-                await Task.Delay(25); // Brief delay
+                  await Task.Delay(25); // Brief delay
             }
 
-            await _colorService.ResetToDefaultAsync();
+            await _colorService.RestoreOriginalSettingsAsync();
         }
 
         [TestMethod]
@@ -307,11 +297,10 @@ namespace ChronoGuard.Tests.Services
             var originalMonitors = await _colorService.GetMonitorsAsync();
             var warmTemperature = new ColorTemperature(2700);
 
-            // Act
-            await _colorService.ApplyTemperatureAsync(warmTemperature);
+            // Act            await _colorService.ApplyTemperatureAsync(warmTemperature);
             await Task.Delay(100); // Let the change settle
             
-            await _colorService.ResetToDefaultAsync();
+            await _colorService.RestoreOriginalSettingsAsync();
             await Task.Delay(100); // Let the reset settle
 
             // Assert
@@ -342,22 +331,22 @@ namespace ChronoGuard.Tests.Services
                 {
                     await _colorService.ApplyTemperatureAsync(temperature);
                     await Task.Delay(10); // Very brief delay for stress testing
-                }
-            }
+                }            }
 
             // Cleanup
-            await _colorService.ResetToDefaultAsync();
+            await _colorService.RestoreOriginalSettingsAsync();
             Assert.IsTrue(true, "System remained stable under rapid temperature changes");
-        }
-
-        [TestCleanup]
+        }        [TestCleanup]
         public async Task Cleanup()
         {
             // Always reset to default after tests
             try
             {
-                await _colorService?.ResetToDefaultAsync();
-                await Task.Delay(100);
+                if (_colorService != null)
+                {
+                    await _colorService.RestoreOriginalSettingsAsync();
+                    await Task.Delay(100);
+                }
             }
             catch
             {

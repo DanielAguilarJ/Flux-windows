@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "INNTZDF1kpQ=",
+  "dgSpecHash": "wP70BaqKGmw=",
   "success": true,
-  "projectFilePath": "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.App\\ChronoGuard.App.csproj",
+  "projectFilePath": "c:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.App\\ChronoGuard.App.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\junco\\.nuget\\packages\\communitytoolkit.mvvm\\8.2.2\\communitytoolkit.mvvm.8.2.2.nupkg.sha512",
     "C:\\Users\\junco\\.nuget\\packages\\harfbuzzsharp\\8.3.0.1\\harfbuzzsharp.8.3.0.1.nupkg.sha512",

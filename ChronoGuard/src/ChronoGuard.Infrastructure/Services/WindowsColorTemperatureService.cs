@@ -1354,19 +1354,17 @@ public class WindowsColorTemperatureService : IColorTemperatureService
     private static extern bool AssociateColorProfileWithDevice(string machineName, string profileName, string deviceName);
 
     [DllImport("mscms.dll", SetLastError = true)]
-    private static extern bool DisassociateColorProfileFromDevice(string machineName, string profileName, string deviceName);
-
-    /// <summary>
+    private static extern bool DisassociateColorProfileFromDevice(string machineName, string profileName, string deviceName);    /// <summary>
     /// Apply ICC profile using Windows Color Management System
     /// </summary>
-    private async Task<bool> ApplyProfileViaWCSAsync(string profilePath, string monitorDeviceName)
+    private Task<bool> ApplyProfileViaWCSAsync(string profilePath, string monitorDeviceName)
     {
         try
         {
             _logger.LogInformation("Applying ICC profile via WCS: {ProfilePath} to {Monitor}", profilePath, monitorDeviceName);
 
             // Install the profile in the system
-            var installSuccess = InstallColorProfile(null, profilePath);
+            var installSuccess = InstallColorProfile(string.Empty, profilePath);
             if (!installSuccess)
             {
                 var error = Marshal.GetLastWin32Error();
@@ -1377,37 +1375,35 @@ public class WindowsColorTemperatureService : IColorTemperatureService
 
             // Associate the profile with the monitor device
             var profileName = Path.GetFileName(profilePath);
-            var associateSuccess = AssociateColorProfileWithDevice(null, profileName, monitorDeviceName);
+            var associateSuccess = AssociateColorProfileWithDevice(string.Empty, profileName, monitorDeviceName);
             
             if (!associateSuccess)
             {
                 var error = Marshal.GetLastWin32Error();
                 _logger.LogError("Failed to associate ICC profile {ProfileName} with device {Device}, error: {Error}", 
                     profileName, monitorDeviceName, error);
-                return false;
+                return Task.FromResult(false);
             }
 
             _logger.LogInformation("Successfully applied ICC profile via WCS for monitor {Monitor}", monitorDeviceName);
-            return true;
+            return Task.FromResult(true);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error applying ICC profile via WCS for monitor {Monitor}", monitorDeviceName);
-            return false;
+            return Task.FromResult(false);
         }
-    }
-
-    /// <summary>
+    }/// <summary>
     /// Remove ICC profile association using Windows Color Management System
     /// </summary>
-    private async Task<bool> RemoveProfileViaWCSAsync(string profilePath, string monitorDeviceName)
+    private Task<bool> RemoveProfileViaWCSAsync(string profilePath, string monitorDeviceName)
     {
         try
         {
             var profileName = Path.GetFileName(profilePath);
             
             // Disassociate the profile from the device
-            var disassociateSuccess = DisassociateColorProfileFromDevice(null, profileName, monitorDeviceName);
+            var disassociateSuccess = DisassociateColorProfileFromDevice(string.Empty, profileName, monitorDeviceName);
             
             if (!disassociateSuccess)
             {
@@ -1417,19 +1413,19 @@ public class WindowsColorTemperatureService : IColorTemperatureService
             }
 
             // Optionally uninstall the profile from the system
-            var uninstallSuccess = UninstallColorProfile(null, profilePath, false);
+            var uninstallSuccess = UninstallColorProfile(string.Empty, profilePath, false);
             if (!uninstallSuccess)
             {
                 var error = Marshal.GetLastWin32Error();
                 _logger.LogInformation("ICC profile {ProfilePath} not uninstalled (may be in use), error: {Error}", profilePath, error);
             }
 
-            return true;
+            return Task.FromResult(true);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error removing ICC profile via WCS for monitor {Monitor}", monitorDeviceName);
-            return false;
+            return Task.FromResult(false);
         }
     }
 

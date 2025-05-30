@@ -251,15 +251,14 @@
                 <StackPanel Grid.Column="0">
                     <!-- Hero Card -->
                     <Border Style="{StaticResource GlassCard}" Padding="32" Margin="0,0,0,24">
-                        <StackPanel>
-                            <!-- Status Header -->
+                        <StackPanel>                            <!-- Status Header -->
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,24">
                                 <Ellipse Width="16" Height="16" VerticalAlignment="Center" Margin="0,0,12,0">
                                     <Ellipse.Fill>
                                         <SolidColorBrush Color="#A6E3A1"/>
                                     </Ellipse.Fill>
                                 </Ellipse>
-                                <TextBlock Text="Filtro Activo" Style="{StaticResource HeadingMedium}"/>
+                                <TextBlock Text="{Binding CurrentStatusText}" Style="{StaticResource HeadingMedium}"/>
                             </StackPanel>
                             
                             <!-- Temperature Display -->
@@ -271,9 +270,8 @@
                                 </Grid.RowDefinitions>
                                 
                                 <TextBlock Grid.Row="0" Text="Temperatura de Color" Style="{StaticResource CaptionText}" Margin="0,0,0,8"/>
-                                
-                                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <TextBlock Text="3200" Style="{StaticResource HeadingLarge}"/>
+                                  <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <TextBlock Text="{Binding CurrentColorTemperature, StringFormat={}{0:F0}}" Style="{StaticResource HeadingLarge}"/>
                                     <TextBlock Text="K" Style="{StaticResource HeadingMedium}" VerticalAlignment="Bottom" Margin="4,0,0,4"/>
                                 </StackPanel>
                                 
@@ -287,26 +285,31 @@
                                     </Ellipse>
                                 </Grid>
                             </Grid>
-                            
-                            <!-- Next Transition -->
-                            <TextBlock Text="Siguiente ajuste en 2h 15m" 
+                              <!-- Next Transition -->
+                            <TextBlock Text="{Binding NextTransitionText}" 
                                        Style="{StaticResource BodyText}"
                                        HorizontalAlignment="Center"/>
                         </StackPanel>
                     </Border>
-                    
-                    <!-- Control Buttons -->
+                      <!-- Control Buttons -->
                     <StackPanel Margin="0,0,0,24">
                         <Button Content="⏸️ Pausar Filtro" 
                                 Style="{StaticResource PrimaryButton}"
+                                Command="{Binding PauseCommand}"
+                                Visibility="{Binding PauseButtonVisibility}"
+                                Margin="0,0,0,12"/>
+                        <Button Content="▶️ Reanudar Filtro" 
+                                Style="{StaticResource PrimaryButton}"
+                                Command="{Binding ResumeCommand}"
+                                Visibility="{Binding ResumeButtonVisibility}"
                                 Margin="0,0,0,12"/>
                         <Button Content="⚙️ Configuración Avanzada" 
-                                Style="{StaticResource SecondaryButton}"/>
+                                Style="{StaticResource SecondaryButton}"
+                                Command="{Binding OpenSettingsCommand}"/>
                     </StackPanel>
                     
                     <!-- Quick Info Cards -->
-                    <StackPanel>
-                        <!-- Location Card -->
+                    <StackPanel>                        <!-- Location Card -->
                         <Border Style="{StaticResource GlassCard}" Padding="20" Margin="0,0,0,16">
                             <StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
@@ -317,11 +320,10 @@
                                           Margin="0,0,8,0"/>
                                     <TextBlock Text="Ubicación" Style="{StaticResource HeadingSmall}"/>
                                 </StackPanel>
-                                <TextBlock Text="Madrid, España" Style="{StaticResource BodyText}" TextWrapping="Wrap"/>
+                                <TextBlock Text="{Binding CurrentLocationText}" Style="{StaticResource BodyText}" TextWrapping="Wrap"/>
                             </StackPanel>
                         </Border>
-                        
-                        <!-- Profile Card -->
+                          <!-- Profile Card -->
                         <Border Style="{StaticResource GlassCard}" Padding="20">
                             <StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
@@ -332,7 +334,7 @@
                                           Margin="0,0,8,0"/>
                                     <TextBlock Text="Perfil Activo" Style="{StaticResource HeadingSmall}"/>
                                 </StackPanel>
-                                <TextBlock Text="Automático (Recomendado)" Style="{StaticResource BodyText}"/>
+                                <TextBlock Text="{Binding CurrentProfileName}" Style="{StaticResource BodyText}"/>
                             </StackPanel>
                         </Border>
                     </StackPanel>
@@ -356,33 +358,30 @@
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            
-                            <!-- Solar Position Card -->
+                              <!-- Solar Position Card -->
                             <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource GlassCard}" 
                                     Padding="24" Margin="0,0,12,12">
                                 <StackPanel>
                                     <TextBlock Text="Posición Solar" Style="{StaticResource CaptionText}" Margin="0,0,0,8"/>
-                                    <TextBlock Text="42.3°" Style="{StaticResource HeadingMedium}"/>
+                                    <TextBlock Text="{Binding SolarElevation}" Style="{StaticResource HeadingMedium}"/>
                                     <TextBlock Text="Elevación" Style="{StaticResource BodyText}"/>
                                 </StackPanel>
                             </Border>
-                            
-                            <!-- Time to Sunset Card -->
+                              <!-- Time to Sunset Card -->
                             <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource GlassCard}" 
                                     Padding="24" Margin="6,0,6,12">
                                 <StackPanel>
                                     <TextBlock Text="Tiempo hasta Sunset" Style="{StaticResource CaptionText}" Margin="0,0,0,8"/>
-                                    <TextBlock Text="5h 23m" Style="{StaticResource HeadingMedium}"/>
+                                    <TextBlock Text="{Binding TimeUntilSunset}" Style="{StaticResource HeadingMedium}"/>
                                     <TextBlock Text="Horas restantes" Style="{StaticResource BodyText}"/>
                                 </StackPanel>
                             </Border>
-                            
-                            <!-- Active Time Card -->
+                              <!-- Active Time Card -->
                             <Border Grid.Row="0" Grid.Column="2" Style="{StaticResource GlassCard}" 
                                     Padding="24" Margin="12,0,0,12">
                                 <StackPanel>
                                     <TextBlock Text="Tiempo Activo" Style="{StaticResource CaptionText}" Margin="0,0,0,8"/>
-                                    <TextBlock Text="8h 42m" Style="{StaticResource HeadingMedium}"/>
+                                    <TextBlock Text="{Binding ApplicationUptime}" Style="{StaticResource HeadingMedium}"/>
                                     <TextBlock Text="Hoy" Style="{StaticResource BodyText}"/>
                                 </StackPanel>
                             </Border>
@@ -433,16 +432,17 @@
                                     
                                     <StackPanel Grid.Column="1">
                                         <TextBlock Text="Acciones Rápidas" Style="{StaticResource HeadingSmall}" Margin="0,0,0,16"/>
-                                        
-                                        <StackPanel>
+                                          <StackPanel>
                                             <Button Content="🔄 Actualizar Ubicación" 
                                                     Style="{StaticResource SecondaryButton}"
+                                                    Command="{Binding UpdateLocationCommand}"
                                                     HorizontalAlignment="Stretch" Margin="0,0,0,8"/>
                                             <Button Content="📊 Estadísticas Detalladas" 
                                                     Style="{StaticResource SecondaryButton}"
                                                     HorizontalAlignment="Stretch" Margin="0,0,0,8"/>
                                             <Button Content="❓ Ayuda y Tutorial" 
                                                     Style="{StaticResource SecondaryButton}"
+                                                    Command="{Binding ShowAboutCommand}"
                                                     HorizontalAlignment="Stretch" Margin="0,0,0,8"/>
                                             <Button Content="🔽 Minimizar a Bandeja" 
                                                     Style="{StaticResource SecondaryButton}"

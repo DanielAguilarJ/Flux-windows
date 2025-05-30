@@ -8,6 +8,7 @@ using ChronoGuard.Domain.Interfaces;
 using ChronoGuard.Application.Services;
 using WpfApp = System.Windows.Application;
 using ChronoGuard.App.Views.Tutorial;
+using System.Windows.Threading;
 
 namespace ChronoGuard.App.ViewModels;
 
@@ -21,6 +22,10 @@ public partial class MainWindowViewModel : ObservableObject
     private readonly IProfileService _profileService;
     private readonly IConfigurationService _configurationService;
     private readonly ChronoGuardBackgroundService _backgroundService;
+    private readonly ISolarCalculatorService _solarCalculatorService;
+    
+    private readonly DispatcherTimer _updateTimer;
+    private DateTime _applicationStartTime;
 
     [ObservableProperty]
     private string _currentLocationText = "Detectando ubicación...";
@@ -55,18 +60,39 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private Visibility _resumeButtonVisibility = Visibility.Collapsed;
 
+    // Solar data properties for dashboard
+    [ObservableProperty]
+    private string _solarElevation = "--°";
+
+    [ObservableProperty]
+    private string _timeUntilSunset = "--h --m";
+
+    [ObservableProperty]
+    private string _applicationUptime = "--h --m";
+
     public MainWindowViewModel(
         ILogger<MainWindowViewModel> logger,
         ILocationService locationService,
         IProfileService profileService,
         IConfigurationService configurationService,
-        ChronoGuardBackgroundService backgroundService)
+        ChronoGuardBackgroundService backgroundService,
+        ISolarCalculatorService solarCalculatorService)
     {
         _logger = logger;
         _locationService = locationService;
         _profileService = profileService;
         _configurationService = configurationService;
         _backgroundService = backgroundService;
+        _solarCalculatorService = solarCalculatorService;
+        
+        // Initialize application start time for uptime calculation
+        _applicationStartTime = DateTime.Now;        // Setup update timer for real-time solar data
+        _updateTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromMinutes(1) // Update every minute
+        };
+        _updateTimer.Tick += UpdateTimer_Tick;
+        _updateTimer.Start();
 
         // Subscribe to service events
         _locationService.LocationChanged += OnLocationChanged;
@@ -243,9 +269,7 @@ Más información: https://github.com/chronoguard/chronoguard";
     {
         var tutorial = new TutorialWindow();
         tutorial.ShowDialog();
-    }
-
-    private async Task InitializeAsync()
+    }    private async Task InitializeAsync()
     {
         try
         {
@@ -269,18 +293,21 @@ Más información: https://github.com/chronoguard/chronoguard";
             {
                 UpdateFromAppState(state);
             }
+
+            // Initialize solar data
+            await UpdateSolarDataAsync();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error during ViewModel initialization");
         }
-    }
-
-    private void OnLocationChanged(object? sender, Location location)
+    }    private void OnLocationChanged(object? sender, Location location)
     {
         WpfApp.Current.Dispatcher.Invoke(() =>
         {
             UpdateLocationDisplay(location);
+            // Update solar data with new location
+            _ = UpdateSolarDataAsync();
         });
     }
 
@@ -347,6 +374,83 @@ Más información: https://github.com/chronoguard/chronoguard";
         // Update button visibility
         PauseButtonVisibility = IsActive ? Visibility.Visible : Visibility.Collapsed;
         ResumeButtonVisibility = IsActive ? Visibility.Collapsed : Visibility.Visible;
+    }    private void UpdateTimer_Tick(object? sender, EventArgs e)
+    {
+        try
+        {
+            // Calculate application uptime
+            var uptime = DateTime.Now - _applicationStartTime;
+            ApplicationUptime = $"{(int)uptime.TotalHours}h {uptime.Minutes % 60}m";
+
+            // Update solar data asynchronously
+            _ = UpdateSolarDataAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating timer data");
+        }
+    }
+
+    private async Task UpdateSolarDataAsync()
+    {
+        try
+        {
+            var currentLocation = await _locationService.GetCurrentLocationAsync();
+            if (currentLocation == null) return;
+
+            var solarTimes = await _solarCalculatorService.CalculateSolarTimesAsync(currentLocation, DateTime.Today);
+            if (solarTimes == null) return;
+
+            // Calculate current solar elevation (simplified)
+            var now = DateTime.Now;
+            var dayLength = solarTimes.Sunset - solarTimes.Sunrise;
+            var timeSinceSunrise = now - solarTimes.Sunrise;
+            
+            // Simple approximation of solar elevation based on time of day
+            double elevation;
+            if (now < solarTimes.Sunrise || now > solarTimes.Sunset)
+            {
+                elevation = -10; // Sun is below horizon
+            }
+            else
+            {
+                // Peak elevation at solar noon (simplified to 60 degrees max)
+                var solarNoon = solarTimes.Sunrise.Add(dayLength / 2);
+                var timeFromNoon = Math.Abs((now - solarNoon).TotalHours);
+                elevation = Math.Max(0, 60 - (timeFromNoon * 10)); // Rough approximation
+            }
+
+            // Update solar elevation
+            SolarElevation = $"{elevation:F1}°";
+
+            // Calculate time until sunset
+            if (now < solarTimes.Sunset)
+            {
+                var timeUntilSunset = solarTimes.Sunset - now;
+                TimeUntilSunset = $"{timeUntilSunset.Hours}h {timeUntilSunset.Minutes}m";
+            }
+            else
+            {
+                // Calculate time until next sunrise
+                var tomorrow = DateTime.Today.AddDays(1);
+                var tomorrowSolar = await _solarCalculatorService.CalculateSolarTimesAsync(currentLocation, tomorrow);
+                if (tomorrowSolar != null)
+                {
+                    var timeUntilSunrise = tomorrowSolar.Sunrise - now;
+                    TimeUntilSunset = $"Amanecer en {timeUntilSunrise.Hours}h {timeUntilSunrise.Minutes}m";
+                }
+                else
+                {
+                    TimeUntilSunset = "No disponible";
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating solar data");
+            SolarElevation = "--°";
+            TimeUntilSunset = "--h --m";
+        }
     }
 
     private static void ShowErrorMessage(string message)
