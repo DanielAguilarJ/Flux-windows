@@ -14,13 +14,13 @@
           "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.0",
           "Microsoft.Extensions.Hosting.Abstractions": "8.0.0",
           "Microsoft.Extensions.Logging.Abstractions": "8.0.0",
-          "runtimepack.Microsoft.Windows.SDK.NET.Ref": "10.0.22621.56"
+          "runtimepack.Microsoft.Windows.SDK.NET.Ref": "10.0.22621.57"
         },
         "runtime": {
           "ChronoGuard.Application.dll": {}
         }
       },
-      "runtimepack.Microsoft.Windows.SDK.NET.Ref/10.0.22621.56": {
+      "runtimepack.Microsoft.Windows.SDK.NET.Ref/10.0.22621.57": {
         "runtime": {
           "Microsoft.Windows.SDK.NET.dll": {
             "assemblyVersion": "10.0.22621.38",
@@ -628,7 +628,7 @@
       "ChronoGuard.Domain/1.0.0": {
         "runtime": {
           "ChronoGuard.Domain.dll": {
-            "assemblyVersion": "1.0.0",
+            "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.0.0"
           }
         }
@@ -646,7 +646,7 @@
         },
         "runtime": {
           "ChronoGuard.Infrastructure.dll": {
-            "assemblyVersion": "1.0.0",
+            "assemblyVersion": "1.0.0.0",
             "fileVersion": "1.0.0.0"
           }
         }
@@ -659,7 +659,7 @@
       "serviceable": false,
       "sha512": ""
     },
-    "runtimepack.Microsoft.Windows.SDK.NET.Ref/10.0.22621.56": {
+    "runtimepack.Microsoft.Windows.SDK.NET.Ref/10.0.22621.57": {
       "type": "runtimepack",
       "serviceable": false,
       "sha512": ""

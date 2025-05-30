@@ -828,10 +828,14 @@
       "System.CodeDom/8.0.0": {
         "type": "package",
         "compile": {
-          "lib/net8.0/System.CodeDom.dll": {}
+          "lib/net8.0/System.CodeDom.dll": {
+            "related": ".xml"
+          }
         },
         "runtime": {
-          "lib/net8.0/System.CodeDom.dll": {}
+          "lib/net8.0/System.CodeDom.dll": {
+            "related": ".xml"
+          }
         },
         "build": {
           "buildTransitive/net6.0/_._": {}
@@ -4237,19 +4241,19 @@
     ]
   },
   "packageFolders": {
-    "/home/codespace/.nuget/packages/": {}
+    "C:\\Users\\junco\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Tests/ChronoGuard.Tests.csproj",
+      "projectUniqueName": "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Tests\\ChronoGuard.Tests.csproj",
       "projectName": "ChronoGuard.Tests",
-      "projectPath": "/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Tests/ChronoGuard.Tests.csproj",
-      "packagesPath": "/home/codespace/.nuget/packages/",
-      "outputPath": "/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Tests/obj/",
+      "projectPath": "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Tests\\ChronoGuard.Tests.csproj",
+      "packagesPath": "C:\\Users\\junco\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Tests\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/home/codespace/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\junco\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0-windows10.0.22621"
@@ -4261,14 +4265,14 @@
         "net8.0-windows10.0.22621": {
           "targetAlias": "net8.0-windows10.0.22621",
           "projectReferences": {
-            "/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Application/ChronoGuard.Application.csproj": {
-              "projectPath": "/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Application/ChronoGuard.Application.csproj"
+            "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Application\\ChronoGuard.Application.csproj": {
+              "projectPath": "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Application\\ChronoGuard.Application.csproj"
             },
-            "/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Domain/ChronoGuard.Domain.csproj": {
-              "projectPath": "/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Domain/ChronoGuard.Domain.csproj"
+            "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Domain\\ChronoGuard.Domain.csproj": {
+              "projectPath": "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Domain\\ChronoGuard.Domain.csproj"
             },
-            "/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/ChronoGuard.Infrastructure.csproj": {
-              "projectPath": "/workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/ChronoGuard.Infrastructure.csproj"
+            "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Infrastructure\\ChronoGuard.Infrastructure.csproj": {
+              "projectPath": "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Infrastructure\\ChronoGuard.Infrastructure.csproj"
             }
           }
         }
@@ -4282,7 +4286,8 @@
         "enableAudit": "true",
         "auditLevel": "low",
         "auditMode": "direct"
-      }
+      },
+      "SdkAnalysisLevel": "9.0.300"
     },
     "frameworks": {
       "net8.0-windows10.0.22621": {
@@ -4330,26 +4335,34 @@
         "warn": true,
         "downloadDependencies": [
           {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[8.0.16, 8.0.16]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[8.0.16, 8.0.16]"
+          },
+          {
             "name": "Microsoft.Windows.SDK.NET.Ref",
-            "version": "[10.0.22621.56, 10.0.22621.56]"
+            "version": "[10.0.22621.57, 10.0.22621.57]"
           },
           {
             "name": "Microsoft.WindowsDesktop.App.Ref",
-            "version": "[8.0.14, 8.0.14]"
+            "version": "[8.0.16, 8.0.16]"
           }
         ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
           },
-          "Microsoft.Windows.SDK.NET.Ref": {
+          "Microsoft.Windows.SDK.NET.Ref.Windows": {
             "privateAssets": "all"
           },
           "Microsoft.WindowsDesktop.App.WPF": {
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.407/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.300/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
