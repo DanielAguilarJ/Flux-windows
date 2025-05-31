@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ChronoGuard.Application")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+15a54ce2b1f249794b45023ab5df522791d47370")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+05c36da81cb36bd9cecd5a9f7c2ffe75d5d37b65")]
 [assembly: System.Reflection.AssemblyProductAttribute("ChronoGuard.Application")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ChronoGuard.Application")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -16,6 +16,9 @@
 /workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Application/obj/Debug/net8.0-windows10.0.22621.0/refint/ChronoGuard.Application.dll
 /workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Application/obj/Debug/net8.0-windows10.0.22621.0/ChronoGuard.Application.pdb
 /workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Application/obj/Debug/net8.0-windows10.0.22621.0/ref/ChronoGuard.Application.dll
+C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\output.txt\ChronoGuard.Application.deps.json
+C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\output.txt\ChronoGuard.Application.dll
+C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\output.txt\ChronoGuard.Application.pdb
 C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Application\bin\Debug\net8.0-windows10.0.22621.0\ChronoGuard.Application.deps.json
 C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Application\bin\Debug\net8.0-windows10.0.22621.0\ChronoGuard.Application.dll
 C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Application\bin\Debug\net8.0-windows10.0.22621.0\ChronoGuard.Application.pdb
@@ -34,6 +37,3 @@ C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src
 C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Application\obj\Debug\net8.0-windows10.0.22621.0\refint\ChronoGuard.Application.dll
 C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Application\obj\Debug\net8.0-windows10.0.22621.0\ChronoGuard.Application.pdb
 C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Application\obj\Debug\net8.0-windows10.0.22621.0\ref\ChronoGuard.Application.dll
-C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\output.txt\ChronoGuard.Application.deps.json
-C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\output.txt\ChronoGuard.Application.dll
-C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\output.txt\ChronoGuard.Application.pdb

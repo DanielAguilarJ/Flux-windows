@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.App\\ChronoGuard.App.csproj": {}
+    "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.App\\ChronoGuard.App.csproj": {}
   },
   "projects": {
-    "c:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Application\\ChronoGuard.Application.csproj": {
+    "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Application\\ChronoGuard.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Application\\ChronoGuard.Application.csproj",
+        "projectUniqueName": "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Application\\ChronoGuard.Application.csproj",
         "projectName": "ChronoGuard.Application",
-        "projectPath": "c:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Application\\ChronoGuard.Application.csproj",
+        "projectPath": "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Application\\ChronoGuard.Application.csproj",
         "packagesPath": "C:\\Users\\junco\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Application\\obj\\",
+        "outputPath": "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Application\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\junco\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -26,8 +26,8 @@
           "net8.0-windows10.0.22621": {
             "targetAlias": "net8.0-windows10.0.22621.0",
             "projectReferences": {
-              "c:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Domain\\ChronoGuard.Domain.csproj": {
-                "projectPath": "c:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Domain\\ChronoGuard.Domain.csproj"
+              "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Domain\\ChronoGuard.Domain.csproj": {
+                "projectPath": "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Domain\\ChronoGuard.Domain.csproj"
               },
               "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Infrastructure\\ChronoGuard.Infrastructure.csproj": {
                 "projectPath": "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Infrastructure\\ChronoGuard.Infrastructure.csproj"
@@ -112,14 +112,14 @@
         }
       }
     },
-    "c:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.App\\ChronoGuard.App.csproj": {
+    "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.App\\ChronoGuard.App.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.App\\ChronoGuard.App.csproj",
+        "projectUniqueName": "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.App\\ChronoGuard.App.csproj",
         "projectName": "ChronoGuard.App",
-        "projectPath": "c:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.App\\ChronoGuard.App.csproj",
+        "projectPath": "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.App\\ChronoGuard.App.csproj",
         "packagesPath": "C:\\Users\\junco\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.App\\obj\\",
+        "outputPath": "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.App\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\junco\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -134,11 +134,11 @@
           "net8.0-windows10.0.22621": {
             "targetAlias": "net8.0-windows10.0.22621.0",
             "projectReferences": {
-              "c:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Application\\ChronoGuard.Application.csproj": {
-                "projectPath": "c:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Application\\ChronoGuard.Application.csproj"
+              "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Application\\ChronoGuard.Application.csproj": {
+                "projectPath": "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Application\\ChronoGuard.Application.csproj"
               },
-              "c:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Domain\\ChronoGuard.Domain.csproj": {
-                "projectPath": "c:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Domain\\ChronoGuard.Domain.csproj"
+              "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Domain\\ChronoGuard.Domain.csproj": {
+                "projectPath": "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Domain\\ChronoGuard.Domain.csproj"
               },
               "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Infrastructure\\ChronoGuard.Infrastructure.csproj": {
                 "projectPath": "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Infrastructure\\ChronoGuard.Infrastructure.csproj"
@@ -247,14 +247,14 @@
         }
       }
     },
-    "c:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Domain\\ChronoGuard.Domain.csproj": {
+    "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Domain\\ChronoGuard.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Domain\\ChronoGuard.Domain.csproj",
+        "projectUniqueName": "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Domain\\ChronoGuard.Domain.csproj",
         "projectName": "ChronoGuard.Domain",
-        "projectPath": "c:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Domain\\ChronoGuard.Domain.csproj",
+        "projectPath": "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Domain\\ChronoGuard.Domain.csproj",
         "packagesPath": "C:\\Users\\junco\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Domain\\obj\\",
+        "outputPath": "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\junco\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -342,8 +342,8 @@
           "net8.0-windows10.0.22621": {
             "targetAlias": "net8.0-windows10.0.22621.0",
             "projectReferences": {
-              "c:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Domain\\ChronoGuard.Domain.csproj": {
-                "projectPath": "c:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Domain\\ChronoGuard.Domain.csproj"
+              "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Domain\\ChronoGuard.Domain.csproj": {
+                "projectPath": "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Domain\\ChronoGuard.Domain.csproj"
               }
             }
           }

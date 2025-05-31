@@ -5,16 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="ChronoGuard" 
-        Height="900" 
-        Width="1400"
-        MinHeight="800"
-        MinWidth="1200"
+        Height="700" 
+        Width="1000"
+        MinHeight="500"
+        MinWidth="800"
         ResizeMode="CanResize"
         WindowStartupLocation="CenterScreen"
         Icon="Assets/chronoguard.ico"
-        WindowStyle="None"
-        AllowsTransparency="True"
-        Background="Transparent">
+        WindowStyle="SingleBorderWindow"
+        Background="{StaticResource WindowGradient}">
     
     <Window.Resources>
         <!-- Modern Color Palette -->
@@ -199,262 +198,235 @@
             </DoubleAnimationUsingKeyFrames>
         </Storyboard>
     </Window.Resources>
-    
+
     <!-- Main Window Container -->
-    <Border Background="{StaticResource WindowGradient}" CornerRadius="16">
-        <Border.Effect>
-            <DropShadowEffect Color="#000000" BlurRadius="32" Opacity="0.5" ShadowDepth="0"/>
-        </Border.Effect>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
         
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            
-            <!-- Title Bar -->
-            <Border Grid.Row="0" Background="Transparent" Height="40" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
-                <Grid>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="20,0">
-                        <Ellipse Width="12" Height="12" Fill="{StaticResource SuccessBrush}" Margin="0,0,12,0">
-                            <Ellipse.Triggers>
-                                <EventTrigger RoutedEvent="Loaded">
-                                    <BeginStoryboard Storyboard="{StaticResource PulseAnimation}"/>
-                                </EventTrigger>
-                            </Ellipse.Triggers>
-                        </Ellipse>
-                        <TextBlock Text="ChronoGuard" Style="{StaticResource HeadingSmall}"/>
-                    </StackPanel>
-                    
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,20,0">
-                        <Button Content="−" Style="{StaticResource SecondaryButton}" 
-                                Width="30" Height="30" Padding="0" 
-                                Click="MinimizeButton_Click" Margin="5,0"/>
-                        <Button Content="🗖" Style="{StaticResource SecondaryButton}" 
-                                Width="30" Height="30" Padding="0" 
-                                Click="MaximizeButton_Click" Margin="5,0"/>
-                        <Button Content="✕" Style="{StaticResource SecondaryButton}" 
-                                Width="30" Height="30" Padding="0" 
-                                Click="CloseButton_Click" Margin="5,0"/>
-                    </StackPanel>
-                </Grid>
-            </Border>
-            
-            <!-- Main Content -->
-            <Grid Grid.Row="1" Margin="32">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="400"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+        <!-- Main Content -->
+        <Grid Grid.Row="0" Margin="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="350" MinWidth="300"/>
+                <ColumnDefinition Width="*" MinWidth="400"/>
+            </Grid.ColumnDefinitions>
                 
-                <!-- Left Panel - Main Status -->
-                <StackPanel Grid.Column="0">
-                    <!-- Hero Card -->
-                    <Border Style="{StaticResource GlassCard}" Padding="32" Margin="0,0,0,24">
-                        <StackPanel>                            <!-- Status Header -->
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,24">
-                                <Ellipse Width="16" Height="16" VerticalAlignment="Center" Margin="0,0,12,0">
-                                    <Ellipse.Fill>
-                                        <SolidColorBrush Color="#A6E3A1"/>
-                                    </Ellipse.Fill>
-                                </Ellipse>
-                                <TextBlock Text="{Binding CurrentStatusText}" Style="{StaticResource HeadingMedium}"/>
-                            </StackPanel>
-                            
-                            <!-- Temperature Display -->
-                            <Grid Margin="0,0,0,24">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                
-                                <TextBlock Grid.Row="0" Text="Temperatura de Color" Style="{StaticResource CaptionText}" Margin="0,0,0,8"/>
-                                  <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <TextBlock Text="{Binding CurrentColorTemperature, StringFormat={}{0:F0}}" Style="{StaticResource HeadingLarge}"/>
-                                    <TextBlock Text="K" Style="{StaticResource HeadingMedium}" VerticalAlignment="Bottom" Margin="4,0,0,4"/>
-                                </StackPanel>
-                                
-                                <!-- Temperature Visualization -->
-                                <Grid Grid.Row="2" Height="8" Margin="0,16,0,0">
-                                    <Rectangle Fill="{StaticResource TemperatureGradient}" RadiusX="4" RadiusY="4"/>
-                                    <Ellipse Width="16" Height="16" Fill="White" HorizontalAlignment="Left" Margin="120,0,0,0">
-                                        <Ellipse.Effect>
-                                            <DropShadowEffect Color="#000000" BlurRadius="8" Opacity="0.3" ShadowDepth="0"/>
-                                        </Ellipse.Effect>
-                                    </Ellipse>
-                                </Grid>
-                            </Grid>
-                              <!-- Next Transition -->
-                            <TextBlock Text="{Binding NextTransitionText}" 
-                                       Style="{StaticResource BodyText}"
-                                       HorizontalAlignment="Center"/>
-                        </StackPanel>
-                    </Border>
-                      <!-- Control Buttons -->
-                    <StackPanel Margin="0,0,0,24">
-                        <Button Content="⏸️ Pausar Filtro" 
-                                Style="{StaticResource PrimaryButton}"
-                                Command="{Binding PauseCommand}"
-                                Visibility="{Binding PauseButtonVisibility}"
-                                Margin="0,0,0,12"/>
-                        <Button Content="▶️ Reanudar Filtro" 
-                                Style="{StaticResource PrimaryButton}"
-                                Command="{Binding ResumeCommand}"
-                                Visibility="{Binding ResumeButtonVisibility}"
-                                Margin="0,0,0,12"/>
-                        <Button Content="⚙️ Configuración Avanzada" 
-                                Style="{StaticResource SecondaryButton}"
-                                Command="{Binding OpenSettingsCommand}"/>
-                    </StackPanel>
-                    
-                    <!-- Quick Info Cards -->
-                    <StackPanel>                        <!-- Location Card -->
-                        <Border Style="{StaticResource GlassCard}" Padding="20" Margin="0,0,0,16">
-                            <StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                                    <Path Data="M12,2C8.13,2 5,5.13 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9C19,5.13 15.87,2 12,2M12,6A3,3 0 0,1 15,9A3,3 0 0,1 12,12A3,3 0 0,1 9,9A3,3 0 0,1 12,6Z" 
-                                          Fill="{StaticResource AccentBrush}" 
-                                          Width="16" Height="16" 
-                                          Stretch="Uniform"
-                                          Margin="0,0,8,0"/>
-                                    <TextBlock Text="Ubicación" Style="{StaticResource HeadingSmall}"/>
-                                </StackPanel>
-                                <TextBlock Text="{Binding CurrentLocationText}" Style="{StaticResource BodyText}" TextWrapping="Wrap"/>
-                            </StackPanel>
-                        </Border>
-                          <!-- Profile Card -->
-                        <Border Style="{StaticResource GlassCard}" Padding="20">
-                            <StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                                    <Path Data="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7H14A7,7 0 0,1 21,14H22A1,1 0 0,1 23,15V18A1,1 0 0,1 22,19H21V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V19H2A1,1 0 0,1 1,18V15A1,1 0 0,1 2,14H3A7,7 0 0,1 10,7H11V5.73C10.4,5.39 10,4.74 10,4A2,2 0 0,1 12,2M7.5,13A2.5,2.5 0 0,0 5,15.5A2.5,2.5 0 0,0 7.5,18A2.5,2.5 0 0,0 10,15.5A2.5,2.5 0 0,0 7.5,13M16.5,13A2.5,2.5 0 0,0 14,15.5A2.5,2.5 0 0,0 16.5,18A2.5,2.5 0 0,0 19,15.5A2.5,2.5 0 0,0 16.5,13Z" 
-                                          Fill="{StaticResource AccentBrush}" 
-                                          Width="16" Height="16" 
-                                          Stretch="Uniform"
-                                          Margin="0,0,8,0"/>
-                                    <TextBlock Text="Perfil Activo" Style="{StaticResource HeadingSmall}"/>
-                                </StackPanel>
-                                <TextBlock Text="{Binding CurrentProfileName}" Style="{StaticResource BodyText}"/>
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
-                </StackPanel>
-                
-                <!-- Right Panel - Dashboard -->
-                <ScrollViewer Grid.Column="1" Margin="24,0,0,0" VerticalScrollBarVisibility="Auto">
+            <!-- Left Panel - Main Status -->
+            <StackPanel Grid.Column="0">
+                <!-- Hero Card -->
+                <Border Style="{StaticResource GlassCard}" Padding="32" Margin="0,0,0,24">
                     <StackPanel>
-                        <!-- Dashboard Header -->
-                        <TextBlock Text="Panel de Control" Style="{StaticResource HeadingMedium}" Margin="0,0,0,24"/>
+                        <!-- Status Header -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,24">
+                            <Ellipse Width="16" Height="16" VerticalAlignment="Center" Margin="0,0,12,0">
+                                <Ellipse.Fill>
+                                    <SolidColorBrush Color="#A6E3A1"/>
+                                </Ellipse.Fill>
+                            </Ellipse>
+                            <TextBlock Text="{Binding CurrentStatusText}" Style="{StaticResource HeadingMedium}"/>
+                        </StackPanel>
                         
-                        <!-- Metrics Grid -->
-                        <Grid>
+                        <!-- Temperature Display -->
+                        <Grid Margin="0,0,0,24">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                              <!-- Solar Position Card -->
-                            <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource GlassCard}" 
-                                    Padding="24" Margin="0,0,12,12">
-                                <StackPanel>
-                                    <TextBlock Text="Posición Solar" Style="{StaticResource CaptionText}" Margin="0,0,0,8"/>
-                                    <TextBlock Text="{Binding SolarElevation}" Style="{StaticResource HeadingMedium}"/>
-                                    <TextBlock Text="Elevación" Style="{StaticResource BodyText}"/>
-                                </StackPanel>
-                            </Border>
-                              <!-- Time to Sunset Card -->
-                            <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource GlassCard}" 
-                                    Padding="24" Margin="6,0,6,12">
-                                <StackPanel>
-                                    <TextBlock Text="Tiempo hasta Sunset" Style="{StaticResource CaptionText}" Margin="0,0,0,8"/>
-                                    <TextBlock Text="{Binding TimeUntilSunset}" Style="{StaticResource HeadingMedium}"/>
-                                    <TextBlock Text="Horas restantes" Style="{StaticResource BodyText}"/>
-                                </StackPanel>
-                            </Border>
-                              <!-- Active Time Card -->
-                            <Border Grid.Row="0" Grid.Column="2" Style="{StaticResource GlassCard}" 
-                                    Padding="24" Margin="12,0,0,12">
-                                <StackPanel>
-                                    <TextBlock Text="Tiempo Activo" Style="{StaticResource CaptionText}" Margin="0,0,0,8"/>
-                                    <TextBlock Text="{Binding ApplicationUptime}" Style="{StaticResource HeadingMedium}"/>
-                                    <TextBlock Text="Hoy" Style="{StaticResource BodyText}"/>
-                                </StackPanel>
-                            </Border>
                             
-                            <!-- Solar Chart -->
-                            <Border Grid.Row="1" Grid.ColumnSpan="3" Style="{StaticResource GlassCard}" 
-                                    Padding="24" Margin="0,0,0,12" Height="200">
-                                <Grid>
-                                    <TextBlock Text="Curva Solar del Día" Style="{StaticResource HeadingSmall}" 
-                                               HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                                    <!-- Placeholder for solar curve chart -->
-                                    <Canvas Background="Transparent">
-                                        <Path Data="M 0,150 Q 150,50 300,100 Q 450,75 600,130" 
-                                              Stroke="{StaticResource AccentGradient}" 
-                                              StrokeThickness="3"
-                                              Fill="Transparent"/>
-                                    </Canvas>
-                                </Grid>
-                            </Border>
+                            <TextBlock Grid.Row="0" Text="Temperatura de Color" Style="{StaticResource CaptionText}" Margin="0,0,0,8"/>
+                            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Text="{Binding CurrentColorTemperature, StringFormat={}{0:F0}}" Style="{StaticResource HeadingLarge}"/>
+                                <TextBlock Text="K" Style="{StaticResource HeadingMedium}" VerticalAlignment="Bottom" Margin="4,0,0,4"/>
+                            </StackPanel>
                             
-                            <!-- System Information -->
-                            <Border Grid.Row="2" Grid.ColumnSpan="3" Style="{StaticResource GlassCard}" 
-                                    Padding="24">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-                                    
-                                    <StackPanel Grid.Column="0">
-                                        <TextBlock Text="Información del Sistema" Style="{StaticResource HeadingSmall}" Margin="0,0,0,16"/>
-                                        
-                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                                            <TextBlock Text="Monitores detectados:" Style="{StaticResource BodyText}" Width="150"/>
-                                            <TextBlock Text="2" Style="{StaticResource BodyText}" FontWeight="SemiBold"/>
-                                        </StackPanel>
-                                        
-                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                                            <TextBlock Text="Versión:" Style="{StaticResource BodyText}" Width="150"/>
-                                            <TextBlock Text="1.0.0" Style="{StaticResource BodyText}" FontWeight="SemiBold"/>
-                                        </StackPanel>
-                                        
-                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                                            <TextBlock Text="Última actualización:" Style="{StaticResource BodyText}" Width="150"/>
-                                            <TextBlock Text="Hoy" Style="{StaticResource BodyText}" FontWeight="SemiBold"/>
-                                        </StackPanel>
-                                    </StackPanel>
-                                    
-                                    <StackPanel Grid.Column="1">
-                                        <TextBlock Text="Acciones Rápidas" Style="{StaticResource HeadingSmall}" Margin="0,0,0,16"/>
-                                          <StackPanel>
-                                            <Button Content="🔄 Actualizar Ubicación" 
-                                                    Style="{StaticResource SecondaryButton}"
-                                                    Command="{Binding UpdateLocationCommand}"
-                                                    HorizontalAlignment="Stretch" Margin="0,0,0,8"/>
-                                            <Button Content="📊 Estadísticas Detalladas" 
-                                                    Style="{StaticResource SecondaryButton}"
-                                                    HorizontalAlignment="Stretch" Margin="0,0,0,8"/>
-                                            <Button Content="❓ Ayuda y Tutorial" 
-                                                    Style="{StaticResource SecondaryButton}"
-                                                    Command="{Binding ShowAboutCommand}"
-                                                    HorizontalAlignment="Stretch" Margin="0,0,0,8"/>
-                                            <Button Content="🔽 Minimizar a Bandeja" 
-                                                    Style="{StaticResource SecondaryButton}"
-                                                    HorizontalAlignment="Stretch"/>
-                                        </StackPanel>
-                                    </StackPanel>
-                                </Grid>
-                            </Border>
+                            <!-- Temperature Visualization -->
+                            <Grid Grid.Row="2" Height="8" Margin="0,16,0,0">
+                                <Rectangle Fill="{StaticResource TemperatureGradient}" RadiusX="4" RadiusY="4"/>
+                                <Ellipse Width="16" Height="16" Fill="White" HorizontalAlignment="Left" Margin="120,0,0,0">
+                                    <Ellipse.Effect>
+                                        <DropShadowEffect Color="#000000" BlurRadius="8" Opacity="0.3" ShadowDepth="0"/>
+                                    </Ellipse.Effect>
+                                </Ellipse>
+                            </Grid>
                         </Grid>
+                        
+                        <!-- Next Transition -->
+                        <TextBlock Text="{Binding NextTransitionText}" 
+                                   Style="{StaticResource BodyText}"
+                                   HorizontalAlignment="Center"/>
                     </StackPanel>
-                </ScrollViewer>
-            </Grid>
+                </Border>
+                
+                <!-- Control Buttons -->
+                <StackPanel Margin="0,0,0,24">
+                    <Button Content="⏸️ Pausar Filtro" 
+                            Style="{StaticResource PrimaryButton}"
+                            Command="{Binding PauseCommand}"
+                            Visibility="{Binding PauseButtonVisibility}"
+                            Margin="0,0,0,12"/>
+                    <Button Content="▶️ Reanudar Filtro" 
+                            Style="{StaticResource PrimaryButton}"
+                            Command="{Binding ResumeCommand}"
+                            Visibility="{Binding ResumeButtonVisibility}"
+                            Margin="0,0,0,12"/>
+                    <Button Content="⚙️ Configuración Avanzada" 
+                            Style="{StaticResource SecondaryButton}"
+                            Command="{Binding OpenSettingsCommand}"/>
+                </StackPanel>
+                
+                <!-- Quick Info Cards -->
+                <StackPanel>
+                    <!-- Location Card -->
+                    <Border Style="{StaticResource GlassCard}" Padding="20" Margin="0,0,0,16">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <Path Data="M12,2C8.13,2 5,5.13 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9C19,5.13 15.87,2 12,2M12,6A3,3 0 0,1 15,9A3,3 0 0,1 12,12A3,3 0 0,1 9,9A3,3 0 0,1 12,6Z" 
+                                      Fill="{StaticResource AccentBrush}" 
+                                      Width="16" Height="16" 
+                                      Stretch="Uniform"
+                                      Margin="0,0,8,0"/>
+                                <TextBlock Text="Ubicación" Style="{StaticResource HeadingSmall}"/>
+                            </StackPanel>
+                            <TextBlock Text="{Binding CurrentLocationText}" Style="{StaticResource BodyText}" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Profile Card -->
+                    <Border Style="{StaticResource GlassCard}" Padding="20">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <Path Data="M12,2A2,2 0 0,1 14,4C14,4.74 13.6,5.39 13,5.73V7H14A7,7 0 0,1 21,14H22A1,1 0 0,1 23,15V18A1,1 0 0,1 22,19H21V20A2,2 0 0,1 19,22H5A2,2 0 0,1 3,20V19H2A1,1 0 0,1 1,18V15A1,1 0 0,1 2,14H3A7,7 0 0,1 10,7H11V5.73C10.4,5.39 10,4.74 10,4A2,2 0 0,1 12,2M7.5,13A2.5,2.5 0 0,0 5,15.5A2.5,2.5 0 0,0 7.5,18A2.5,2.5 0 0,0 10,15.5A2.5,2.5 0 0,0 7.5,13M16.5,13A2.5,2.5 0 0,0 14,15.5A2.5,2.5 0 0,0 16.5,18A2.5,2.5 0 0,0 19,15.5A2.5,2.5 0 0,0 16.5,13Z" 
+                                      Fill="{StaticResource AccentBrush}" 
+                                      Width="16" Height="16" 
+                                      Stretch="Uniform"
+                                      Margin="0,0,8,0"/>
+                                <TextBlock Text="Perfil Activo" Style="{StaticResource HeadingSmall}"/>
+                            </StackPanel>
+                            <TextBlock Text="{Binding CurrentProfileName}" Style="{StaticResource BodyText}"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </StackPanel>
+            
+            <!-- Right Panel - Dashboard -->
+            <ScrollViewer Grid.Column="1" Margin="24,0,0,0" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <!-- Dashboard Header -->
+                    <TextBlock Text="Panel de Control" Style="{StaticResource HeadingMedium}" Margin="0,0,0,24"/>
+                    
+                    <!-- Metrics Grid -->
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" MinWidth="120"/>
+                            <ColumnDefinition Width="*" MinWidth="120"/>
+                            <ColumnDefinition Width="*" MinWidth="120"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <!-- Solar Position Card -->
+                        <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource GlassCard}" 
+                                Padding="16" Margin="0,0,6,12">
+                            <StackPanel>
+                                <TextBlock Text="Posición Solar" Style="{StaticResource CaptionText}" Margin="0,0,0,8" TextWrapping="Wrap"/>
+                                <TextBlock Text="{Binding SolarElevation}" Style="{StaticResource HeadingMedium}"/>
+                                <TextBlock Text="Elevación" Style="{StaticResource BodyText}"/>
+                            </StackPanel>
+                        </Border>
+                        
+                        <!-- Time to Sunset Card -->
+                        <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource GlassCard}" 
+                                Padding="16" Margin="3,0,3,12">
+                            <StackPanel>
+                                <TextBlock Text="Tiempo hasta Sunset" Style="{StaticResource CaptionText}" Margin="0,0,0,8" TextWrapping="Wrap"/>
+                                <TextBlock Text="{Binding TimeUntilSunset}" Style="{StaticResource HeadingMedium}"/>
+                                <TextBlock Text="Horas restantes" Style="{StaticResource BodyText}"/>
+                            </StackPanel>
+                        </Border>
+                        
+                        <!-- Active Time Card -->
+                        <Border Grid.Row="0" Grid.Column="2" Style="{StaticResource GlassCard}" 
+                                Padding="16" Margin="6,0,0,12">
+                            <StackPanel>
+                                <TextBlock Text="Tiempo Activo" Style="{StaticResource CaptionText}" Margin="0,0,0,8" TextWrapping="Wrap"/>
+                                <TextBlock Text="{Binding ApplicationUptime}" Style="{StaticResource HeadingMedium}"/>
+                                <TextBlock Text="Hoy" Style="{StaticResource BodyText}"/>
+                            </StackPanel>
+                        </Border>
+                        
+                        <!-- Solar Chart -->
+                        <Border Grid.Row="1" Grid.ColumnSpan="3" Style="{StaticResource GlassCard}" 
+                                Padding="24" Margin="0,0,0,12" Height="200">
+                            <Grid>
+                                <TextBlock Text="Curva Solar del Día" Style="{StaticResource HeadingSmall}" 
+                                           HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                <!-- Placeholder for solar curve chart -->
+                                <Canvas Background="Transparent">
+                                    <Path Data="M 0,150 Q 150,50 300,100 Q 450,75 600,130" 
+                                          Stroke="{StaticResource AccentGradient}" 
+                                          StrokeThickness="3"
+                                          Fill="Transparent"/>
+                                </Canvas>
+                            </Grid>
+                        </Border>
+                        
+                        <!-- System Information -->
+                        <Border Grid.Row="2" Grid.ColumnSpan="3" Style="{StaticResource GlassCard}" 
+                                Padding="24">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Información del Sistema" Style="{StaticResource HeadingSmall}" Margin="0,0,0,16"/>
+                                    
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                        <TextBlock Text="Monitores detectados:" Style="{StaticResource BodyText}" Width="150"/>
+                                        <TextBlock Text="2" Style="{StaticResource BodyText}" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                    
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                        <TextBlock Text="Versión:" Style="{StaticResource BodyText}" Width="150"/>
+                                        <TextBlock Text="1.0.0" Style="{StaticResource BodyText}" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                    
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                        <TextBlock Text="Última actualización:" Style="{StaticResource BodyText}" Width="150"/>
+                                        <TextBlock Text="Hoy" Style="{StaticResource BodyText}" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="Acciones Rápidas" Style="{StaticResource HeadingSmall}" Margin="0,0,0,16"/>
+                                    <StackPanel>
+                                        <Button Content="🔄 Actualizar Ubicación" 
+                                                Style="{StaticResource SecondaryButton}"
+                                                Command="{Binding UpdateLocationCommand}"
+                                                HorizontalAlignment="Stretch" Margin="0,0,0,8"/>
+                                        <Button Content="📊 Estadísticas Detalladas" 
+                                                Style="{StaticResource SecondaryButton}"
+                                                HorizontalAlignment="Stretch" Margin="0,0,0,8"/>
+                                        <Button Content="❓ Ayuda y Tutorial" 
+                                                Style="{StaticResource SecondaryButton}"
+                                                Command="{Binding ShowAboutCommand}"
+                                                HorizontalAlignment="Stretch" Margin="0,0,0,8"/>
+                                        <Button Content="🔽 Minimizar a Bandeja" 
+                                                Style="{StaticResource SecondaryButton}"
+                                                HorizontalAlignment="Stretch"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </StackPanel>
+            </ScrollViewer>
         </Grid>
-    </Border>
+    </Grid>
 </Window>

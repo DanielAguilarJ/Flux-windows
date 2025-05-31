@@ -1039,10 +1039,14 @@
           "System.CodeDom": "8.0.0"
         },
         "compile": {
-          "lib/net8.0/System.Management.dll": {}
+          "lib/net8.0/System.Management.dll": {
+            "related": ".xml"
+          }
         },
         "runtime": {
-          "lib/net8.0/System.Management.dll": {}
+          "lib/net8.0/System.Management.dll": {
+            "related": ".xml"
+          }
         },
         "build": {
           "buildTransitive/net6.0/_._": {}

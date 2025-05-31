@@ -10,6 +10,9 @@
 /workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Domain/obj/Debug/net8.0/refint/ChronoGuard.Domain.dll
 /workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Domain/obj/Debug/net8.0/ChronoGuard.Domain.pdb
 /workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Domain/obj/Debug/net8.0/ref/ChronoGuard.Domain.dll
+C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\output.txt\ChronoGuard.Domain.deps.json
+C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\output.txt\ChronoGuard.Domain.dll
+C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\output.txt\ChronoGuard.Domain.pdb
 C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Domain\bin\Debug\net8.0\ChronoGuard.Domain.deps.json
 C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Domain\bin\Debug\net8.0\ChronoGuard.Domain.dll
 C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Domain\bin\Debug\net8.0\ChronoGuard.Domain.pdb
@@ -22,6 +25,3 @@ C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src
 C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Domain\obj\Debug\net8.0\refint\ChronoGuard.Domain.dll
 C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Domain\obj\Debug\net8.0\ChronoGuard.Domain.pdb
 C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Domain\obj\Debug\net8.0\ref\ChronoGuard.Domain.dll
-C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\output.txt\ChronoGuard.Domain.deps.json
-C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\output.txt\ChronoGuard.Domain.dll
-C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\output.txt\ChronoGuard.Domain.pdb

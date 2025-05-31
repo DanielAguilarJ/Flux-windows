@@ -14,6 +14,9 @@
 /workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/obj/Debug/net8.0-windows10.0.22621.0/refint/ChronoGuard.Infrastructure.dll
 /workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/obj/Debug/net8.0-windows10.0.22621.0/ChronoGuard.Infrastructure.pdb
 /workspaces/Flux-windows/ChronoGuard/src/ChronoGuard.Infrastructure/obj/Debug/net8.0-windows10.0.22621.0/ref/ChronoGuard.Infrastructure.dll
+C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\output.txt\ChronoGuard.Infrastructure.deps.json
+C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\output.txt\ChronoGuard.Infrastructure.dll
+C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\output.txt\ChronoGuard.Infrastructure.pdb
 C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Infrastructure\bin\Debug\net8.0-windows10.0.22621.0\ChronoGuard.Infrastructure.deps.json
 C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Infrastructure\bin\Debug\net8.0-windows10.0.22621.0\ChronoGuard.Infrastructure.dll
 C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Infrastructure\bin\Debug\net8.0-windows10.0.22621.0\ChronoGuard.Infrastructure.pdb
@@ -30,6 +33,3 @@ C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src
 C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Infrastructure\obj\Debug\net8.0-windows10.0.22621.0\refint\ChronoGuard.Infrastructure.dll
 C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Infrastructure\obj\Debug\net8.0-windows10.0.22621.0\ChronoGuard.Infrastructure.pdb
 C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Infrastructure\obj\Debug\net8.0-windows10.0.22621.0\ref\ChronoGuard.Infrastructure.dll
-C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\output.txt\ChronoGuard.Infrastructure.deps.json
-C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\output.txt\ChronoGuard.Infrastructure.dll
-C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\output.txt\ChronoGuard.Infrastructure.pdb

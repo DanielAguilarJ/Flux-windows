@@ -371,10 +371,11 @@ Más información: https://github.com/chronoguard/chronoguard";
             NextTransitionText = "";
         }
 
-        // Update button visibility
-        PauseButtonVisibility = IsActive ? Visibility.Visible : Visibility.Collapsed;
+        // Update button visibility        PauseButtonVisibility = IsActive ? Visibility.Visible : Visibility.Collapsed;
         ResumeButtonVisibility = IsActive ? Visibility.Collapsed : Visibility.Visible;
-    }    private void UpdateTimer_Tick(object? sender, EventArgs e)
+    }
+    
+    private void UpdateTimer_Tick(object? sender, EventArgs e)
     {
         try
         {
