@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Ajzf01xV1kg=",
+  "dgSpecHash": "4hn+uKcpBLY=",
   "success": true,
-  "projectFilePath": "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Infrastructure\\ChronoGuard.Infrastructure.csproj",
+  "projectFilePath": "c:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Infrastructure\\ChronoGuard.Infrastructure.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\junco\\.nuget\\packages\\microsoft.extensions.configuration\\8.0.0\\microsoft.extensions.configuration.8.0.0.nupkg.sha512",
     "C:\\Users\\junco\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\8.0.0\\microsoft.extensions.configuration.abstractions.8.0.0.nupkg.sha512",

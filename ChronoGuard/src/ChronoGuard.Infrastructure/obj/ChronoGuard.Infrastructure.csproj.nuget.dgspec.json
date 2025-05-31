@@ -1,7 +1,7 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Infrastructure\\ChronoGuard.Infrastructure.csproj": {}
+    "c:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Infrastructure\\ChronoGuard.Infrastructure.csproj": {}
   },
   "projects": {
     "c:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Domain\\ChronoGuard.Domain.csproj": {
@@ -77,14 +77,14 @@
         }
       }
     },
-    "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Infrastructure\\ChronoGuard.Infrastructure.csproj": {
+    "c:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Infrastructure\\ChronoGuard.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Infrastructure\\ChronoGuard.Infrastructure.csproj",
+        "projectUniqueName": "c:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Infrastructure\\ChronoGuard.Infrastructure.csproj",
         "projectName": "ChronoGuard.Infrastructure",
-        "projectPath": "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Infrastructure\\ChronoGuard.Infrastructure.csproj",
+        "projectPath": "c:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Infrastructure\\ChronoGuard.Infrastructure.csproj",
         "packagesPath": "C:\\Users\\junco\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Infrastructure\\obj\\",
+        "outputPath": "c:\\Users\\junco\\OneDrive\\JUNCOKEVIN\\Documents\\GitHub\\Flux-windows\\ChronoGuard\\src\\ChronoGuard.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\junco\\AppData\\Roaming\\NuGet\\NuGet.Config"
