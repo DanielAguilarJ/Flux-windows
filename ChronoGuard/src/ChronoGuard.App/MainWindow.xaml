@@ -226,10 +226,11 @@
                             </Ellipse>
                             <TextBlock Text="{Binding CurrentStatusText}" Style="{StaticResource HeadingMedium}"/>
                         </StackPanel>
-                        
-                        <!-- Temperature Display -->
+                          <!-- Temperature Display and Control -->
                         <Grid Margin="0,0,0,24">
                             <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
@@ -240,8 +241,7 @@
                                 <TextBlock Text="{Binding CurrentColorTemperature, StringFormat={}{0:F0}}" Style="{StaticResource HeadingLarge}"/>
                                 <TextBlock Text="K" Style="{StaticResource HeadingMedium}" VerticalAlignment="Bottom" Margin="4,0,0,4"/>
                             </StackPanel>
-                            
-                            <!-- Temperature Visualization -->
+                              <!-- Temperature Visualization -->
                             <Grid Grid.Row="2" Height="8" Margin="0,16,0,0">
                                 <Rectangle Fill="{StaticResource TemperatureGradient}" RadiusX="4" RadiusY="4"/>
                                 <Ellipse Width="16" Height="16" Fill="White" HorizontalAlignment="Left" Margin="120,0,0,0">
@@ -250,6 +250,60 @@
                                     </Ellipse.Effect>
                                 </Ellipse>
                             </Grid>
+                              <!-- Manual Temperature Control -->
+                            <StackPanel Grid.Row="3" Margin="0,20,0,0">
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="Control Manual" Style="{StaticResource CaptionText}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding ManualTemperature, StringFormat={}{0:F0}K}" 
+                                               Style="{StaticResource CaptionText}" FontWeight="SemiBold"/>
+                                </Grid>
+                                
+                                <Slider x:Name="TemperatureSlider"
+                                        Minimum="1000" 
+                                        Maximum="10000"
+                                        Value="{Binding ManualTemperature, Mode=TwoWay}"
+                                        TickFrequency="500"
+                                        IsSnapToTickEnabled="True"
+                                        SmallChange="100"
+                                        LargeChange="500"
+                                        Margin="0,0,0,12"
+                                        AutomationProperties.Name="Control de temperatura de color"
+                                        AutomationProperties.HelpText="Ajusta la temperatura de color manualmente. 1000K (muy cálido) a 10000K (muy frío)"/>
+                                
+                                <!-- Temperature Quick Presets -->
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <Button Grid.Column="0" Content="🕯️ Cálido" Style="{StaticResource SecondaryButton}"
+                                            Command="{Binding SetTemperatureCommand}" CommandParameter="2700"
+                                            FontSize="11" Padding="8,6" Margin="0,0,3,0"/>
+                                    <Button Grid.Column="1" Content="🌅 Natural" Style="{StaticResource SecondaryButton}"
+                                            Command="{Binding SetTemperatureCommand}" CommandParameter="6500"
+                                            FontSize="11" Padding="8,6" Margin="1.5,0"/>
+                                    <Button Grid.Column="2" Content="❄️ Frío" Style="{StaticResource SecondaryButton}"
+                                            Command="{Binding SetTemperatureCommand}" CommandParameter="9300"
+                                            FontSize="11" Padding="8,6" Margin="3,0,0,0"/>
+                                </Grid>
+                            </StackPanel>                            <!-- Apply Button and Options -->
+                            <StackPanel Grid.Row="4" Margin="0,12,0,0">
+                                <CheckBox Content="⚡ Ajuste en tiempo real" 
+                                          IsChecked="{Binding RealTimeTemperatureAdjustment}"
+                                          Foreground="{StaticResource OnSurfaceBrush}"
+                                          Margin="0,0,0,12"
+                                          FontFamily="Segoe UI Variable Text"
+                                          FontSize="12"/>
+                                <Button Content="🎯 Aplicar Temperatura" 
+                                        Style="{StaticResource PrimaryButton}"
+                                        Command="{Binding ApplyManualTemperatureCommand}"/>
+                            </StackPanel>
                         </Grid>
                         
                         <!-- Next Transition -->

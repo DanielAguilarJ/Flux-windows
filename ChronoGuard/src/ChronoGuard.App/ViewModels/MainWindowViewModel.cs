@@ -43,10 +43,12 @@ public partial class MainWindowViewModel : ObservableObject
     private bool _isActive = true;
 
     [ObservableProperty]
-    private bool _isTransitioning = false;
+    private bool _isTransitioning = false;    [ObservableProperty]
+    private double _currentColorTemperature = 6500;    [ObservableProperty]
+    private double _manualTemperature = 6500;
 
     [ObservableProperty]
-    private double _currentColorTemperature = 6500;
+    private bool _realTimeTemperatureAdjustment = false;
 
     [ObservableProperty]
     private DateTime _nextTransitionTime;
@@ -97,6 +99,9 @@ public partial class MainWindowViewModel : ObservableObject
         _backgroundService.StateChanged += OnBackgroundServiceStateChanged;
         _colorTemperatureService.TemperatureChanged += OnTemperatureChanged;
         _colorTemperatureService.TransitionCompleted += OnTransitionCompleted;
+
+        // Subscribe to property changes for real-time temperature adjustment
+        PropertyChanged += OnViewModelPropertyChanged;
 
         // Initialize data
         _ = Task.Run(InitializeAsync);
@@ -258,9 +263,7 @@ Más información: https://github.com/chronoguard/chronoguard";
     private void ExitApplication()
     {
         WpfApp.Current.Shutdown();
-    }
-
-    /// <summary>
+    }    /// <summary>
     /// Shows the interactive tutorial
     /// </summary>
     [RelayCommand]
@@ -268,7 +271,70 @@ Más información: https://github.com/chronoguard/chronoguard";
     {
         var tutorial = new TutorialWindow();
         tutorial.ShowDialog();
-    }    private async Task InitializeAsync()
+    }
+
+    /// <summary>
+    /// Sets a specific temperature value (for preset buttons)
+    /// </summary>
+    [RelayCommand]
+    private void SetTemperature(object parameter)
+    {
+        if (parameter is string tempStr && int.TryParse(tempStr, out int temperature))
+        {
+            ManualTemperature = temperature;
+            _logger.LogInformation("Manual temperature preset set to {Temperature}K", temperature);
+        }
+    }
+
+    /// <summary>
+    /// Applies the manually selected temperature
+    /// </summary>
+    [RelayCommand]
+    private async Task ApplyManualTemperatureAsync()
+    {
+        try
+        {
+            var colorTemperature = new ColorTemperature((int)ManualTemperature);
+            await _colorTemperatureService.ApplyTemperatureAsync(colorTemperature);
+            
+            _logger.LogInformation("Manual temperature {Temperature}K applied", ManualTemperature);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error applying manual temperature {Temperature}K", ManualTemperature);            ShowErrorMessage($"Error al aplicar temperatura {ManualTemperature}K");
+        }
+    }
+
+    /// <summary>
+    /// Toggles real-time temperature adjustment
+    /// </summary>
+    [RelayCommand]
+    private void ToggleRealTimeAdjustment()
+    {
+        RealTimeTemperatureAdjustment = !RealTimeTemperatureAdjustment;
+        _logger.LogInformation("Real-time temperature adjustment {Status}", 
+            RealTimeTemperatureAdjustment ? "enabled" : "disabled");
+    }
+
+    private void OnViewModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ManualTemperature) && RealTimeTemperatureAdjustment)
+        {
+            // Apply temperature changes in real-time when real-time adjustment is enabled
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    var colorTemperature = new ColorTemperature((int)ManualTemperature);
+                    await _colorTemperatureService.ApplyTemperatureAsync(colorTemperature);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error applying real-time temperature {Temperature}K", ManualTemperature);
+                }
+            });
+        }
+    }private async Task InitializeAsync()
     {
         try
         {
@@ -293,6 +359,15 @@ Más información: https://github.com/chronoguard/chronoguard";
                 UpdateFromAppState(state);
             }
 
+            // Initialize manual temperature with current temperature
+            var currentTemp = _colorTemperatureService.GetCurrentTemperature();
+            if (currentTemp != null)
+            {
+                ManualTemperature = currentTemp.Kelvin;
+                CurrentColorTemperature = currentTemp.Kelvin;
+                CurrentTemperatureText = $"{currentTemp.Kelvin}K";
+            }
+
             // Initialize solar data
             await UpdateSolarDataAsync();
         }
@@ -300,7 +375,7 @@ Más información: https://github.com/chronoguard/chronoguard";
         {
             _logger.LogError(ex, "Error during ViewModel initialization");
         }
-    }    private void OnLocationChanged(object? sender, Location location)
+    }private void OnLocationChanged(object? sender, Location location)
     {
         WpfApp.Current.Dispatcher.Invoke(() =>
         {
@@ -329,6 +404,9 @@ Más información: https://github.com/chronoguard/chronoguard";
             CurrentColorTemperature = temperature.Kelvin;
             CurrentTemperatureText = $"{temperature.Kelvin}K";
             
+            // Sync manual temperature with current temperature (unless user is actively changing it)
+            ManualTemperature = temperature.Kelvin;
+            
             _logger.LogDebug("Temperature changed to {Temperature}K", temperature.Kelvin);
         });
     }    private void OnTransitionCompleted(object? sender, TransitionState transitionState)
@@ -340,6 +418,9 @@ Más información: https://github.com/chronoguard/chronoguard";
             // Update to the final temperature
             CurrentColorTemperature = transitionState.ToTemperature.Kelvin;
             CurrentTemperatureText = $"{transitionState.ToTemperature.Kelvin}K";
+            
+            // Sync manual temperature with final temperature
+            ManualTemperature = transitionState.ToTemperature.Kelvin;
             
             _logger.LogInformation("Transition completed: {Reason}", transitionState.Reason);
         });
