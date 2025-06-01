@@ -16,13 +16,13 @@ namespace ChronoGuard.App.ViewModels;
 /// ViewModel for the main application window
 /// </summary>
 public partial class MainWindowViewModel : ObservableObject
-{
-    private readonly ILogger<MainWindowViewModel> _logger;
+{    private readonly ILogger<MainWindowViewModel> _logger;
     private readonly ILocationService _locationService;
     private readonly IProfileService _profileService;
     private readonly IConfigurationService _configurationService;
     private readonly ChronoGuardBackgroundService _backgroundService;
     private readonly ISolarCalculatorService _solarCalculatorService;
+    private readonly IColorTemperatureService _colorTemperatureService;
     
     private readonly DispatcherTimer _updateTimer;
     private DateTime _applicationStartTime;
@@ -68,22 +68,21 @@ public partial class MainWindowViewModel : ObservableObject
     private string _timeUntilSunset = "--h --m";
 
     [ObservableProperty]
-    private string _applicationUptime = "--h --m";
-
-    public MainWindowViewModel(
+    private string _applicationUptime = "--h --m";    public MainWindowViewModel(
         ILogger<MainWindowViewModel> logger,
         ILocationService locationService,
         IProfileService profileService,
         IConfigurationService configurationService,
         ChronoGuardBackgroundService backgroundService,
-        ISolarCalculatorService solarCalculatorService)
-    {
-        _logger = logger;
+        ISolarCalculatorService solarCalculatorService,
+        IColorTemperatureService colorTemperatureService)
+    {        _logger = logger;
         _locationService = locationService;
         _profileService = profileService;
         _configurationService = configurationService;
         _backgroundService = backgroundService;
         _solarCalculatorService = solarCalculatorService;
+        _colorTemperatureService = colorTemperatureService;
         
         // Initialize application start time for uptime calculation
         _applicationStartTime = DateTime.Now;        // Setup update timer for real-time solar data
@@ -92,12 +91,12 @@ public partial class MainWindowViewModel : ObservableObject
             Interval = TimeSpan.FromMinutes(1) // Update every minute
         };
         _updateTimer.Tick += UpdateTimer_Tick;
-        _updateTimer.Start();
-
-        // Subscribe to service events
+        _updateTimer.Start();        // Subscribe to service events
         _locationService.LocationChanged += OnLocationChanged;
         _profileService.ActiveProfileChanged += OnActiveProfileChanged;
         _backgroundService.StateChanged += OnBackgroundServiceStateChanged;
+        _colorTemperatureService.TemperatureChanged += OnTemperatureChanged;
+        _colorTemperatureService.TransitionCompleted += OnTransitionCompleted;
 
         // Initialize data
         _ = Task.Run(InitializeAsync);
@@ -317,13 +316,32 @@ Más información: https://github.com/chronoguard/chronoguard";
         {
             CurrentProfileName = profile.Name;
         });
-    }
-
-    private void OnBackgroundServiceStateChanged(object? sender, AppState state)
+    }    private void OnBackgroundServiceStateChanged(object? sender, AppState state)
     {
         WpfApp.Current.Dispatcher.Invoke(() =>
         {
             UpdateFromAppState(state);
+        });
+    }    private void OnTemperatureChanged(object? sender, ColorTemperature temperature)
+    {
+        WpfApp.Current.Dispatcher.Invoke(() =>
+        {
+            CurrentColorTemperature = temperature.Kelvin;
+            CurrentTemperatureText = $"{temperature.Kelvin}K";
+            
+            _logger.LogDebug("Temperature changed to {Temperature}K", temperature.Kelvin);
+        });
+    }    private void OnTransitionCompleted(object? sender, TransitionState transitionState)
+    {
+        WpfApp.Current.Dispatcher.Invoke(() =>
+        {
+            IsTransitioning = false;
+            
+            // Update to the final temperature
+            CurrentColorTemperature = transitionState.ToTemperature.Kelvin;
+            CurrentTemperatureText = $"{transitionState.ToTemperature.Kelvin}K";
+            
+            _logger.LogInformation("Transition completed: {Reason}", transitionState.Reason);
         });
     }
 
