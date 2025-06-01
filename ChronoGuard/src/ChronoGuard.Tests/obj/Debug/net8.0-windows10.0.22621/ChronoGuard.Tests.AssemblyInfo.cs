@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ChronoGuard.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f1fd551f9859aceff09809e5c743917e75f9ad19")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a10e74e1095cfcc11ad300961f7dac651ffd9a94")]
 [assembly: System.Reflection.AssemblyProductAttribute("ChronoGuard.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ChronoGuard.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
