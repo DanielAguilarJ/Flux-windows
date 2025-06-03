@@ -8,13 +8,11 @@
         Height="700" 
         Width="1000"
         MinHeight="500"
-        MinWidth="800"
-        ResizeMode="CanResize"
+        MinWidth="800"        ResizeMode="CanResize"
         WindowStartupLocation="CenterScreen"
         Icon="Assets/chronoguard.ico"
         WindowStyle="SingleBorderWindow"
-        Background="{StaticResource WindowGradient}">
-    
+        Background="{DynamicResource WindowGradient}">
     <Window.Resources>
         <!-- Modern Color Palette -->
         <SolidColorBrush x:Key="PrimaryBrush" Color="#667EEA"/>
@@ -26,14 +24,7 @@
         <SolidColorBrush x:Key="SuccessBrush" Color="#A6E3A1"/>
         <SolidColorBrush x:Key="WarningBrush" Color="#F9E2AF"/>
         <SolidColorBrush x:Key="ErrorBrush" Color="#F38BA8"/>
-        
-        <!-- Modern Gradients -->
-        <LinearGradientBrush x:Key="WindowGradient" StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="#1E1E2E" Offset="0"/>
-            <GradientStop Color="#181825" Offset="0.5"/>
-            <GradientStop Color="#11111B" Offset="1"/>
-        </LinearGradientBrush>
-        
+          <!-- Modern Gradients -->
         <LinearGradientBrush x:Key="CardGradient" StartPoint="0,0" EndPoint="1,1">
             <GradientStop Color="#313244" Offset="0"/>
             <GradientStop Color="#292A3A" Offset="1"/>

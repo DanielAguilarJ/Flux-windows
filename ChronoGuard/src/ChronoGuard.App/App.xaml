@@ -14,6 +14,12 @@
                 <!-- Colors -->
                 <ResourceDictionary Source="Resources/Colors/AppColors.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+              <!-- Global window gradient -->
+            <LinearGradientBrush x:Key="WindowGradient" StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#1E1E2E" Offset="0"/>
+                <GradientStop Color="#181825" Offset="0.5"/>
+                <GradientStop Color="#11111B" Offset="1"/>
+            </LinearGradientBrush>
             
             <!-- Global converters -->
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>

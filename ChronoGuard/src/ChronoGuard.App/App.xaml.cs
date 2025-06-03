@@ -40,10 +40,15 @@ public partial class App : System.Windows.Application
 
             // Start background service
             _backgroundService = ServiceProvider.GetRequiredService<ChronoGuardBackgroundService>();
-            _ = Task.Run(() => _backgroundService.StartAsync(CancellationToken.None));
-
-            // Initialize system tray
+            _ = Task.Run(() => _backgroundService.StartAsync(CancellationToken.None));            // Initialize system tray
             _systemTrayService = ServiceProvider.GetRequiredService<SystemTrayService>();
+            _systemTrayService.Initialize();
+            _systemTrayService.ShowMainWindowRequested += (s, e) => 
+            {
+                MainWindow.Show();
+                MainWindow.Activate();
+            };
+            _systemTrayService.ExitRequested += (s, e) => Shutdown();
 
             // Create and show main window
             var mainWindow = ServiceProvider.GetRequiredService<MainWindow>();

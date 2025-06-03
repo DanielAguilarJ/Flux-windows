@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ChronoGuard.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a10e74e1095cfcc11ad300961f7dac651ffd9a94")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+35ebc2636aec06c49c5ba8842aed23c5c283725a")]
 [assembly: System.Reflection.AssemblyProductAttribute("ChronoGuard.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ChronoGuard.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

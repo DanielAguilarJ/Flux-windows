@@ -55,13 +55,14 @@ public static class Program
                     builder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Information);
                 });                // Register HTTP client
                 services.AddHttpClient();
-                
-                // Register domain services
+                  // Register domain services
                 services.AddSingleton<ILocationService, LocationService>();
                 services.AddSingleton<ISolarCalculatorService, SolarCalculatorService>();
+                  // Register color temperature services
                 services.AddSingleton<IColorTemperatureService, WindowsColorTemperatureService>();
-                services.AddSingleton<IProfileService, ChronoGuard.Infrastructure.Services.ProfileService>();
-                services.AddSingleton<IConfigurationService, ConfigurationService>();                services.AddSingleton<INotificationService, NotificationService>();
+                  services.AddSingleton<IProfileService, ChronoGuard.Infrastructure.Services.ProfileService>();
+                services.AddSingleton<IConfigurationService, ConfigurationService>();
+                services.AddSingleton<IConfigurationPersistenceService, ConfigurationPersistenceService>();services.AddSingleton<INotificationService, NotificationService>();
                 services.AddSingleton<IUpdateService, UpdateService>();
                 services.AddHostedService<UpdateNotificationService>();                services.AddSingleton<IStartupManager, StartupManager>();
                 services.AddSingleton<IForegroundApplicationService, ChronoGuard.Infrastructure.Services.WindowsForegroundApplicationService>();

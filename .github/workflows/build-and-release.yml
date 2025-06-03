@@ -1,0 +1,352 @@
+name: 🏗️ Build and Release ChronoGuard
+
+on:
+  push:
+    branches: [ main, develop ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., 1.0.0)'
+        required: false
+        default: '1.0.0'
+      create_release:
+        description: 'Create GitHub Release'
+        type: boolean
+        default: false
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  SOLUTION_PATH: 'ChronoGuard/ChronoGuard.sln'
+  APP_PROJECT: 'ChronoGuard/src/ChronoGuard.App/ChronoGuard.App.csproj'
+  CONFIGURATION: 'Release'
+  PLATFORM: 'x64'
+
+jobs:
+  # ============================================================================
+  # BUILD JOB - Build and test the application
+  # ============================================================================
+  build:
+    name: 🔨 Build & Test
+    runs-on: windows-latest
+    
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      should_release: ${{ steps.version.outputs.should_release }}
+    
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Full history for GitVersion
+    
+    - name: 🛠️ Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+    
+    - name: 📋 Display .NET Info
+      run: dotnet --info
+    
+    - name: 🔢 Determine Version
+      id: version
+      run: |
+        if ("${{ github.event_name }}" -eq "workflow_dispatch" -and "${{ github.event.inputs.version }}" -ne "") {
+          $version = "${{ github.event.inputs.version }}"
+          $shouldRelease = "${{ github.event.inputs.create_release }}"
+        } elseif ("${{ github.ref }}" -like "refs/tags/v*") {
+          $version = "${{ github.ref }}".Replace("refs/tags/v", "")
+          $shouldRelease = "true"
+        } else {
+          $version = "1.0.0-dev.${{ github.run_number }}"
+          $shouldRelease = "false"
+        }
+        
+        echo "version=$version" >> $env:GITHUB_OUTPUT
+        echo "should_release=$shouldRelease" >> $env:GITHUB_OUTPUT
+        echo "🔢 Version: $version"
+        echo "🚀 Should Release: $shouldRelease"
+    
+    - name: 📦 Restore Dependencies
+      run: dotnet restore ${{ env.SOLUTION_PATH }}
+    
+    - name: 🏗️ Build Solution
+      run: |
+        dotnet build ${{ env.SOLUTION_PATH }} `
+          --configuration ${{ env.CONFIGURATION }} `
+          --no-restore `
+          --verbosity minimal `
+          -p:Version=${{ steps.version.outputs.version }}
+    
+    - name: 🧪 Run Tests
+      run: |
+        dotnet test ${{ env.SOLUTION_PATH }} `
+          --configuration ${{ env.CONFIGURATION }} `
+          --no-build `
+          --verbosity minimal `
+          --logger "trx;LogFileName=test-results.trx" `
+          --collect:"XPlat Code Coverage"
+    
+    - name: 📊 Publish Test Results
+      uses: dorny/test-reporter@v1
+      if: always()
+      with:
+        name: 'Test Results'
+        path: '**/test-results.trx'
+        reporter: 'dotnet-trx'
+    
+    - name: 📄 Upload Test Coverage
+      uses: codecov/codecov-action@v3
+      if: always()
+      with:
+        directory: ./coverage
+        flags: unittests
+        name: codecov-umbrella
+    
+    - name: 🏗️ Publish Application
+      run: |
+        dotnet publish ${{ env.APP_PROJECT }} `
+          --configuration ${{ env.CONFIGURATION }} `
+          --runtime win-${{ env.PLATFORM }} `
+          --self-contained true `
+          --output "./publish" `
+          -p:PublishSingleFile=false `
+          -p:PublishTrimmed=false `
+          -p:Version=${{ steps.version.outputs.version }}
+    
+    - name: 📤 Upload Build Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: chronoguard-build-${{ steps.version.outputs.version }}
+        path: ./publish/
+        retention-days: 30
+
+  # ============================================================================
+  # PACKAGE JOB - Create distribution packages
+  # ============================================================================
+  package:
+    name: 📦 Create Packages
+    runs-on: windows-latest
+    needs: build
+    if: github.event_name != 'pull_request'
+    
+    strategy:
+      matrix:
+        package-type: ['portable', 'msi', 'msix']
+    
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+    
+    - name: 🛠️ Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+    
+    - name: 📥 Download Build Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: chronoguard-build-${{ needs.build.outputs.version }}
+        path: ./ChronoGuard/src/ChronoGuard.App/bin/Release/net8.0-windows10.0.22621.0/publish/
+    
+    - name: 🛠️ Setup WiX Toolset (MSI)
+      if: matrix.package-type == 'msi'
+      run: |
+        # Download and install WiX Toolset
+        Invoke-WebRequest -Uri "https://github.com/wixtoolset/wix3/releases/download/wix3112rtm/wix311.exe" -OutFile "wix311.exe"
+        Start-Process -FilePath "wix311.exe" -ArgumentList "/quiet" -Wait
+        
+        # Add to PATH
+        $env:PATH += ";C:\Program Files (x86)\WiX Toolset v3.11\bin"
+        echo "C:\Program Files (x86)\WiX Toolset v3.11\bin" >> $env:GITHUB_PATH
+    
+    - name: 🛠️ Setup Windows SDK (MSIX)
+      if: matrix.package-type == 'msix'
+      uses: microsoft/setup-msbuild@v1
+    
+    - name: 📦 Build Portable Package
+      if: matrix.package-type == 'portable'
+      run: |
+        .\ChronoGuard\packaging\build-portable.ps1 `
+          -Configuration ${{ env.CONFIGURATION }} `
+          -Version ${{ needs.build.outputs.version }} `
+          -Platform ${{ env.PLATFORM }}
+    
+    - name: 📦 Build MSI Package
+      if: matrix.package-type == 'msi'
+      run: |
+        .\ChronoGuard\packaging\build-msi.ps1 `
+          -Configuration ${{ env.CONFIGURATION }} `
+          -Version ${{ needs.build.outputs.version }} `
+          -Platform ${{ env.PLATFORM }}
+    
+    - name: 📦 Build MSIX Package
+      if: matrix.package-type == 'msix'
+      run: |
+        .\ChronoGuard\packaging\build-msix.ps1 `
+          -Configuration ${{ env.CONFIGURATION }} `
+          -Version ${{ needs.build.outputs.version }} `
+          -Platform ${{ env.PLATFORM }}
+    
+    - name: 📤 Upload Package Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: chronoguard-${{ matrix.package-type }}-${{ needs.build.outputs.version }}
+        path: ./ChronoGuard/packaging/output/
+        retention-days: 30
+
+  # ============================================================================
+  # RELEASE JOB - Create GitHub release with packages
+  # ============================================================================
+  release:
+    name: 🚀 Create Release
+    runs-on: windows-latest
+    needs: [build, package]
+    if: needs.build.outputs.should_release == 'true'
+    
+    steps:
+    - name: 📥 Checkout Repository
+      uses: actions/checkout@v4
+    
+    - name: 📥 Download All Packages
+      uses: actions/download-artifact@v4
+      with:
+        pattern: chronoguard-*-${{ needs.build.outputs.version }}
+        path: ./release-assets/
+        merge-multiple: true
+    
+    - name: 📋 List Release Assets
+      run: |
+        echo "📁 Release Assets:"
+        Get-ChildItem -Path "./release-assets" -Recurse -File | ForEach-Object {
+          $size = [math]::Round($_.Length / 1MB, 2)
+          echo "   📄 $($_.Name) ($size MB)"
+        }
+    
+    - name: 📝 Generate Release Notes
+      id: release_notes
+      run: |
+        $version = "${{ needs.build.outputs.version }}"
+        $date = Get-Date -Format "yyyy-MM-dd"
+        
+        $releaseNotes = @"
+        # 🌅 ChronoGuard v$version
+        
+        **Release Date:** $date
+        
+        ## 📦 Download Options
+        
+        Choose the installation method that works best for you:
+        
+        ### 🔧 MSI Installer (Recommended)
+        - **File:** ``ChronoGuard-Setup-v$version.msi``
+        - **Best for:** Most Windows users
+        - **Features:** Automatic updates, Windows integration, easy uninstall
+        
+        ### 📱 MSIX Package (Modern Windows)
+        - **File:** ``ChronoGuard-v$version.msix``
+        - **Best for:** Windows 10/11 users, Microsoft Store-like experience
+        - **Features:** Sandboxed installation, automatic updates
+        
+        ### 📦 Portable Version
+        - **File:** ``ChronoGuard-Portable-v$version.zip``
+        - **Best for:** No installation needed, USB drives, testing
+        - **Features:** Self-contained, leave no traces
+        
+        ## 🆕 What's New in v$version
+        
+        - ✨ Advanced color temperature management
+        - 🖥️ Multi-monitor support
+        - 🌅 Automatic sunrise/sunset detection
+        - 🎨 Custom color profiles
+        - ⚙️ System tray integration
+        - 🔄 Automatic updates
+        - 🌍 Location-based adjustments
+        
+        ## 💻 System Requirements
+        
+        - **OS:** Windows 10 version 1903+ or Windows 11
+        - **Runtime:** .NET 8.0 (included in installers)
+        - **Graphics:** DirectX 11 compatible graphics card
+        - **RAM:** 50 MB
+        - **Storage:** 100 MB
+        
+        ## 🚀 Quick Start
+        
+        1. Download and install using your preferred method above
+        2. ChronoGuard will start automatically and appear in system tray
+        3. Right-click the tray icon to access settings
+        4. Enjoy automatic color temperature adjustments!
+        
+        ## 📚 Documentation
+        
+        - [Installation Guide](https://github.com/your-username/ChronoGuard/blob/main/docs/guides/INSTALLATION.md)
+        - [User Manual](https://github.com/your-username/ChronoGuard/wiki)
+        - [FAQ](https://github.com/your-username/ChronoGuard/wiki/FAQ)
+        
+        ## 🐛 Known Issues
+        
+        - Some graphics drivers may require updates for optimal compatibility
+        - Windows 10 versions before 1903 are not supported
+        
+        ## 🤝 Support
+        
+        - **Issues:** [GitHub Issues](https://github.com/your-username/ChronoGuard/issues)
+        - **Discussions:** [GitHub Discussions](https://github.com/your-username/ChronoGuard/discussions)
+        - **Email:** support@chronoguard.dev
+        
+        ## ✨ Special Thanks
+        
+        Thanks to all contributors and beta testers who made this release possible!
+        
+        ---
+        
+        **Full Changelog:** [v$version...main](https://github.com/your-username/ChronoGuard/compare/v$version...main)
+        "@
+        
+        # Save to file for upload
+        $releaseNotes | Out-File -FilePath "release-notes.md" -Encoding utf8
+        
+        # Output for GitHub (escape newlines)
+        $escaped = $releaseNotes -replace "`r`n", "%0A" -replace "`n", "%0A"
+        echo "notes=$escaped" >> $env:GITHUB_OUTPUT
+    
+    - name: 🏷️ Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ needs.build.outputs.version }}
+        name: ChronoGuard v${{ needs.build.outputs.version }}
+        body_path: release-notes.md
+        files: |
+          ./release-assets/**/*
+        draft: false
+        prerelease: ${{ contains(needs.build.outputs.version, '-') }}
+        generate_release_notes: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: 🎉 Release Success
+      run: |
+        echo "🎉 Release created successfully!"
+        echo "🔗 URL: https://github.com/${{ github.repository }}/releases/tag/v${{ needs.build.outputs.version }}"
+        echo "📦 Packages: MSI, MSIX, Portable"
+        echo "🚀 ChronoGuard v${{ needs.build.outputs.version }} is now live!"
+
+  # ============================================================================
+  # CLEANUP JOB - Clean up artifacts
+  # ============================================================================
+  cleanup:
+    name: 🧹 Cleanup
+    runs-on: windows-latest
+    needs: [build, package]
+    if: always() && github.event_name != 'workflow_dispatch'
+    
+    steps:
+    - name: 🗑️ Delete Build Artifacts
+      uses: geekyeggo/delete-artifact@v2
+      with:
+        name: |
+          chronoguard-build-${{ needs.build.outputs.version }}
+        failOnError: false

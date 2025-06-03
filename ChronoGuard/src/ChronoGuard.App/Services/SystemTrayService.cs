@@ -27,7 +27,9 @@ public class SystemTrayService : IDisposable
     private Timer? _pauseTimer;
     private Timer? _disableUntilTomorrowTimer;
 
-    public SystemTrayService(
+    // Events for App.xaml.cs integration
+    public event EventHandler? ShowMainWindowRequested;
+    public event EventHandler? ExitRequested;    public SystemTrayService(
         ILogger<SystemTrayService> logger,
         ChronoGuardBackgroundService backgroundService,
         IProfileService profileService,
@@ -39,7 +41,13 @@ public class SystemTrayService : IDisposable
         _profileService = profileService;
         _locationService = locationService;
         _foregroundAppService = foregroundAppService;
+    }
 
+    /// <summary>
+    /// Initialize the system tray service. Should be called from App.xaml.cs after dependency injection is complete.
+    /// </summary>
+    public void Initialize()
+    {
         InitializeSystemTray();
         SubscribeToEvents();
     }
@@ -318,15 +326,13 @@ public class SystemTrayService : IDisposable
                 }
             });
         }
-    }
-
-    private void OnTrayIconDoubleClick(object? sender, EventArgs e)
+    }    private void OnTrayIconDoubleClick(object? sender, EventArgs e)
     {
         // Double click - Show main window
         try
         {
-            var mainWindow = System.Windows.Application.Current?.MainWindow as MainWindow;
-            mainWindow?.ShowAndActivate();
+            // Raise the ShowMainWindowRequested event for App.xaml.cs to handle
+            ShowMainWindowRequested?.Invoke(this, EventArgs.Empty);
         }
         catch (Exception ex)
         {
@@ -531,13 +537,12 @@ public class SystemTrayService : IDisposable
         {
             _logger.LogError(ex, "Failed to open help");
         }
-    }
-
-    private void OnExit(object? sender, EventArgs e)
+    }    private void OnExit(object? sender, EventArgs e)
     {
         try
         {
-            System.Windows.Application.Current?.Shutdown();
+            // Raise the ExitRequested event for App.xaml.cs to handle
+            ExitRequested?.Invoke(this, EventArgs.Empty);
         }
         catch (Exception ex)
         {

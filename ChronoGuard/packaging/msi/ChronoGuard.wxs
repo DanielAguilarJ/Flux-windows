@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+
+  <Package Name="ChronoGuard" 
+           Language="1033" 
+           Version="1.0.0.0" 
+           Manufacturer="ChronoGuard Team"
+           UpgradeCode="12345678-1234-1234-1234-123456789ABC"
+           InstallerVersion="500"
+           Compressed="yes">
+
+    <SummaryInformation Keywords="Installer,ChronoGuard,Display Color Temperature"
+                       Description="ChronoGuard Setup Package"
+                       Manufacturer="ChronoGuard Team" />
+
+    <!-- Properties -->
+    <Property Id="ARPPRODUCTICON" Value="ChronoGuardIcon.exe" />
+    <Property Id="ARPHELPLINK" Value="https://github.com/your-username/ChronoGuard" />
+    <Property Id="ARPURLINFOABOUT" Value="https://github.com/your-username/ChronoGuard" />
+    <Property Id="ARPNOREPAIR" Value="yes" Secure="yes" />
+    <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" />
+    
+    <!-- Launch conditions -->
+    <Property Id="NETCORECHECK">
+      <RegistrySearch Id="CheckForNetCore"
+                      Root="HKLM"
+                      Key="SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x64\sharedhost"
+                      Name="Version"
+                      Type="raw" />
+    </Property>
+    
+    <Launch Condition="NETCORECHECK" 
+            Message="This application requires .NET 8.0 Runtime. Please download and install it from https://dotnet.microsoft.com/download" />
+
+    <!-- Upgrade logic -->
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed."
+                  Schedule="afterInstallInitialize" />
+
+    <!-- Media -->
+    <Media Id="1" Cabinet="ChronoGuard.cab" EmbedCab="yes" />
+
+    <!-- Directory structure -->
+    <StandardDirectory Id="ProgramFiles6432Folder">
+      <Directory Id="INSTALLFOLDER" Name="ChronoGuard">
+        <Directory Id="BINDIR" Name="bin" />
+      </Directory>
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ApplicationProgramsFolder" Name="ChronoGuard" />
+    </StandardDirectory>
+
+    <StandardDirectory Id="DesktopFolder" />
+    <StandardDirectory Id="StartupFolder" />
+
+    <!-- Components -->
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      
+      <!-- Main application files -->
+      <Component Id="MainExecutable" Guid="12345678-1234-1234-1234-123456789AB1">
+        <File Id="ChronoGuardAppExe"
+              Source="$(var.SourceDir)\ChronoGuard.App.exe"
+              KeyPath="yes" />
+        
+        <!-- Registry entries for application -->
+        <RegistryValue Root="HKCU"
+                       Key="Software\ChronoGuard"
+                       Name="InstallPath"
+                       Value="[INSTALLFOLDER]"
+                       Type="string" />
+        
+        <!-- Auto-start registry entry (optional) -->
+        <RegistryValue Root="HKCU"
+                       Key="Software\Microsoft\Windows\CurrentVersion\Run"
+                       Name="ChronoGuard"
+                       Value="&quot;[INSTALLFOLDER]ChronoGuard.App.exe&quot; --minimized"
+                       Type="string" />
+      </Component>
+
+      <!-- Configuration files -->
+      <Component Id="ConfigFiles" Guid="12345678-1234-1234-1234-123456789AB2">
+        <File Id="AppSettingsJson"
+              Source="$(var.SourceDir)\appsettings.json"
+              KeyPath="yes" />
+      </Component>
+
+      <!-- Dependencies -->
+      <Component Id="Dependencies" Guid="12345678-1234-1234-1234-123456789AB3">
+        <File Id="ChronoGuardApplicationDll"
+              Source="$(var.SourceDir)\ChronoGuard.Application.dll" />
+        <File Id="ChronoGuardDomainDll"
+              Source="$(var.SourceDir)\ChronoGuard.Domain.dll" />
+        <File Id="ChronoGuardInfrastructureDll"
+              Source="$(var.SourceDir)\ChronoGuard.Infrastructure.dll" />
+        
+        <!-- Third-party dependencies -->
+        <File Id="MicrosoftExtensionsDependencyInjectionDll"
+              Source="$(var.SourceDir)\Microsoft.Extensions.DependencyInjection.dll" />
+        <File Id="MicrosoftExtensionsHostingDll"
+              Source="$(var.SourceDir)\Microsoft.Extensions.Hosting.dll" />
+        <File Id="MicrosoftExtensionsLoggingDll"
+              Source="$(var.SourceDir)\Microsoft.Extensions.Logging.dll" />
+        <File Id="CommunityToolkitMvvmDll"
+              Source="$(var.SourceDir)\CommunityToolkit.Mvvm.dll" />
+        <File Id="SystemTextJsonDll"
+              Source="$(var.SourceDir)\System.Text.Json.dll" />
+      </Component>
+
+      <!-- Runtime files -->
+      <Component Id="RuntimeFiles" Guid="12345678-1234-1234-1234-123456789AB4">
+        <File Id="ChronoGuardRuntimeConfigJson"
+              Source="$(var.SourceDir)\ChronoGuard.App.runtimeconfig.json" />
+        <File Id="ChronoGuardDepsJson"
+              Source="$(var.SourceDir)\ChronoGuard.App.deps.json" />
+      </Component>
+
+    </ComponentGroup>
+
+    <!-- Shortcuts -->
+    <ComponentGroup Id="ShortcutComponents">
+      
+      <!-- Start Menu shortcut -->
+      <Component Id="StartMenuShortcut" Directory="ApplicationProgramsFolder" Guid="12345678-1234-1234-1234-123456789AB5">
+        <Shortcut Id="ApplicationStartMenuShortcut"
+                  Name="ChronoGuard"
+                  Description="Advanced Display Color Temperature Manager"
+                  Target="[INSTALLFOLDER]ChronoGuard.App.exe"
+                  WorkingDirectory="INSTALLFOLDER"
+                  Icon="ChronoGuardIcon.exe" />
+        <RemoveFolder Id="CleanUpShortCut" Directory="ApplicationProgramsFolder" On="uninstall" />
+        <RegistryValue Root="HKCU" Key="Software\ChronoGuard\Shortcuts" Name="StartMenu" Value="1" Type="integer" KeyPath="yes" />
+      </Component>
+
+      <!-- Desktop shortcut (optional) -->
+      <Component Id="DesktopShortcut" Directory="DesktopFolder" Guid="12345678-1234-1234-1234-123456789AB6">
+        <Condition>DESKTOP_SHORTCUT</Condition>
+        <Shortcut Id="ApplicationDesktopShortcut"
+                  Name="ChronoGuard"
+                  Description="Advanced Display Color Temperature Manager"
+                  Target="[INSTALLFOLDER]ChronoGuard.App.exe"
+                  WorkingDirectory="INSTALLFOLDER"
+                  Icon="ChronoGuardIcon.exe" />
+        <RegistryValue Root="HKCU" Key="Software\ChronoGuard\Shortcuts" Name="Desktop" Value="1" Type="integer" KeyPath="yes" />
+      </Component>
+
+    </ComponentGroup>
+
+    <!-- Icon -->
+    <Icon Id="ChronoGuardIcon.exe" SourceFile="$(var.SourceDir)\ChronoGuard.App.exe" />
+
+    <!-- Features -->
+    <Feature Id="ProductFeature" Title="ChronoGuard" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+      <ComponentGroupRef Id="ShortcutComponents" />
+    </Feature>
+
+    <!-- Custom Actions -->
+    <CustomAction Id="LaunchApplication"
+                  Directory="INSTALLFOLDER"
+                  ExeCommand="[INSTALLFOLDER]ChronoGuard.App.exe"
+                  Impersonate="yes"
+                  Return="asyncNoWait" />
+
+    <!-- UI -->
+    <ui:WixUI Id="WixUI_FeatureTree" />
+    <ui:WixUI Id="WixUI_ErrorProgressText" />
+    
+    <!-- Custom UI properties -->
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+    <Property Id="DESKTOP_SHORTCUT" Value="1" />
+
+    <!-- License agreement -->
+    <WixVariable Id="WixUILicenseRtf" Value="license.rtf" />
+
+    <!-- Installation sequences -->
+    <InstallExecuteSequence>
+      <Custom Action="LaunchApplication" After="InstallFinalize">
+        NOT Installed AND NOT REMOVE AND UILevel > 2
+      </Custom>
+    </InstallExecuteSequence>
+
+  </Package>
+</Wix>

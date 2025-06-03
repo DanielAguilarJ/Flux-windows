@@ -1,0 +1,34 @@
+<Project Sdk="WixToolset.Sdk/4.0.0">
+
+  <PropertyGroup>
+    <OutputType>Package</OutputType>
+    <TargetFramework>net472</TargetFramework>
+    <Product>ChronoGuard</Product>
+    <ProductVersion>1.0.0</ProductVersion>
+    <Manufacturer>ChronoGuard Team</Manufacturer>
+    <PackageDescription>Advanced Display Color Temperature Manager for Windows</PackageDescription>
+    <PackageTags>display;color-temperature;flux;blue-light;windows</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/your-username/ChronoGuard</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/your-username/ChronoGuard</RepositoryUrl>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Source directory for application files -->
+    <SourceDir>..\..\src\ChronoGuard.App\bin\Release\net8.0-windows10.0.22621.0\publish</SourceDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="ChronoGuard.wxs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="license.rtf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixToolset.UI.wixext" Version="4.0.0" />
+    <PackageReference Include="WixToolset.Util.wixext" Version="4.0.0" />
+  </ItemGroup>
+
+</Project>
