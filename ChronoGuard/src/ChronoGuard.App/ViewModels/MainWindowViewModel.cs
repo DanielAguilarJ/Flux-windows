@@ -67,10 +67,11 @@ public partial class MainWindowViewModel : ObservableObject
     private string _solarElevation = "--°";
 
     [ObservableProperty]
-    private string _timeUntilSunset = "--h --m";
+    private string _timeUntilSunset = "--h --m";    [ObservableProperty]
+    private string _applicationUptime = "0h 0m";
 
-    [ObservableProperty]
-    private string _applicationUptime = "--h --m";    public MainWindowViewModel(
+    // ...existing code...
+    public MainWindowViewModel(
         ILogger<MainWindowViewModel> logger,
         ILocationService locationService,
         IProfileService profileService,
@@ -87,7 +88,7 @@ public partial class MainWindowViewModel : ObservableObject
         _colorTemperatureService = colorTemperatureService;
         
         // Initialize application start time for uptime calculation
-        _applicationStartTime = DateTime.Now;        // Setup update timer for real-time solar data
+        _applicationStartTime = DateTime.Now;// Setup update timer for real-time solar data
         _updateTimer = new DispatcherTimer
         {
             Interval = TimeSpan.FromMinutes(1) // Update every minute
@@ -271,13 +272,11 @@ Más información: https://github.com/chronoguard/chronoguard";
     {
         var tutorial = new TutorialWindow();
         tutorial.ShowDialog();
-    }
-
-    /// <summary>
+    }    /// <summary>
     /// Sets a specific temperature value (for preset buttons)
     /// </summary>
     [RelayCommand]
-    private void SetTemperature(object parameter)
+    private void SetTemperature(object? parameter)
     {
         if (parameter is string tempStr && int.TryParse(tempStr, out int temperature))
         {

@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.X86;
@@ -17,7 +19,9 @@ public class SimdOptimizedGammaService : IGammaService
     private readonly ILogger<SimdOptimizedGammaService> _logger;
     private readonly bool _avx2Supported;
     private readonly bool _sse2Supported;
-    private readonly bool _vectorSupported;    public SimdOptimizedGammaService(ILogger<SimdOptimizedGammaService> logger)
+    private readonly bool _vectorSupported;
+
+    public SimdOptimizedGammaService(ILogger<SimdOptimizedGammaService> logger)
     {
         _logger = logger;
         
@@ -77,11 +81,11 @@ public class SimdOptimizedGammaService : IGammaService
         }
         else if (_sse2Supported)
         {
-            GenerateGammaRampSse2(ramp, colorTemperature, (float)brightness, (float)contrast);
+            GenerateGammaRampSse2(ramp, new ColorTemperature(colorTemperature), (float)brightness, (float)contrast);
         }
         else if (_vectorSupported)
         {
-            GenerateGammaRampVector(ramp, colorTemperature, (float)brightness, (float)contrast);
+            GenerateGammaRampVector(ramp, new ColorTemperature(colorTemperature), (float)brightness, (float)contrast);
         }
         else
         {
@@ -106,7 +110,7 @@ public class SimdOptimizedGammaService : IGammaService
         
         if (_avx2Supported)
         {
-            GenerateGammaRampAvx2(ramp, temperature, brightness, contrast);
+            GenerateGammaRampAvx2(ramp, temperature.Kelvin, brightness, contrast);
         }
         else if (_sse2Supported)
         {
@@ -128,7 +132,8 @@ public class SimdOptimizedGammaService : IGammaService
     /// <summary>
     /// AVX2-optimized gamma calculation (processes 8 values simultaneously)
     /// Provides maximum performance on modern CPUs
-    /// </summary>    private void GenerateGammaRampAvx2(GammaRamp ramp, int colorTemperature, float brightness, float contrast)
+    /// </summary>
+    private void GenerateGammaRampAvx2(GammaRamp ramp, int colorTemperature, float brightness, float contrast)
     {
         if (!_avx2Supported) throw new NotSupportedException("AVX2 not supported on this hardware");
 
@@ -141,37 +146,33 @@ public class SimdOptimizedGammaService : IGammaService
         var redFactorVec = Vector256.Create(redFactor * brightness * contrast);
         var greenFactorVec = Vector256.Create(greenFactor * brightness * contrast);
         var blueFactorVec = Vector256.Create(blueFactor * brightness * contrast);
-        var maxValueVec = Vector256.Create(65535.0f);
-
-        // Process 8 values at a time
+        var maxValueVec = Vector256.Create(65535.0f);        // Process 8 values at a time
         for (int i = 0; i < 256; i += 8)
         {
-            // Create input vectors
+            // Create input vectors as floats
             var inputVec = Vector256.Create(
-                i + 0, i + 1, i + 2, i + 3, 
-                i + 4, i + 5, i + 6, i + 7
+                (float)(i + 0), (float)(i + 1), (float)(i + 2), (float)(i + 3), 
+                (float)(i + 4), (float)(i + 5), (float)(i + 6), (float)(i + 7)
             );
             
             // Convert to 0-1 range
-            var normalizedVec = Avx2.Divide(inputVec, Vector256.Create(255.0f));
+            var normalizedVec = Avx.Divide(inputVec, Vector256.Create(255.0f));
             
             // Apply gamma correction (approximate with fast polynomial)
             var gammaVec = ApplyGammaAvx2(normalizedVec);
-            
-            // Apply color temperature factors
-            var redVec = Avx2.Multiply(gammaVec, redFactorVec);
-            var greenVec = Avx2.Multiply(gammaVec, greenFactorVec);
-            var blueVec = Avx2.Multiply(gammaVec, blueFactorVec);
+              // Apply color temperature factors
+            var redVec = Avx.Multiply(gammaVec, redFactorVec);
+            var greenVec = Avx.Multiply(gammaVec, greenFactorVec);
+            var blueVec = Avx.Multiply(gammaVec, blueFactorVec);
             
             // Scale to 16-bit range and clamp
-            redVec = Avx2.Min(Avx2.Multiply(redVec, maxValueVec), maxValueVec);
-            greenVec = Avx2.Min(Avx2.Multiply(greenVec, maxValueVec), maxValueVec);
-            blueVec = Avx2.Min(Avx2.Multiply(blueVec, maxValueVec), maxValueVec);
-            
-            // Convert to integers and store
-            var redInts = Avx2.ConvertToVector256Int32(redVec);
-            var greenInts = Avx2.ConvertToVector256Int32(greenVec);
-            var blueInts = Avx2.ConvertToVector256Int32(blueVec);
+            redVec = Avx.Min(Avx.Multiply(redVec, maxValueVec), maxValueVec);
+            greenVec = Avx.Min(Avx.Multiply(greenVec, maxValueVec), maxValueVec);
+            blueVec = Avx.Min(Avx.Multiply(blueVec, maxValueVec), maxValueVec);
+              // Convert to integers and store
+            var redInts = Avx.ConvertToVector256Int32(redVec);
+            var greenInts = Avx.ConvertToVector256Int32(greenVec);
+            var blueInts = Avx.ConvertToVector256Int32(blueVec);
             
             // Extract values and store in gamma ramp
             StoreAvx2Results(ramp, i, redInts, greenInts, blueInts);
@@ -274,6 +275,38 @@ public class SimdOptimizedGammaService : IGammaService
             ramp.Green[i] = (ushort)Math.Min(gamma * greenFactor * 65535, 65535);
             ramp.Blue[i] = (ushort)Math.Min(gamma * blueFactor * 65535, 65535);
         }
+    }
+
+    /// <summary>
+    /// Fallback gamma ramp generation for int colorTemperature parameter
+    /// </summary>
+    private void GenerateGammaRampFallback(GammaRamp ramp, int colorTemperature, float brightness, float contrast)
+    {
+        var tempKelvin = (float)colorTemperature;
+        var redFactor = CalculateRedFactor(tempKelvin) * brightness * contrast;
+        var greenFactor = CalculateGreenFactor(tempKelvin) * brightness * contrast;
+        var blueFactor = CalculateBlueFactor(tempKelvin) * brightness * contrast;
+
+        for (int i = 0; i < 256; i++)
+        {
+            var normalized = i / 255.0f;
+            var gamma = MathF.Pow(normalized, 2.2f);
+
+            ramp.Red[i] = (ushort)Math.Min(gamma * redFactor * 65535, 65535);
+            ramp.Green[i] = (ushort)Math.Min(gamma * greenFactor * 65535, 65535);
+            ramp.Blue[i] = (ushort)Math.Min(gamma * blueFactor * 65535, 65535);
+        }
+    }
+
+    /// <summary>
+    /// Gets the currently active SIMD method
+    /// </summary>
+    private string GetActiveMethod()
+    {
+        if (_avx2Supported) return "AVX2";
+        if (_sse2Supported) return "SSE2";
+        if (_vectorSupported) return "Vector<T>";
+        return "Scalar";
     }
 
     #region SIMD Helper Methods
@@ -402,7 +435,7 @@ public class SimdOptimizedGammaService : IGammaService
     /// <summary>
     /// Gets performance information about SIMD capabilities
     /// </summary>
-    public SimdCapabilities GetCapabilities()
+    public SimdCapabilities GetSimdCapabilities()
     {
         return new SimdCapabilities
         {

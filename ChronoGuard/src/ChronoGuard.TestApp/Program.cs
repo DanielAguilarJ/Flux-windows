@@ -8,12 +8,15 @@ using System.Threading.Tasks;
 namespace ChronoGuard.TestApp
 {
     class Program
-    {
-        static async Task Main(string[] args)
+    {        static async Task Main(string[] args)
         {
             Console.WriteLine("========================================");
             Console.WriteLine("   CHRONOGUARD TESTAPP - VERIFICACION");
             Console.WriteLine("========================================");
+            Console.WriteLine();
+            
+            // First, verify MVVM command generation
+            CommandVerificationTest.VerifyCommandGeneration();
             Console.WriteLine();
             
             try

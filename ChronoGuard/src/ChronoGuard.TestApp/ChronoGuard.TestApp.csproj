@@ -7,14 +7,14 @@
     <Nullable>enable</Nullable>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Moq" Version="4.20.69" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\ChronoGuard.Domain\ChronoGuard.Domain.csproj" />
     <ProjectReference Include="..\ChronoGuard.Application\ChronoGuard.Application.csproj" />
+    <ProjectReference Include="..\ChronoGuard.App\ChronoGuard.App.csproj" />
   </ItemGroup>
 
 </Project>
