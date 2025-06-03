@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,81 +17,60 @@ namespace ChronoGuard.Tests.Services
     [TestClass]
     public class WindowsColorTemperatureServicePerformanceTests
     {
-        private Mock<ILogger<WindowsColorTemperatureService>>? _mockLogger;
-        private Mock<ICCProfileService>? _mockICCProfileService;
+        private ILogger<WindowsColorTemperatureService>? _logger;
         private AdvancedColorManagementConfig? _config;
         private WindowsColorTemperatureService? _service;
 
         [TestInitialize]
         public void TestInitialize()
         {
-            _mockLogger = new Mock<ILogger<WindowsColorTemperatureService>>();
-            _mockICCProfileService = new Mock<ICCProfileService>();
+            var loggerFactory = LoggerFactory.Create(builder => { });
+            _logger = loggerFactory.CreateLogger<WindowsColorTemperatureService>();
             
             _config = new AdvancedColorManagementConfig
             {
-                EnableHardwareGamma = true,
-                EnableICCProfileFallback = true,
-                MonitorCalibrations = new Dictionary<string, MonitorCalibrationSettings>()
+                EnableICCProfileFallback = true
             };
             
-            _service = new WindowsColorTemperatureService(
-                _mockLogger.Object,
-                _mockICCProfileService.Object,
-                _config
-            );
-        }
+            _service = new WindowsColorTemperatureService(_logger);}
 
         [TestMethod]
         public async Task AdaptiveTransitionInterval_CalculatesCorrectly_BasedOnComplexity()
         {
-            // Arrange
-            var simpleTransition = new TransitionState(
-                sourceTemp: 6500,
-                targetTemp: 3000,
-                duration: TimeSpan.FromMinutes(1),
-                curve: TransitionCurve.Linear,
-                priority: TransitionPriority.Normal
-            );
+            // Arrange - Create test transitions using correct TransitionState constructor
+            var fromTemp = new ColorTemperature(6500);
+            var toTemp = new ColorTemperature(3000);
+            var duration = TimeSpan.FromMinutes(1);
 
-            var complexTransition = new TransitionState(
-                sourceTemp: 6500,
-                targetTemp: 3000,
-                duration: TimeSpan.FromMinutes(1),
-                curve: TransitionCurve.Exponential,
-                priority: TransitionPriority.High
-            );
-
-            // Act & Assert
+            var simpleTransition = new TransitionState(fromTemp, toTemp, duration, "Simple transition");
+            var complexTransition = new TransitionState(fromTemp, toTemp, duration, "Complex transition");            // Act & Assert
             var stopwatch = Stopwatch.StartNew();
             
-            var simpleState = _service!.CalculateTransitionState(simpleTransition);
-            var complexState = _service.CalculateTransitionState(complexTransition);
+            // Test creating transitions using the service's CreateTransitionAsync method
+            var simpleTransitionResult = await _service!.CreateTransitionAsync(fromTemp, toTemp, duration, "Simple transition");
+            var complexTransitionResult = await _service.CreateTransitionAsync(fromTemp, toTemp, duration, "Complex transition");
             
             stopwatch.Stop();
 
             // Verify that transitions are created quickly (should be < 100ms)
             Assert.IsTrue(stopwatch.ElapsedMilliseconds < 100,
                 $"Transition creation took {stopwatch.ElapsedMilliseconds}ms, expected < 100ms");
-            Assert.IsNotNull(simpleState);
-            Assert.IsNotNull(complexState);
-        }
-
-        [TestMethod]
+            Assert.IsNotNull(simpleTransitionResult);
+            Assert.IsNotNull(complexTransitionResult);
+        }        [TestMethod]
         public async Task GammaRampCaching_ImprovesPerfomance_OnRepeatedCalls()
         {
             // Arrange
-            var temperatureValue = 4000;
-            var brightness = 1.0f;
+            var temperature = new ColorTemperature(4000);
 
             // Act - First run (cache miss expected)
             var firstRunStopwatch = Stopwatch.StartNew();
-            await _service!.ApplyColorTemperatureAsync(temperatureValue, brightness);
+            await _service!.ApplyTemperatureAsync(temperature);
             firstRunStopwatch.Stop();
 
             // Act - Second run (cache hit expected)
             var secondRunStopwatch = Stopwatch.StartNew();
-            await _service.ApplyColorTemperatureAsync(temperatureValue, brightness);
+            await _service.ApplyTemperatureAsync(temperature);
             secondRunStopwatch.Stop();
 
             // Assert - Second run should be faster due to caching
@@ -104,9 +82,7 @@ namespace ChronoGuard.Tests.Services
             Assert.IsTrue(secondRunStopwatch.ElapsedMilliseconds <= improvementThreshold,
                 $"Expected performance improvement from caching. First: {firstRunStopwatch.ElapsedMilliseconds}ms, " +
                 $"Second: {secondRunStopwatch.ElapsedMilliseconds}ms");
-        }
-
-        [TestMethod]
+        }        [TestMethod]
         public async Task ConcurrentTemperatureApplication_MaintainsThreadSafety()
         {
             // Arrange
@@ -117,14 +93,13 @@ namespace ChronoGuard.Tests.Services
             // Act - Execute multiple operations concurrently
             for (int i = 0; i < concurrentOperations; i++)
             {
-                var temp = 3000 + (i * 200); // Vary temperatures
-                var brightness = 0.8f + (i * 0.02f); // Vary brightness
+                var temp = new ColorTemperature(3000 + (i * 200)); // Vary temperatures
 
                 tasks.Add(Task.Run(async () =>
                 {
                     try
                     {
-                        await _service!.ApplyColorTemperatureAsync(temp, brightness);
+                        await _service!.ApplyTemperatureAsync(temp);
                         return true;
                     }
                     catch
@@ -157,18 +132,15 @@ namespace ChronoGuard.Tests.Services
         {
             // Arrange
             const int operationCount = 50;
-            var operationTimes = new List<long>();
-
-            // Act - Execute many operations and measure individual performance
+            var operationTimes = new List<long>();            // Act - Execute many operations and measure individual performance
             for (int i = 0; i < operationCount; i++)
             {
-                var tempValue = 2700 + (i % 10) * 400; // Cycle through different temperatures
-                var brightness = 0.5f + (i % 5) * 0.1f; // Cycle through different brightness
+                var tempValue = new ColorTemperature(2700 + (i % 10) * 400); // Cycle through different temperatures
 
                 var sw = Stopwatch.StartNew();
                 try
                 {
-                    await _service!.ApplyColorTemperatureAsync(tempValue, brightness);
+                    await _service!.ApplyTemperatureAsync(tempValue);
                     sw.Stop();
                     operationTimes.Add(sw.ElapsedMilliseconds);
                 }
@@ -200,19 +172,16 @@ namespace ChronoGuard.Tests.Services
         {
             // Arrange
             const int frameUpdates = 30; // Simulate 30 frame updates
-            var frameUpdateTimes = new List<long>();
-
-            // Act - Simulate continuous transition updates (like during sunset/sunrise)
+            var frameUpdateTimes = new List<long>();            // Act - Simulate continuous transition updates (like during sunset/sunrise)
             for (int frame = 0; frame < frameUpdates; frame++)
             {
                 var progress = (float)frame / frameUpdates;
-                var currentTemp = 6500 - (int)(3500 * progress); // Transition from 6500K to 3000K
-                var currentBrightness = 1.0f - (0.3f * progress); // Dim slightly during transition
+                var currentTemp = new ColorTemperature(6500 - (int)(3500 * progress)); // Transition from 6500K to 3000K
 
                 var sw = Stopwatch.StartNew();
                 try
                 {
-                    await _service!.ApplyColorTemperatureAsync(currentTemp, currentBrightness);
+                    await _service!.ApplyTemperatureAsync(currentTemp);
                     sw.Stop();
                     frameUpdateTimes.Add(sw.ElapsedMilliseconds);
                 }
@@ -251,16 +220,14 @@ namespace ChronoGuard.Tests.Services
             GC.Collect();
 
             var initialMemory = GC.GetTotalMemory(false);
-            const int operationCycles = 20;
-
-            // Act - Perform continuous operations
+            const int operationCycles = 20;            // Act - Perform continuous operations
             for (int cycle = 0; cycle < operationCycles; cycle++)
             {
                 for (int temp = 2700; temp <= 6500; temp += 200)
                 {
                     try
                     {
-                        await _service!.ApplyColorTemperatureAsync(temp, 1.0f);
+                        await _service!.ApplyTemperatureAsync(new ColorTemperature(temp));
                     }
                     catch
                     {
@@ -288,13 +255,11 @@ namespace ChronoGuard.Tests.Services
                 $"Memory growth should be < 1MB, was {memoryGrowth / 1024.0:F2} KB");
         }
 
-        [TestMethod]
-        public void CacheEfficiency_MaintainsOptimalHitRatio()
+        [TestMethod]        public void CacheEfficiency_MaintainsOptimalHitRatio()
         {
             // Arrange
             const int operations = 100;
             var temperatures = new[] { 2700, 3000, 4000, 5000, 6500 }; // Common temperatures
-            var brightnessLevels = new[] { 0.5f, 0.8f, 1.0f }; // Common brightness levels
             var random = new Random(42); // Fixed seed for repeatability
 
             var operationTimes = new List<long>();
@@ -302,13 +267,12 @@ namespace ChronoGuard.Tests.Services
             // Act - Execute operations with repeated values to test caching
             for (int i = 0; i < operations; i++)
             {
-                var temp = temperatures[random.Next(temperatures.Length)];
-                var brightness = brightnessLevels[random.Next(brightnessLevels.Length)];
+                var temp = new ColorTemperature(temperatures[random.Next(temperatures.Length)]);
 
                 var sw = Stopwatch.StartNew();
                 try
                 {
-                    _service!.ApplyColorTemperatureAsync(temp, brightness).Wait();
+                    _service!.ApplyTemperatureAsync(temp).Wait();
                     sw.Stop();
                     operationTimes.Add(sw.ElapsedMilliseconds);
                 }
@@ -333,22 +297,15 @@ namespace ChronoGuard.Tests.Services
             // With our test pattern, we should see good cache utilization
             Assert.IsTrue(hitRatio > 0.3,
                 $"Cache hit ratio should be > 30% with repeated values, was {hitRatio:P2}");
-        }
-
-        /// <summary>
+        }        /// <summary>
         /// Helper method to create transition states for testing
         /// </summary>
-        private TransitionState CreateTestTransition(int sourceTemp, int targetTemp, 
-            TransitionCurve curve = TransitionCurve.Linear, 
-            TransitionPriority priority = TransitionPriority.Normal)
+        private TransitionState CreateTestTransition(int sourceTemp, int targetTemp)
         {
-            return new TransitionState(
-                sourceTemp: sourceTemp,
-                targetTemp: targetTemp,
-                duration: TimeSpan.FromMinutes(1),
-                curve: curve,
-                priority: priority
-            );
+            var fromTemp = new ColorTemperature(sourceTemp);
+            var toTemp = new ColorTemperature(targetTemp);
+            var duration = TimeSpan.FromMinutes(1);
+            return new TransitionState(fromTemp, toTemp, duration, "Test transition");
         }
 
         [TestCleanup]
