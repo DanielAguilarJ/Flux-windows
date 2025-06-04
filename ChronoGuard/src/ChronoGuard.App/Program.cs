@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Windows;
+using System.Threading;
 using ChronoGuard.App;
 using ChronoGuard.App.Services;
 using ChronoGuard.App.ViewModels;
@@ -13,17 +14,30 @@ using ChronoGuard.Application.Services;
 namespace ChronoGuard.App;
 
 /// <summary>
-/// Application entry point with dependency injection setup
+/// Application entry point with dependency injection setup and single-instance enforcement
 /// </summary>
 public static class Program
 {
+    private static Mutex? _singleInstanceMutex;
+    private const string MutexName = "Global\\ChronoGuard_SingleInstance_E9F7B8A5-2C3D-4F6E-9A8B-1C5D7E9F2A4B";
+
     [STAThread]
     public static void Main(string[] args)
     {
         try
         {
+            // Enforce single instance
+            if (!EnsureSingleInstance())
+            {
+                // Another instance is already running, exit gracefully
+                Environment.Exit(0);
+                return;
+            }
+
             // Create host builder with DI container
-            var host = CreateHostBuilder(args).Build();            // Start the WPF application
+            var host = CreateHostBuilder(args).Build();
+
+            // Start the WPF application
             var app = new App();
             
             // Set service provider for the app
@@ -38,8 +52,32 @@ public static class Program
             var logger = LoggerFactory.Create(builder => builder.AddConsole())
                 .CreateLogger<App>();
             logger.LogCritical(ex, "Application failed to start");
-              System.Windows.MessageBox.Show($"Error fatal al iniciar ChronoGuard:\n{ex.Message}", 
+            
+            System.Windows.MessageBox.Show($"Error fatal al iniciar ChronoGuard:\n{ex.Message}", 
                 "ChronoGuard - Error", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+        }
+        finally
+        {
+            // Release mutex on exit
+            _singleInstanceMutex?.ReleaseMutex();
+            _singleInstanceMutex?.Dispose();
+        }
+    }
+
+    /// <summary>
+    /// Ensures only one instance of ChronoGuard is running at a time
+    /// </summary>
+    private static bool EnsureSingleInstance()
+    {
+        try
+        {
+            _singleInstanceMutex = new Mutex(true, MutexName, out bool createdNew);
+            return createdNew;
+        }
+        catch (Exception)
+        {
+            // If mutex creation fails, allow the application to continue
+            return true;
         }
     }
 
@@ -67,10 +105,10 @@ public static class Program
                 services.AddHostedService<UpdateNotificationService>();                services.AddSingleton<IStartupManager, StartupManager>();
                 services.AddSingleton<IForegroundApplicationService, ChronoGuard.Infrastructure.Services.WindowsForegroundApplicationService>();
                 services.AddSingleton<IPerformanceMonitoringService, ChronoGuard.Infrastructure.Services.PerformanceMonitoringService>();
-                
-                // Register application services
+                  // Register application services
                 services.AddSingleton<ChronoGuardBackgroundService>();
                 services.AddSingleton<SystemTrayService>();
+                services.AddSingleton<ApplicationLifecycleService>();
                   // Register ViewModels
                 services.AddTransient<MainWindowViewModel>();
                 services.AddTransient<SettingsViewModel>();

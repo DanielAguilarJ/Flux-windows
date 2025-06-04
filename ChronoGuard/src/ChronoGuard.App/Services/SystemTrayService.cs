@@ -562,6 +562,39 @@ public class SystemTrayService : IDisposable
         }
     }
 
+    /// <summary>
+    /// Shows the main application window from system tray
+    /// </summary>
+    public void ShowMainWindow()
+    {
+        try
+        {
+            ShowMainWindowRequested?.Invoke(this, EventArgs.Empty);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to show main window");
+        }
+    }
+
+    /// <summary>
+    /// Updates the system tray based on current application state
+    /// </summary>
+    public void RefreshTrayState()
+    {
+        try
+        {
+            var currentState = GetCurrentAppState();
+            UpdateIcon(currentState);
+            UpdateTooltip(currentState);
+            UpdateContextMenuStatus(currentState);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to refresh tray state");
+        }
+    }
+
     public void Dispose()
     {
         if (_disposed) return;
