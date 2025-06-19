@@ -1,0 +1,12 @@
+C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Domain\bin\Debug\net8.0\ChronoGuard.Domain.deps.json
+C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Domain\bin\Debug\net8.0\ChronoGuard.Domain.dll
+C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Domain\bin\Debug\net8.0\ChronoGuard.Domain.pdb
+C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Domain\obj\Debug\net8.0\ChronoGuard.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Domain\obj\Debug\net8.0\ChronoGuard.Domain.AssemblyInfoInputs.cache
+C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Domain\obj\Debug\net8.0\ChronoGuard.Domain.AssemblyInfo.cs
+C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Domain\obj\Debug\net8.0\ChronoGuard.Domain.csproj.CoreCompileInputs.cache
+C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Domain\obj\Debug\net8.0\ChronoGuard.Domain.sourcelink.json
+C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Domain\obj\Debug\net8.0\ChronoGuard.Domain.dll
+C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Domain\obj\Debug\net8.0\refint\ChronoGuard.Domain.dll
+C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Domain\obj\Debug\net8.0\ChronoGuard.Domain.pdb
+C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Domain\obj\Debug\net8.0\ref\ChronoGuard.Domain.dll

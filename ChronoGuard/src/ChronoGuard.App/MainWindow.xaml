@@ -315,10 +315,15 @@
                             Style="{StaticResource PrimaryButton}"
                             Command="{Binding ResumeCommand}"
                             Visibility="{Binding ResumeButtonVisibility}"
-                            Margin="0,0,0,12"/>
-                    <Button Content="⚙️ Configuración Avanzada" 
+                            Margin="0,0,0,12"/>                    <Button Content="⚙️ Configuración Avanzada" 
                             Style="{StaticResource SecondaryButton}"
-                            Command="{Binding OpenSettingsCommand}"/>
+                            Command="{Binding OpenSettingsCommand}"
+                            Margin="0,0,0,12"/>
+                    <Button Content="🔧 Diagnóstico de Compatibilidad" 
+                            Style="{StaticResource SecondaryButton}"
+                            Command="{Binding RunDiagnosticsCommand}"
+                            ToolTip="Verificar compatibilidad del monitor y drivers"
+                            FontSize="11"/>
                 </StackPanel>
                 
                 <!-- Quick Info Cards -->

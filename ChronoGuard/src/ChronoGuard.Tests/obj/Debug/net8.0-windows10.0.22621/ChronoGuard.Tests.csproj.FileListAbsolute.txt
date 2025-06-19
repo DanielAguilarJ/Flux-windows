@@ -1,0 +1,7 @@
+c:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Tests\bin\Debug\net8.0-windows10.0.22621\CoverletSourceRootsMapping_ChronoGuard.Tests
+c:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Tests\obj\Debug\net8.0-windows10.0.22621\ChronoGuard.Tests.csproj.AssemblyReference.cache
+c:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Tests\obj\Debug\net8.0-windows10.0.22621\ChronoGuard.Tests.GeneratedMSBuildEditorConfig.editorconfig
+c:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Tests\obj\Debug\net8.0-windows10.0.22621\ChronoGuard.Tests.AssemblyInfoInputs.cache
+c:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Tests\obj\Debug\net8.0-windows10.0.22621\ChronoGuard.Tests.AssemblyInfo.cs
+c:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Tests\obj\Debug\net8.0-windows10.0.22621\ChronoGuard.Tests.csproj.CoreCompileInputs.cache
+c:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.Tests\obj\Debug\net8.0-windows10.0.22621\ChronoGuard.Tests.sourcelink.json

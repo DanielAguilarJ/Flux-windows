@@ -360,9 +360,7 @@ public class WindowsColorTemperatureService : IColorTemperatureService
         profile.MaxLuminance = 250.0; // Default assumption
         
         return Task.CompletedTask;
-    }
-
-    public async Task<bool> ApplyTemperatureAsync(ColorTemperature temperature)
+    }    public async Task<bool> ApplyTemperatureAsync(ColorTemperature temperature)
     {
         if (!_isInitialized)
         {
@@ -373,7 +371,18 @@ public class WindowsColorTemperatureService : IColorTemperatureService
         try
         {
             var success = true;
-            var appliedCount = 0;            foreach (var (monitorId, handle) in _monitorHandles)
+            var appliedCount = 0;
+            var totalMonitors = _monitorHandles.Count;
+
+            _logger.LogDebug("Attempting to apply {Temperature}K to {MonitorCount} monitor(s)", temperature.Kelvin, totalMonitors);
+
+            if (totalMonitors == 0)
+            {
+                _logger.LogError("No monitors available for color temperature application");
+                return false;
+            }
+
+            foreach (var (monitorId, handle) in _monitorHandles)
             {
                 if (_monitorProfiles.TryGetValue(monitorId, out var profile))
                 {
@@ -386,9 +395,15 @@ public class WindowsColorTemperatureService : IColorTemperatureService
                     }
                     else
                     {
-                        _logger.LogWarning("Failed to set gamma ramp for monitor {MonitorId}", monitorId);
+                        _logger.LogWarning("Failed to set gamma ramp for monitor {MonitorId} - SetDeviceGammaRamp returned false", monitorId);
+                        _logger.LogInformation("Monitor {MonitorId} may not support gamma manipulation or another application is controlling it", monitorId);
                         success = false;
                     }
+                }
+                else
+                {
+                    _logger.LogWarning("No profile found for monitor {MonitorId}", monitorId);
+                    success = false;
                 }
             }
 
@@ -396,14 +411,28 @@ public class WindowsColorTemperatureService : IColorTemperatureService
             {
                 _currentTemperature = temperature;
                 TemperatureChanged?.Invoke(this, temperature);
-                _logger.LogDebug("Applied color temperature {Temperature}K to {Count} monitors", temperature.Kelvin, appliedCount);
+                _logger.LogInformation("Successfully applied color temperature {Temperature}K to {Count}/{Total} monitors", 
+                    temperature.Kelvin, appliedCount, totalMonitors);
+            }
+            else if (appliedCount == 0)
+            {
+                _logger.LogError("Failed to apply temperature {Temperature}K to any monitor. Common causes:", temperature.Kelvin);
+                _logger.LogError("• Monitor/graphics driver doesn't support gamma ramp manipulation");
+                _logger.LogError("• Another color management application is active (f.lux, Night Light, etc.)");
+                _logger.LogError("• Insufficient permissions (try running as Administrator)");
+                _logger.LogError("• Hardware limitation or compatibility issue");
+            }
+            else
+            {
+                _logger.LogWarning("Partial success: applied temperature {Temperature}K to {Count}/{Total} monitors", 
+                    temperature.Kelvin, appliedCount, totalMonitors);
             }
 
-            return success;
+            return success && appliedCount > 0;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error applying color temperature: {Temperature}", temperature);
+            _logger.LogError(ex, "Exception while applying color temperature {Temperature}K", temperature.Kelvin);
             return false;
         }
         finally

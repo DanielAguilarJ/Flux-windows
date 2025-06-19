@@ -3,6 +3,11 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Runtime.InteropServices;
+using System.Security.Principal;
+using System.Diagnostics;
 using ChronoGuard.Domain.Entities;
 using ChronoGuard.Domain.Interfaces;
 using ChronoGuard.Application.Services;
@@ -283,9 +288,7 @@ Más información: https://github.com/chronoguard/chronoguard";
             ManualTemperature = temperature;
             _logger.LogInformation("Manual temperature preset set to {Temperature}K", temperature);
         }
-    }
-
-    /// <summary>
+    }    /// <summary>
     /// Applies the manually selected temperature
     /// </summary>
     [RelayCommand]
@@ -294,13 +297,29 @@ Más información: https://github.com/chronoguard/chronoguard";
         try
         {
             var colorTemperature = new ColorTemperature((int)ManualTemperature);
-            await _colorTemperatureService.ApplyTemperatureAsync(colorTemperature);
+            var success = await _colorTemperatureService.ApplyTemperatureAsync(colorTemperature);
             
-            _logger.LogInformation("Manual temperature {Temperature}K applied", ManualTemperature);
+            if (success)
+            {
+                _logger.LogInformation("Manual temperature {Temperature}K applied successfully", ManualTemperature);
+                ShowSuccessMessage($"Temperatura {ManualTemperature}K aplicada correctamente");
+            }
+            else
+            {
+                _logger.LogWarning("Failed to apply manual temperature {Temperature}K - monitor/driver may not support gamma manipulation", ManualTemperature);
+                ShowErrorMessage($"No se pudo aplicar la temperatura {ManualTemperature}K.\n\n" +
+                    "Posibles causas:\n" +
+                    "• Tu monitor no soporta ajustes de gamma\n" +
+                    "• El driver de gráficos es incompatible\n" +
+                    "• Otro software está controlando los colores\n" +
+                    "• Se necesitan permisos de administrador\n\n" +
+                    "Prueba ejecutar como administrador o usar la Luz Nocturna de Windows.");
+            }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error applying manual temperature {Temperature}K", ManualTemperature);            ShowErrorMessage($"Error al aplicar temperatura {ManualTemperature}K");
+            _logger.LogError(ex, "Error applying manual temperature {Temperature}K", ManualTemperature);
+            ShowErrorMessage($"Error inesperado al aplicar temperatura {ManualTemperature}K:\n{ex.Message}");
         }
     }
 
@@ -550,11 +569,273 @@ Más información: https://github.com/chronoguard/chronoguard";
             SolarElevation = "--°";
             TimeUntilSunset = "--h --m";
         }
-    }
-
-    private static void ShowErrorMessage(string message)
+    }    private static void ShowErrorMessage(string message)
     {
         System.Windows.MessageBox.Show(message, "ChronoGuard - Error", 
             System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
     }
+
+    private static void ShowSuccessMessage(string message)
+    {
+        System.Windows.MessageBox.Show(message, "ChronoGuard - Éxito", 
+            System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+    }
+
+    /// <summary>
+    /// Runs compatibility diagnostics to help troubleshoot color temperature issues
+    /// </summary>
+    [RelayCommand]
+    private async Task RunDiagnosticsAsync()
+    {
+        try
+        {
+            _logger.LogInformation("Starting compatibility diagnostics");
+            
+            // Create a progress window or use existing UI feedback
+            var progressWindow = new Window
+            {
+                Title = "Diagnóstico de Compatibilidad",
+                Width = 500,
+                Height = 400,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                Owner = WpfApp.Current.MainWindow,
+                ResizeMode = ResizeMode.NoResize
+            };
+
+            var textBlock = new TextBlock
+            {
+                Text = "Ejecutando diagnóstico de compatibilidad...\nEsto puede tomar unos momentos.",
+                Margin = new Thickness(20),
+                TextWrapping = TextWrapping.Wrap,
+                FontFamily = new FontFamily("Segoe UI"),
+                FontSize = 14
+            };
+
+            var scrollViewer = new ScrollViewer
+            {
+                Content = textBlock,
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto
+            };
+
+            progressWindow.Content = scrollViewer;
+            progressWindow.Show();
+
+            // Run basic diagnostics
+            var diagnosticResult = await RunBasicDiagnosticsAsync();
+            
+            // Update the window with results
+            textBlock.Text = FormatDiagnosticResults(diagnosticResult);
+            
+            _logger.LogInformation("Compatibility diagnostics completed");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error running compatibility diagnostics");
+            ShowErrorMessage($"Error ejecutando diagnóstico:\n{ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Runs basic compatibility diagnostics without external dependencies
+    /// </summary>
+    private async Task<DiagnosticResults> RunBasicDiagnosticsAsync()
+    {
+        var results = new DiagnosticResults();
+        
+        try
+        {
+            // Test 1: Check if we can enumerate monitors
+            var monitorCount = 0;
+            EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, (IntPtr hMonitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr dwData) =>
+            {
+                monitorCount++;
+                return true;
+            }, IntPtr.Zero);
+            
+            results.TotalMonitorCount = monitorCount;
+            results.MonitorEnumerationSuccess = monitorCount > 0;
+
+            // Test 2: Try to apply a test temperature
+            try
+            {
+                var testTemperature = new ColorTemperature(6500); // Neutral temperature
+                var success = await _colorTemperatureService.ApplyTemperatureAsync(testTemperature);
+                results.GammaManipulationSuccess = success;
+                results.ErrorDetails.Add(success ? "✅ Manipulación de gamma: EXITOSA" : "❌ Manipulación de gamma: FALLÓ");
+            }
+            catch (Exception ex)
+            {
+                results.GammaManipulationSuccess = false;
+                results.ErrorDetails.Add($"❌ Error en manipulación de gamma: {ex.Message}");
+            }
+
+            // Test 3: Check running processes for conflicts
+            var conflictingProcesses = CheckForConflictingSoftware();
+            results.ConflictingSoftwareFound = conflictingProcesses.Count > 0;
+            if (conflictingProcesses.Count > 0)
+            {
+                results.ErrorDetails.Add("⚠️ Software conflictivo detectado:");
+                foreach (var process in conflictingProcesses)
+                {
+                    results.ErrorDetails.Add($"  • {process}");
+                }
+            }
+
+            // Test 4: Basic system info
+            results.SystemInfo.Add($"🖥️ Monitores detectados: {monitorCount}");
+            results.SystemInfo.Add($"💻 Sistema: {Environment.OSVersion}");
+            results.SystemInfo.Add($"🎮 Ejecutando como administrador: {IsRunningAsAdministrator()}");
+
+            // Generate recommendations
+            GenerateRecommendations(results);
+        }
+        catch (Exception ex)
+        {
+            results.ErrorDetails.Add($"❌ Error general en diagnóstico: {ex.Message}");
+        }
+
+        return results;
+    }
+
+    private List<string> CheckForConflictingSoftware()
+    {
+        var conflictingProcesses = new List<string>();
+        var conflictingNames = new[] { "f.lux", "redshift", "lightbulb", "iris", "sunsetscreen", "nightlight" };
+
+        try
+        {
+            var processes = System.Diagnostics.Process.GetProcesses();
+            foreach (var process in processes)
+            {
+                try
+                {
+                    var processName = process.ProcessName.ToLower();
+                    if (conflictingNames.Any(name => processName.Contains(name)))
+                    {
+                        conflictingProcesses.Add(process.ProcessName);
+                    }
+                }
+                catch { /* Ignore access denied errors */ }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Error checking for conflicting software");
+        }
+
+        return conflictingProcesses;
+    }
+
+    private bool IsRunningAsAdministrator()
+    {
+        try
+        {
+            var identity = System.Security.Principal.WindowsIdentity.GetCurrent();
+            var principal = new System.Security.Principal.WindowsPrincipal(identity);
+            return principal.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private void GenerateRecommendations(DiagnosticResults results)
+    {
+        if (!results.GammaManipulationSuccess)
+        {
+            results.Recommendations.Add("💡 Ejecutar ChronoGuard como administrador");
+            results.Recommendations.Add("💡 Actualizar drivers de gráficos");
+            results.Recommendations.Add("💡 Cerrar software conflictivo (f.lux, etc.)");
+            results.Recommendations.Add("💡 Verificar soporte de gamma en monitor");
+        }
+
+        if (results.ConflictingSoftwareFound)
+        {
+            results.Recommendations.Add("⚠️ Cerrar o desinstalar software conflictivo");
+        }
+
+        if (!results.MonitorEnumerationSuccess)
+        {
+            results.Recommendations.Add("🔧 Verificar conexión de monitores");
+            results.Recommendations.Add("🔧 Reiniciar sistema de gráficos");
+        }
+    }
+
+    private string FormatDiagnosticResults(DiagnosticResults results)
+    {
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine("=== RESULTADOS DEL DIAGNÓSTICO ===\n");
+
+        // System info
+        sb.AppendLine("📊 INFORMACIÓN DEL SISTEMA:");
+        foreach (var info in results.SystemInfo)
+        {
+            sb.AppendLine($"  {info}");
+        }
+        sb.AppendLine();
+
+        // Test results
+        sb.AppendLine("🧪 RESULTADOS DE PRUEBAS:");
+        foreach (var detail in results.ErrorDetails)
+        {
+            sb.AppendLine($"  {detail}");
+        }
+        sb.AppendLine();
+
+        // Recommendations
+        if (results.Recommendations.Count > 0)
+        {
+            sb.AppendLine("💡 RECOMENDACIONES:");
+            foreach (var recommendation in results.Recommendations)
+            {
+                sb.AppendLine($"  {recommendation}");
+            }
+            sb.AppendLine();
+        }
+
+        // Overall status
+        sb.AppendLine("📋 RESUMEN:");
+        if (results.GammaManipulationSuccess && !results.ConflictingSoftwareFound)
+        {
+            sb.AppendLine("  ✅ Tu sistema es compatible con ChronoGuard");
+            sb.AppendLine("  ✅ Los ajustes de temperatura deberían funcionar correctamente");
+        }
+        else
+        {
+            sb.AppendLine("  ⚠️ Se detectaron problemas de compatibilidad");
+            sb.AppendLine("  📋 Sigue las recomendaciones para resolver los problemas");
+        }
+
+        return sb.ToString();
+    }
+
+    // Windows API for monitor enumeration
+    [DllImport("user32.dll")]
+    private static extern bool EnumDisplayMonitors(IntPtr hdc, IntPtr lprcClip, EnumMonitorsDelegate lpfnEnum, IntPtr dwData);
+
+    private delegate bool EnumMonitorsDelegate(IntPtr hMonitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr dwData);
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct RECT
+    {
+        public int Left;
+        public int Top;
+        public int Right;
+        public int Bottom;
+    }
+
+    // Diagnostic results class
+    private class DiagnosticResults
+    {
+        public bool MonitorEnumerationSuccess { get; set; }
+        public bool GammaManipulationSuccess { get; set; }
+        public bool ConflictingSoftwareFound { get; set; }
+        public int TotalMonitorCount { get; set; }
+        public List<string> SystemInfo { get; set; } = new();
+        public List<string> ErrorDetails { get; set; } = new();
+        public List<string> Recommendations { get; set; } = new();
+    }
+
+    // ...existing code...
 }
