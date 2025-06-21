@@ -98,7 +98,23 @@ public class NotNullToBooleanConverter : IValueConverter
 }
 
 /// <summary>
-/// Inverts a boolean value
+/// Converts null values to Visibility.Collapsed, non-null to Visibility.Visible
+/// </summary>
+public class NullToVisibilityConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        return value == null ? Visibility.Collapsed : Visibility.Visible;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+/// <summary>
+/// Inverts boolean values
 /// </summary>
 public class InverseBooleanConverter : IValueConverter
 {
@@ -106,14 +122,14 @@ public class InverseBooleanConverter : IValueConverter
     {
         if (value is bool boolValue)
             return !boolValue;
-        return false;
+        return DependencyProperty.UnsetValue;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value is bool boolValue)
             return !boolValue;
-        return false;
+        return DependencyProperty.UnsetValue;
     }
 }
 

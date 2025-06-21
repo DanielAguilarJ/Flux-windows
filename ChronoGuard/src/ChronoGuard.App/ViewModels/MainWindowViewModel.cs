@@ -72,10 +72,52 @@ public partial class MainWindowViewModel : ObservableObject
     private string _solarElevation = "--°";
 
     [ObservableProperty]
-    private string _timeUntilSunset = "--h --m";    [ObservableProperty]
+    private string _timeUntilSunset = "--h --m";
+
+    [ObservableProperty]
     private string _applicationUptime = "0h 0m";
 
-    // ...existing code...
+    // Automatic temperature adjustment properties
+    [ObservableProperty]
+    private bool _automaticTemperatureEnabled = true;
+
+    [ObservableProperty]
+    private string _currentSolarPhase = "Detectando...";
+
+    [ObservableProperty]
+    private bool _isLocationDetectionInProgress = false;
+
+    [ObservableProperty]
+    private string _locationStatus = "Detectando ubicación...";
+
+    [ObservableProperty]
+    private DateTime _lastLocationUpdate = DateTime.MinValue;
+
+    [ObservableProperty]
+    private Location? _currentLocation;
+
+    // Temperature configuration
+    [ObservableProperty]
+    private int _dayTemperature = 6500;
+
+    [ObservableProperty]
+    private int _nightTemperature = 2700;
+
+    [ObservableProperty]
+    private int _transitionDurationMinutes = 60;
+
+    // Cached solar times for performance
+    private SolarTimes? _cachedSolarTimes;
+    private DateTime _cachedSolarDate = DateTime.MinValue;
+    
+    // Timer for automatic temperature updates
+    private readonly DispatcherTimer _automaticUpdateTimer;
+    
+    // Constants for temperature calculation
+    private const double TransitionHours = 1.0; // Hours for each transition (sunset/sunrise)
+    private const int MinTransitionMinutes = 30;
+    private const int MaxTransitionMinutes = 120;
+
     public MainWindowViewModel(
         ILogger<MainWindowViewModel> logger,
         ILocationService locationService,
@@ -93,13 +135,21 @@ public partial class MainWindowViewModel : ObservableObject
         _colorTemperatureService = colorTemperatureService;
         
         // Initialize application start time for uptime calculation
-        _applicationStartTime = DateTime.Now;// Setup update timer for real-time solar data
+        _applicationStartTime = DateTime.Now;        // Setup update timer for real-time solar data
         _updateTimer = new DispatcherTimer
         {
             Interval = TimeSpan.FromMinutes(1) // Update every minute
         };
         _updateTimer.Tick += UpdateTimer_Tick;
-        _updateTimer.Start();        // Subscribe to service events
+        _updateTimer.Start();
+        
+        // Setup automatic temperature update timer (more frequent for smooth transitions)
+        _automaticUpdateTimer = new DispatcherTimer
+        {
+            Interval = TimeSpan.FromMinutes(5) // Check every 5 minutes for automatic updates
+        };
+        _automaticUpdateTimer.Tick += AutomaticUpdateTimer_Tick;
+        _automaticUpdateTimer.Start();// Subscribe to service events
         _locationService.LocationChanged += OnLocationChanged;
         _profileService.ActiveProfileChanged += OnActiveProfileChanged;
         _backgroundService.StateChanged += OnBackgroundServiceStateChanged;
@@ -219,34 +269,13 @@ Más información: https://github.com/chronoguard/chronoguard";
 
         System.Windows.MessageBox.Show(aboutText, "Acerca de ChronoGuard", 
             System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
-    }
-
-    /// <summary>
-    /// Manually updates location
+    }    /// <summary>
+    /// Manually updates location (simplified version, use ForceLocationDetectionAsync for full detection)
     /// </summary>
     [RelayCommand]
     private async Task UpdateLocationAsync()
     {
-        try
-        {
-            CurrentLocationText = "Actualizando ubicación...";
-            var location = await _locationService.GetCurrentLocationAsync();
-            
-            if (location != null)
-            {
-                UpdateLocationDisplay(location);
-                _logger.LogInformation("Location manually updated: {Location}", location);
-            }
-            else
-            {
-                CurrentLocationText = "No se pudo obtener ubicación";
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error updating location manually");
-            CurrentLocationText = "Error al obtener ubicación";
-        }
+        await ForceLocationDetectionAsync();
     }
 
     /// <summary>
@@ -334,251 +363,80 @@ Más información: https://github.com/chronoguard/chronoguard";
             RealTimeTemperatureAdjustment ? "enabled" : "disabled");
     }
 
-    private void OnViewModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(ManualTemperature) && RealTimeTemperatureAdjustment)
-        {
-            // Apply temperature changes in real-time when real-time adjustment is enabled
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    var colorTemperature = new ColorTemperature((int)ManualTemperature);
-                    await _colorTemperatureService.ApplyTemperatureAsync(colorTemperature);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error applying real-time temperature {Temperature}K", ManualTemperature);
-                }
-            });
-        }
-    }private async Task InitializeAsync()
+    /// <summary>
+    /// Toggles automatic temperature adjustment based on solar times
+    /// </summary>
+    [RelayCommand]
+    private async Task ToggleAutomaticTemperatureAsync()
     {
         try
         {
-            // Get current location
-            var location = await _locationService.GetCurrentLocationAsync();
+            AutomaticTemperatureEnabled = !AutomaticTemperatureEnabled;
+            
+            if (AutomaticTemperatureEnabled)
+            {
+                _logger.LogInformation("Automatic temperature adjustment enabled");
+                // Immediately apply automatic temperature
+                await ApplyAutomaticTemperatureAsync();
+            }
+            else
+            {
+                _logger.LogInformation("Automatic temperature adjustment disabled");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error toggling automatic temperature adjustment");
+            ShowErrorMessage("Error al cambiar el modo automático");
+        }
+    }
+
+    /// <summary>
+    /// Forces location detection and updates solar calculations
+    /// </summary>
+    [RelayCommand]
+    private async Task ForceLocationDetectionAsync()
+    {
+        try
+        {
+            if (IsLocationDetectionInProgress) return;
+            
+            IsLocationDetectionInProgress = true;
+            LocationStatus = "Detectando ubicación...";
+            
+            _logger.LogInformation("Forcing location detection");
+            
+            // Try to get fresh location
+            var location = await GetBestLocationAsync();
+            
             if (location != null)
             {
-                UpdateLocationDisplay(location);
-            }
-
-            // Get current profile
-            var profile = await _profileService.GetActiveProfileAsync();
-            if (profile != null)
-            {
-                CurrentProfileName = profile.Name;
-            }
-
-            // Get current state from background service
-            var state = _backgroundService.CurrentState;
-            if (state != null)
-            {
-                UpdateFromAppState(state);
-            }
-
-            // Initialize manual temperature with current temperature
-            var currentTemp = _colorTemperatureService.GetCurrentTemperature();
-            if (currentTemp != null)
-            {
-                ManualTemperature = currentTemp.Kelvin;
-                CurrentColorTemperature = currentTemp.Kelvin;
-                CurrentTemperatureText = $"{currentTemp.Kelvin}K";
-            }
-
-            // Initialize solar data
-            await UpdateSolarDataAsync();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error during ViewModel initialization");
-        }
-    }private void OnLocationChanged(object? sender, Location location)
-    {
-        WpfApp.Current.Dispatcher.Invoke(() =>
-        {
-            UpdateLocationDisplay(location);
-            // Update solar data with new location
-            _ = UpdateSolarDataAsync();
-        });
-    }
-
-    private void OnActiveProfileChanged(object? sender, ColorProfile profile)
-    {
-        WpfApp.Current.Dispatcher.Invoke(() =>
-        {
-            CurrentProfileName = profile.Name;
-        });
-    }    private void OnBackgroundServiceStateChanged(object? sender, AppState state)
-    {
-        WpfApp.Current.Dispatcher.Invoke(() =>
-        {
-            UpdateFromAppState(state);
-        });
-    }    private void OnTemperatureChanged(object? sender, ColorTemperature temperature)
-    {
-        WpfApp.Current.Dispatcher.Invoke(() =>
-        {
-            CurrentColorTemperature = temperature.Kelvin;
-            CurrentTemperatureText = $"{temperature.Kelvin}K";
-            
-            // Sync manual temperature with current temperature (unless user is actively changing it)
-            ManualTemperature = temperature.Kelvin;
-            
-            _logger.LogDebug("Temperature changed to {Temperature}K", temperature.Kelvin);
-        });
-    }    private void OnTransitionCompleted(object? sender, TransitionState transitionState)
-    {
-        WpfApp.Current.Dispatcher.Invoke(() =>
-        {
-            IsTransitioning = false;
-            
-            // Update to the final temperature
-            CurrentColorTemperature = transitionState.ToTemperature.Kelvin;
-            CurrentTemperatureText = $"{transitionState.ToTemperature.Kelvin}K";
-            
-            // Sync manual temperature with final temperature
-            ManualTemperature = transitionState.ToTemperature.Kelvin;
-            
-            _logger.LogInformation("Transition completed: {Reason}", transitionState.Reason);
-        });
-    }
-
-    private void UpdateLocationDisplay(Location location)
-    {
-        if (!string.IsNullOrEmpty(location.City))
-        {
-            CurrentLocationText = $"{location.City}, {location.Country}";
-        }
-        else
-        {
-            CurrentLocationText = $"{location.Latitude:F1}°, {location.Longitude:F1}°";
-        }
-    }
-
-    private void UpdateFromAppState(AppState state)
-    {
-        IsActive = !state.IsPaused;
-        CurrentStatusText = state.IsPaused ? "Pausado" : "Activo";
-        IsTransitioning = state.IsTransitioning;
-        
-        CurrentColorTemperature = state.CurrentColorTemperature;
-        CurrentTemperatureText = $"{state.CurrentColorTemperature}K";
-
-        if (state.NextTransitionTime.HasValue)
-        {
-            NextTransitionTime = state.NextTransitionTime.Value;
-            var timeUntil = NextTransitionTime - DateTime.Now;
-            
-            if (timeUntil.TotalMinutes > 60)
-            {
-                NextTransitionText = $"Próxima transición en {timeUntil.Hours}h {timeUntil.Minutes}m";
-            }
-            else if (timeUntil.TotalMinutes > 0)
-            {
-                NextTransitionText = $"Próxima transición en {timeUntil.Minutes}m";
+                CurrentLocation = location;
+                CurrentLocationText = FormatLocationText(location);
+                LastLocationUpdate = DateTime.Now;
+                LocationStatus = "Ubicación actualizada correctamente";
+                
+                // Recalculate solar times and temperature
+                await RecalculateSolarDataAndTemperatureAsync(location);
+                
+                _logger.LogInformation("Location detection completed: {Location}", location);
             }
             else
             {
-                NextTransitionText = "Transición en progreso";
-            }
-        }
-        else
-        {
-            NextTransitionText = "";
-        }
-
-        // Update button visibility        PauseButtonVisibility = IsActive ? Visibility.Visible : Visibility.Collapsed;
-        ResumeButtonVisibility = IsActive ? Visibility.Collapsed : Visibility.Visible;
-    }
-    
-    private void UpdateTimer_Tick(object? sender, EventArgs e)
-    {
-        try
-        {
-            // Calculate application uptime
-            var uptime = DateTime.Now - _applicationStartTime;
-            ApplicationUptime = $"{(int)uptime.TotalHours}h {uptime.Minutes % 60}m";
-
-            // Update solar data asynchronously
-            _ = UpdateSolarDataAsync();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error updating timer data");
-        }
-    }
-
-    private async Task UpdateSolarDataAsync()
-    {
-        try
-        {
-            var currentLocation = await _locationService.GetCurrentLocationAsync();
-            if (currentLocation == null) return;
-
-            var solarTimes = await _solarCalculatorService.CalculateSolarTimesAsync(currentLocation, DateTime.Today);
-            if (solarTimes == null) return;
-
-            // Calculate current solar elevation (simplified)
-            var now = DateTime.Now;
-            var dayLength = solarTimes.Sunset - solarTimes.Sunrise;
-            var timeSinceSunrise = now - solarTimes.Sunrise;
-            
-            // Simple approximation of solar elevation based on time of day
-            double elevation;
-            if (now < solarTimes.Sunrise || now > solarTimes.Sunset)
-            {
-                elevation = -10; // Sun is below horizon
-            }
-            else
-            {
-                // Peak elevation at solar noon (simplified to 60 degrees max)
-                var solarNoon = solarTimes.Sunrise.Add(dayLength / 2);
-                var timeFromNoon = Math.Abs((now - solarNoon).TotalHours);
-                elevation = Math.Max(0, 60 - (timeFromNoon * 10)); // Rough approximation
-            }
-
-            // Update solar elevation
-            SolarElevation = $"{elevation:F1}°";
-
-            // Calculate time until sunset
-            if (now < solarTimes.Sunset)
-            {
-                var timeUntilSunset = solarTimes.Sunset - now;
-                TimeUntilSunset = $"{timeUntilSunset.Hours}h {timeUntilSunset.Minutes}m";
-            }
-            else
-            {
-                // Calculate time until next sunrise
-                var tomorrow = DateTime.Today.AddDays(1);
-                var tomorrowSolar = await _solarCalculatorService.CalculateSolarTimesAsync(currentLocation, tomorrow);
-                if (tomorrowSolar != null)
-                {
-                    var timeUntilSunrise = tomorrowSolar.Sunrise - now;
-                    TimeUntilSunset = $"Amanecer en {timeUntilSunrise.Hours}h {timeUntilSunrise.Minutes}m";
-                }
-                else
-                {
-                    TimeUntilSunset = "No disponible";
-                }
+                LocationStatus = "No se pudo detectar la ubicación";
+                ShowErrorMessage("No se pudo detectar la ubicación. Verifica permisos y conexión.");
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error updating solar data");
-            SolarElevation = "--°";
-            TimeUntilSunset = "--h --m";
+            _logger.LogError(ex, "Error during forced location detection");
+            LocationStatus = "Error al detectar ubicación";
+            ShowErrorMessage($"Error al detectar ubicación: {ex.Message}");
         }
-    }    private static void ShowErrorMessage(string message)
-    {
-        System.Windows.MessageBox.Show(message, "ChronoGuard - Error", 
-            System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
-    }
-
-    private static void ShowSuccessMessage(string message)
-    {
-        System.Windows.MessageBox.Show(message, "ChronoGuard - Éxito", 
-            System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+        finally
+        {
+            IsLocationDetectionInProgress = false;
+        }
     }
 
     /// <summary>
@@ -837,5 +695,561 @@ Más información: https://github.com/chronoguard/chronoguard";
         public List<string> Recommendations { get; set; } = new();
     }
 
-    // ...existing code...
+    /// <summary>
+    /// Automatic temperature update timer handler
+    /// </summary>
+    private async void AutomaticUpdateTimer_Tick(object? sender, EventArgs e)
+    {
+        try
+        {
+            if (AutomaticTemperatureEnabled)
+            {
+                await ApplyAutomaticTemperatureAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in automatic temperature update timer");
+        }
+    }    /// <summary>
+    /// Gets the best available location using multiple sources
+    /// </summary>
+    private async Task<Location?> GetBestLocationAsync()
+    {
+        try
+        {
+            // Try Windows Location API first
+            var windowsLocation = await _locationService.GetCurrentLocationAsync();
+            if (windowsLocation != null)
+            {
+                _logger.LogInformation("Location obtained from Windows Location API");
+                return windowsLocation;
+            }
+
+            // Return cached location if available
+            if (CurrentLocation != null)
+            {
+                _logger.LogInformation("Using cached location");
+                return CurrentLocation;
+            }
+
+            return null;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting best location");
+            return CurrentLocation; // Return cached if available
+        }
+    }
+
+    /// <summary>
+    /// Formats location for display
+    /// </summary>
+    private string FormatLocationText(Location location)
+    {
+        if (!string.IsNullOrEmpty(location.City) && !string.IsNullOrEmpty(location.Country))
+        {
+            return $"{location.City}, {location.Country}";
+        }
+        else if (!string.IsNullOrEmpty(location.City))
+        {
+            return location.City;
+        }
+        else
+        {
+            return $"{location.Latitude:F1}°N, {location.Longitude:F1}°E";
+        }
+    }
+
+    /// <summary>
+    /// Recalculates solar data and applies appropriate temperature when location changes
+    /// </summary>
+    private async Task RecalculateSolarDataAndTemperatureAsync(Location location)
+    {
+        try
+        {
+            // Clear cached solar times to force recalculation
+            _cachedSolarTimes = null;
+            _cachedSolarDate = DateTime.MinValue;
+
+            // Get new solar times
+            var solarTimes = await GetSolarTimesAsync(location);
+            if (solarTimes != null)
+            {
+                _cachedSolarTimes = solarTimes;
+                _cachedSolarDate = DateTime.Today;
+
+                // Update solar phase display
+                UpdateSolarPhaseDisplay(solarTimes);
+
+                // Apply new temperature if automatic mode is enabled
+                if (AutomaticTemperatureEnabled)
+                {
+                    await ApplyAutomaticTemperatureAsync();
+                }
+
+                _logger.LogInformation("Solar data recalculated for new location");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error recalculating solar data for new location");
+        }
+    }
+
+    /// <summary>
+    /// Applies automatic temperature based on current solar phase
+    /// </summary>
+    private async Task ApplyAutomaticTemperatureAsync()
+    {
+        try
+        {
+            if (!AutomaticTemperatureEnabled || CurrentLocation == null)
+                return;
+
+            var solarTimes = await GetSolarTimesAsync(CurrentLocation);
+            if (solarTimes == null)
+                return;
+
+            var now = DateTime.Now;
+            var targetTemperature = CalculateAutomaticTemperature(now, solarTimes);
+
+            // Update solar phase display
+            UpdateSolarPhaseDisplay(solarTimes);
+
+            // Apply the calculated temperature
+            var colorTemperature = new ColorTemperature(targetTemperature);
+            var success = await _colorTemperatureService.ApplyTemperatureAsync(colorTemperature);
+
+            if (success)
+            {
+                CurrentColorTemperature = targetTemperature;
+                CurrentTemperatureText = $"{targetTemperature}K";
+                ManualTemperature = targetTemperature; // Sync manual slider
+
+                _logger.LogDebug("Automatic temperature applied: {Temperature}K", targetTemperature);
+            }
+            else
+            {
+                _logger.LogWarning("Failed to apply automatic temperature: {Temperature}K", targetTemperature);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error applying automatic temperature");
+        }
+    }
+
+    /// <summary>
+    /// Calculates the appropriate temperature based on current time and solar data
+    /// </summary>
+    private int CalculateAutomaticTemperature(DateTime currentTime, SolarTimes solarTimes)
+    {
+        var timeOfDay = currentTime.TimeOfDay;
+        var sunrise = solarTimes.Sunrise.TimeOfDay;
+        var sunset = solarTimes.Sunset.TimeOfDay;
+
+        // Define transition periods (1 hour before/after sunrise and sunset)
+        var transitionDuration = TimeSpan.FromMinutes(TransitionDurationMinutes);
+        var sunriseTransitionStart = sunrise - transitionDuration;
+        var sunriseTransitionEnd = sunrise + transitionDuration;
+        var sunsetTransitionStart = sunset - transitionDuration;
+        var sunsetTransitionEnd = sunset + transitionDuration;
+
+        // Handle day/night periods
+        if (timeOfDay >= sunriseTransitionEnd && timeOfDay <= sunsetTransitionStart)
+        {
+            // Daytime - use day temperature
+            return DayTemperature;
+        }
+        else if (timeOfDay <= sunriseTransitionStart || timeOfDay >= sunsetTransitionEnd)
+        {
+            // Nighttime - use night temperature
+            return NightTemperature;
+        }
+        else if (timeOfDay >= sunriseTransitionStart && timeOfDay <= sunriseTransitionEnd)
+        {
+            // Sunrise transition - interpolate from night to day
+            var progress = (timeOfDay - sunriseTransitionStart).TotalMinutes / (2 * TransitionDurationMinutes);
+            progress = Math.Clamp(progress, 0.0, 1.0);
+            
+            // Use smooth sigmoid interpolation
+            var smoothProgress = SmoothInterpolation(progress);
+            return (int)Math.Round(NightTemperature + (DayTemperature - NightTemperature) * smoothProgress);
+        }
+        else if (timeOfDay >= sunsetTransitionStart && timeOfDay <= sunsetTransitionEnd)
+        {
+            // Sunset transition - interpolate from day to night
+            var progress = (timeOfDay - sunsetTransitionStart).TotalMinutes / (2 * TransitionDurationMinutes);
+            progress = Math.Clamp(progress, 0.0, 1.0);
+            
+            // Use smooth sigmoid interpolation
+            var smoothProgress = SmoothInterpolation(progress);
+            return (int)Math.Round(DayTemperature + (NightTemperature - DayTemperature) * smoothProgress);
+        }
+
+        // Fallback - shouldn't reach here
+        return DayTemperature;
+    }
+
+    /// <summary>
+    /// Smooth sigmoid interpolation for natural transitions
+    /// </summary>
+    private static double SmoothInterpolation(double t)
+    {
+        // Sigmoid function for smooth transitions
+        // f(t) = 1 / (1 + e^(-k*(t-0.5)))
+        // where k controls the steepness (6 gives a nice smooth curve)
+        const double k = 6.0;
+        return 1.0 / (1.0 + Math.Exp(-k * (t - 0.5)));
+    }
+
+    /// <summary>
+    /// Updates the solar phase display text
+    /// </summary>
+    private void UpdateSolarPhaseDisplay(SolarTimes solarTimes)
+    {
+        var now = DateTime.Now;
+        var timeOfDay = now.TimeOfDay;
+        var sunrise = solarTimes.Sunrise.TimeOfDay;
+        var sunset = solarTimes.Sunset.TimeOfDay;
+
+        var transitionDuration = TimeSpan.FromMinutes(TransitionDurationMinutes);
+
+        if (timeOfDay >= sunrise + transitionDuration && timeOfDay <= sunset - transitionDuration)
+        {
+            CurrentSolarPhase = "🌞 Día - Temperatura cálida";
+        }
+        else if (timeOfDay <= sunrise - transitionDuration || timeOfDay >= sunset + transitionDuration)
+        {
+            CurrentSolarPhase = "🌙 Noche - Temperatura fría";
+        }
+        else if (timeOfDay >= sunrise - transitionDuration && timeOfDay <= sunrise + transitionDuration)
+        {
+            CurrentSolarPhase = "🌅 Transición de amanecer";
+        }
+        else if (timeOfDay >= sunset - transitionDuration && timeOfDay <= sunset + transitionDuration)
+        {
+            CurrentSolarPhase = "🌇 Transición de atardecer";
+        }
+        else
+        {
+            CurrentSolarPhase = "⏰ Calculando fase solar...";
+        }
+    }
+
+    /// <summary>
+    /// Gets solar times for the given location with caching
+    /// </summary>
+    private async Task<SolarTimes?> GetSolarTimesAsync(Location location)
+    {
+        try
+        {
+            var today = DateTime.Today;
+
+            // Return cached data if available and current
+            if (_cachedSolarTimes != null && 
+                _cachedSolarDate == today && 
+                Math.Abs(_cachedSolarTimes.Location.Latitude - location.Latitude) < 0.1 &&
+                Math.Abs(_cachedSolarTimes.Location.Longitude - location.Longitude) < 0.1)
+            {
+                return _cachedSolarTimes;
+            }
+
+            // Calculate new solar times
+            var solarTimes = await _solarCalculatorService.CalculateSolarTimesAsync(location, today);
+            if (solarTimes != null)
+            {
+                _cachedSolarTimes = solarTimes;
+                _cachedSolarDate = today;
+            }
+
+            return solarTimes;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting solar times for location");
+            return _cachedSolarTimes; // Return cached data if available
+        }
+    }
+
+    private async Task InitializeAsync()
+    {
+        try
+        {
+            // Get current location
+            var location = await GetBestLocationAsync();
+            if (location != null)
+            {
+                CurrentLocation = location;
+                CurrentLocationText = FormatLocationText(location);
+                LastLocationUpdate = DateTime.Now;
+                LocationStatus = "Ubicación detectada correctamente";
+            }
+            else
+            {
+                LocationStatus = "No se pudo detectar la ubicación";
+                CurrentLocationText = "Ubicación no disponible";
+            }
+
+            // Get current profile
+            var profile = await _profileService.GetActiveProfileAsync();
+            if (profile != null)
+            {
+                CurrentProfileName = profile.Name;
+            }
+
+            // Get current state from background service
+            var state = _backgroundService.CurrentState;
+            if (state != null)
+            {
+                UpdateFromAppState(state);
+            }
+
+            // Initialize manual temperature with current temperature
+            var currentTemp = _colorTemperatureService.GetCurrentTemperature();
+            if (currentTemp != null)
+            {
+                ManualTemperature = currentTemp.Kelvin;
+                CurrentColorTemperature = currentTemp.Kelvin;
+                CurrentTemperatureText = $"{currentTemp.Kelvin}K";
+            }
+
+            // Initialize solar data and apply automatic temperature
+            if (CurrentLocation != null)
+            {
+                await RecalculateSolarDataAndTemperatureAsync(CurrentLocation);
+            }
+
+            // Apply automatic temperature if enabled
+            if (AutomaticTemperatureEnabled)
+            {
+                await ApplyAutomaticTemperatureAsync();
+            }
+
+            _logger.LogInformation("ViewModel initialization completed");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during ViewModel initialization");
+        }
+    }
+
+    private void OnLocationChanged(object? sender, Location location)
+    {
+        WpfApp.Current.Dispatcher.Invoke(() =>
+        {
+            CurrentLocation = location;
+            CurrentLocationText = FormatLocationText(location);
+            LastLocationUpdate = DateTime.Now;
+            LocationStatus = "Ubicación actualizada";
+            
+            // Recalculate solar data with new location
+            _ = RecalculateSolarDataAndTemperatureAsync(location);
+        });
+    }
+
+    private void OnActiveProfileChanged(object? sender, ColorProfile profile)
+    {
+        WpfApp.Current.Dispatcher.Invoke(() =>
+        {
+            CurrentProfileName = profile.Name;
+        });
+    }
+
+    private void OnBackgroundServiceStateChanged(object? sender, AppState state)
+    {
+        WpfApp.Current.Dispatcher.Invoke(() =>
+        {
+            UpdateFromAppState(state);
+        });
+    }
+
+    private void OnTemperatureChanged(object? sender, ColorTemperature temperature)
+    {
+        WpfApp.Current.Dispatcher.Invoke(() =>
+        {
+            CurrentColorTemperature = temperature.Kelvin;
+            CurrentTemperatureText = $"{temperature.Kelvin}K";
+            
+            // Sync manual temperature with current temperature (unless user is actively changing it)
+            if (!RealTimeTemperatureAdjustment)
+            {
+                ManualTemperature = temperature.Kelvin;
+            }
+            
+            _logger.LogDebug("Temperature changed to {Temperature}K", temperature.Kelvin);
+        });
+    }
+
+    private void OnTransitionCompleted(object? sender, TransitionState transitionState)
+    {
+        WpfApp.Current.Dispatcher.Invoke(() =>
+        {
+            IsTransitioning = false;
+            
+            // Update to the final temperature
+            CurrentColorTemperature = transitionState.ToTemperature.Kelvin;
+            CurrentTemperatureText = $"{transitionState.ToTemperature.Kelvin}K";
+            
+            // Sync manual temperature with final temperature
+            if (!RealTimeTemperatureAdjustment)
+            {
+                ManualTemperature = transitionState.ToTemperature.Kelvin;
+            }
+            
+            _logger.LogInformation("Transition completed: {Reason}", transitionState.Reason);
+        });
+    }
+
+    private void OnViewModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ManualTemperature) && RealTimeTemperatureAdjustment)
+        {
+            // Apply temperature changes in real-time when real-time adjustment is enabled
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    var colorTemperature = new ColorTemperature((int)ManualTemperature);
+                    await _colorTemperatureService.ApplyTemperatureAsync(colorTemperature);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error applying real-time temperature {Temperature}K", ManualTemperature);
+                }
+            });
+        }
+    }
+
+    private void UpdateFromAppState(AppState state)
+    {
+        IsActive = !state.IsPaused;
+        CurrentStatusText = state.IsPaused ? "Pausado" : "Activo";
+        IsTransitioning = state.IsTransitioning;
+        
+        CurrentColorTemperature = state.CurrentColorTemperature;
+        CurrentTemperatureText = $"{state.CurrentColorTemperature}K";
+
+        if (state.NextTransitionTime.HasValue)
+        {
+            NextTransitionTime = state.NextTransitionTime.Value;
+            var timeUntil = NextTransitionTime - DateTime.Now;
+            
+            if (timeUntil.TotalMinutes > 60)
+            {
+                NextTransitionText = $"Próxima transición en {timeUntil.Hours}h {timeUntil.Minutes}m";
+            }
+            else if (timeUntil.TotalMinutes > 0)
+            {
+                NextTransitionText = $"Próxima transición en {timeUntil.Minutes}m";
+            }
+            else
+            {
+                NextTransitionText = "Transición en progreso";
+            }
+        }
+        else
+        {
+            NextTransitionText = "";
+        }
+
+        // Update button visibility
+        PauseButtonVisibility = IsActive ? Visibility.Visible : Visibility.Collapsed;
+        ResumeButtonVisibility = IsActive ? Visibility.Collapsed : Visibility.Visible;
+    }
+    
+    private void UpdateTimer_Tick(object? sender, EventArgs e)
+    {
+        try
+        {
+            // Calculate application uptime
+            var uptime = DateTime.Now - _applicationStartTime;
+            ApplicationUptime = $"{(int)uptime.TotalHours}h {uptime.Minutes % 60}m";
+
+            // Update solar data asynchronously
+            _ = UpdateSolarDataAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating timer data");
+        }
+    }
+
+    private async Task UpdateSolarDataAsync()
+    {
+        try
+        {
+            var currentLocation = CurrentLocation ?? await GetBestLocationAsync();
+            if (currentLocation == null) return;
+
+            var solarTimes = await _solarCalculatorService.CalculateSolarTimesAsync(currentLocation, DateTime.Today);
+            if (solarTimes == null) return;
+
+            // Calculate current solar elevation (simplified)
+            var now = DateTime.Now;
+            var dayLength = solarTimes.Sunset - solarTimes.Sunrise;
+            var timeSinceSunrise = now - solarTimes.Sunrise;
+            
+            // Simple approximation of solar elevation based on time of day
+            double elevation;
+            if (now < solarTimes.Sunrise || now > solarTimes.Sunset)
+            {
+                elevation = -10; // Sun is below horizon
+            }
+            else
+            {
+                // Peak elevation at solar noon (simplified to 60 degrees max)
+                var solarNoon = solarTimes.Sunrise.Add(dayLength / 2);
+                var timeFromNoon = Math.Abs((now - solarNoon).TotalHours);
+                elevation = Math.Max(0, 60 - (timeFromNoon * 10)); // Rough approximation
+            }
+
+            // Update solar elevation
+            SolarElevation = $"{elevation:F1}°";
+
+            // Calculate time until sunset
+            if (now < solarTimes.Sunset)
+            {
+                var timeUntilSunset = solarTimes.Sunset - now;
+                TimeUntilSunset = $"{timeUntilSunset.Hours}h {timeUntilSunset.Minutes}m";
+            }
+            else
+            {
+                // Calculate time until next sunrise
+                var tomorrow = DateTime.Today.AddDays(1);
+                var tomorrowSolar = await _solarCalculatorService.CalculateSolarTimesAsync(currentLocation, tomorrow);
+                if (tomorrowSolar != null)
+                {
+                    var timeUntilSunrise = tomorrowSolar.Sunrise - now;
+                    TimeUntilSunset = $"Amanecer en {timeUntilSunrise.Hours}h {timeUntilSunrise.Minutes}m";
+                }
+                else
+                {
+                    TimeUntilSunset = "No disponible";
+                }
+            }
+
+            // Update solar phase display
+            UpdateSolarPhaseDisplay(solarTimes);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating solar data");
+            SolarElevation = "--°";
+            TimeUntilSunset = "--h --m";
+        }
+    }
+
+    private static void ShowErrorMessage(string message)
+    {
+        System.Windows.MessageBox.Show(message, "ChronoGuard - Error", 
+            System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+    }
+
+    private static void ShowSuccessMessage(string message)
+    {
+        System.Windows.MessageBox.Show(message, "ChronoGuard - Éxito", 
+            System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
+    }
 }

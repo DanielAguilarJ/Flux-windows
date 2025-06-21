@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:converters="clr-namespace:ChronoGuard.App.Converters"
         mc:Ignorable="d"
         Title="ChronoGuard" 
         Height="700" 
@@ -14,6 +15,13 @@
         WindowStyle="SingleBorderWindow"
         Background="{DynamicResource WindowGradient}">
     <Window.Resources>
+        <!-- Value Converters -->
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        
+        <!-- Custom Converters -->
+        <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+        
         <!-- Modern Color Palette -->
         <SolidColorBrush x:Key="PrimaryBrush" Color="#667EEA"/>
         <SolidColorBrush x:Key="SecondaryBrush" Color="#764BA2"/>
@@ -326,8 +334,7 @@
                             FontSize="11"/>
                 </StackPanel>
                 
-                <!-- Quick Info Cards -->
-                <StackPanel>
+                <!-- Quick Info Cards -->                <StackPanel>
                     <!-- Location Card -->
                     <Border Style="{StaticResource GlassCard}" Padding="20" Margin="0,0,0,16">
                         <StackPanel>
@@ -337,9 +344,42 @@
                                       Width="16" Height="16" 
                                       Stretch="Uniform"
                                       Margin="0,0,8,0"/>
-                                <TextBlock Text="Ubicación" Style="{StaticResource HeadingSmall}"/>
+                                <TextBlock Text="Ubicación" Style="{StaticResource HeadingSmall}"/>                                <Button Content="🔄" 
+                                        Command="{Binding ForceLocationDetectionCommand}"
+                                        Style="{StaticResource SecondaryButton}"
+                                        Margin="8,0,0,0"
+                                        Padding="8,4"
+                                        FontSize="12"
+                                        IsEnabled="{Binding IsLocationDetectionInProgress, Converter={StaticResource InverseBooleanConverter}}"
+                                        ToolTip="Actualizar ubicación"/>
                             </StackPanel>
                             <TextBlock Text="{Binding CurrentLocationText}" Style="{StaticResource BodyText}" TextWrapping="Wrap"/>
+                            <TextBlock Text="{Binding LocationStatus}" Style="{StaticResource CaptionText}" Margin="0,4,0,0"/>
+                            <TextBlock Text="{Binding LastLocationUpdate, StringFormat='Actualizado: {0:HH:mm}'}" 
+                                       Style="{StaticResource CaptionText}" 
+                                       Margin="0,2,0,0"
+                                       Visibility="{Binding LastLocationUpdate, Converter={StaticResource NullToVisibilityConverter}}"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- Automatic Mode Card -->
+                    <Border Style="{StaticResource GlassCard}" Padding="20" Margin="0,0,0,16">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <Path Data="M12,2A7,7 0 0,1 19,9C19,11.38 17.81,13.47 16,14.74V17A1,1 0 0,1 15,18H9A1,1 0 0,1 8,17V14.74C6.19,13.47 5,11.38 5,9A7,7 0 0,1 12,2M9,21V20H15V21A1,1 0 0,1 14,22H10A1,1 0 0,1 9,21M12,4A5,5 0 0,0 7,9C7,10.64 7.81,12.09 9,13V16H15V13C16.19,12.09 17,10.64 17,9A5,5 0 0,0 12,4Z" 
+                                      Fill="{StaticResource AccentBrush}" 
+                                      Width="16" Height="16" 
+                                      Stretch="Uniform"
+                                      Margin="0,0,8,0"/>
+                                <TextBlock Text="Modo Automático" Style="{StaticResource HeadingSmall}"/>
+                                <CheckBox IsChecked="{Binding AutomaticTemperatureEnabled}" 
+                                          Command="{Binding ToggleAutomaticTemperatureCommand}"
+                                          Margin="8,0,0,0"/>
+                            </StackPanel>
+                            <TextBlock Text="{Binding CurrentSolarPhase}" Style="{StaticResource BodyText}"/>
+                            <TextBlock Text="La temperatura se ajusta automáticamente según la hora solar" 
+                                       Style="{StaticResource CaptionText}" 
+                                       Margin="0,4,0,0"/>
                         </StackPanel>
                     </Border>
                     

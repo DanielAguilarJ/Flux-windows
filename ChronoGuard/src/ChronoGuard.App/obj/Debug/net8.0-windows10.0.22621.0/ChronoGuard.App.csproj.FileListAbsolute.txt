@@ -112,3 +112,11 @@ C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src
 C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.App\obj\Debug\net8.0-windows10.0.22621.0\ChronoGuard.App.dll
 C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.App\obj\Debug\net8.0-windows10.0.22621.0\refint\ChronoGuard.App.dll
 C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.App\obj\Debug\net8.0-windows10.0.22621.0\ChronoGuard.App.pdb
+C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.App\bin\Debug\net8.0-windows10.0.22621.0\ChronoGuard.App.exe
+C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.App\bin\Debug\net8.0-windows10.0.22621.0\ChronoGuard.App.deps.json
+C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.App\bin\Debug\net8.0-windows10.0.22621.0\ChronoGuard.App.runtimeconfig.json
+C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.App\bin\Debug\net8.0-windows10.0.22621.0\ChronoGuard.App.dll
+C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.App\bin\Debug\net8.0-windows10.0.22621.0\ChronoGuard.App.pdb
+C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.App\obj\Debug\net8.0-windows10.0.22621.0\ChronoGu.54DD3029.Up2Date
+C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.App\obj\Debug\net8.0-windows10.0.22621.0\ChronoGuard.App.genruntimeconfig.cache
+C:\Users\junco\OneDrive\JUNCOKEVIN\Documents\GitHub\Flux-windows\ChronoGuard\src\ChronoGuard.App\obj\Debug\net8.0-windows10.0.22621.0\ref\ChronoGuard.App.dll
