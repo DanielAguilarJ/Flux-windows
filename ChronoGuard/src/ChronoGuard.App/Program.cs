@@ -104,6 +104,7 @@ public static class Program
                 services.AddSingleton<IUpdateService, UpdateService>();
                 services.AddHostedService<UpdateNotificationService>();                services.AddSingleton<IStartupManager, StartupManager>();
                 services.AddSingleton<IForegroundApplicationService, ChronoGuard.Infrastructure.Services.WindowsForegroundApplicationService>();
+                services.AddSingleton<IApplicationWhitelistService, ApplicationWhitelistService>();
                 services.AddSingleton<IPerformanceMonitoringService, ChronoGuard.Infrastructure.Services.PerformanceMonitoringService>();
                   // Register application services
                 services.AddSingleton<ChronoGuardBackgroundService>();

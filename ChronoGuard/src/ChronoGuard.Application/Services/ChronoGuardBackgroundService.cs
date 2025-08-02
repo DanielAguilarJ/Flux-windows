@@ -24,6 +24,8 @@ namespace ChronoGuard.Application.Services
         private readonly IProfileService? _profileService;
         private readonly IConfigurationService? _configService;
         private readonly IForegroundApplicationService? _foregroundAppService;
+        private readonly IApplicationWhitelistService? _whitelistService;
+        private readonly INotificationService? _notificationService;
         private readonly ILogger<ChronoGuardBackgroundService>? _logger;
         
         private AppState _appState = new();
@@ -78,6 +80,8 @@ namespace ChronoGuard.Application.Services
             IProfileService profileService,
             IConfigurationService configService,
             IForegroundApplicationService foregroundAppService,
+            IApplicationWhitelistService whitelistService,
+            INotificationService notificationService,
             ILogger<ChronoGuardBackgroundService> logger)
         {
             _locationService = locationService;
@@ -86,6 +90,8 @@ namespace ChronoGuard.Application.Services
             _profileService = profileService;
             _configService = configService;
             _foregroundAppService = foregroundAppService;
+            _whitelistService = whitelistService;
+            _notificationService = notificationService;
             _logger = logger;
         }
 
@@ -439,8 +445,11 @@ namespace ChronoGuard.Application.Services
         {
             try
             {
-                if (!_appState.ShouldApplyFiltering())
+                // Check if filtering should be applied (considering whitelist)
+                if (!await ShouldApplyColorFilteringAsync())
                 {
+                    // If filtering is disabled due to whitelist, restore original colors
+                    await _colorService.RestoreOriginalSettingsAsync();
                     return;
                 }
 
@@ -464,6 +473,96 @@ namespace ChronoGuard.Application.Services
             {
                 _logger?.LogError(ex, "Error updating color temperature");
             }
+        }
+
+        /// <summary>
+        /// Determines if color filtering should be applied based on application state and whitelist
+        /// </summary>
+        private async Task<bool> ShouldApplyColorFilteringAsync()
+        {
+            // Basic state checks
+            if (!_appState.ShouldApplyFiltering())
+            {
+                return false;
+            }
+
+            // Check application whitelist
+            if (_foregroundAppService != null && _whitelistService != null)
+            {
+                var foregroundApp = _foregroundAppService.GetForegroundApplicationName();
+                if (!string.IsNullOrEmpty(foregroundApp))
+                {
+                    var whitelistStatus = await _whitelistService.GetWhitelistStatusAsync(foregroundApp);
+                    if (whitelistStatus.IsWhitelisted)
+                    {
+                        switch (whitelistStatus.Mode)
+                        {
+                            case WhitelistMode.CompleteDisable:
+                                return false;
+                            case WhitelistMode.PauseTransitions:
+                                // Allow current temperature but don't transition
+                                return _appState.CurrentTemperature != null;
+                            case WhitelistMode.ReducedEffect:
+                                // Continue with filtering but at reduced intensity
+                                return true;
+                            case WhitelistMode.FullscreenOnly:
+                                // Only disable if application is in fullscreen mode
+                                return !IsApplicationFullscreen(foregroundApp);
+                        }
+                    }
+                    else
+                    {
+                        // Process potential auto-detection
+                        var appInfo = _foregroundAppService.GetForegroundApplicationInfo();
+                        if (appInfo != null)
+                        {
+                            var action = await _whitelistService.ProcessForegroundApplicationAsync(
+                                appInfo.ProcessName, appInfo.WindowTitle, appInfo.ExecutablePath);
+                            
+                            if (action.ShouldDisableColorAdjustment)
+                            {
+                                if (action.RequiresUserConfirmation)
+                                {
+                                    // Show notification asking user for confirmation
+                                    await _notificationService?.ShowInfoAsync(
+                                        "ChronoGuard - Aplicación Detectada", 
+                                        $"Se detectó '{appInfo.ProcessName}' como aplicación de diseño. ¿Desactivar filtro automáticamente?");
+                                }
+                                return !action.ShouldDisableColorAdjustment;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Checks if an application is running in fullscreen mode
+        /// </summary>
+        private bool IsApplicationFullscreen(string processName)
+        {
+            // This is a simplified implementation - in production you'd use Windows API
+            // to detect fullscreen applications more accurately
+            try
+            {
+                var appInfo = _foregroundAppService?.GetForegroundApplicationInfo();
+                if (appInfo != null)
+                {
+                    // Basic heuristic: if window title contains common fullscreen indicators
+                    var windowTitle = appInfo.WindowTitle.ToLowerInvariant();
+                    return windowTitle.Contains("fullscreen") || 
+                           windowTitle.Contains("full screen") ||
+                           string.IsNullOrEmpty(windowTitle); // Many fullscreen apps have no title
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogDebug(ex, "Error checking fullscreen status for {ProcessName}", processName);
+            }
+
+            return false;
         }
 
         private async Task StartTransitionAsync(ColorTemperature? from, ColorTemperature to, ColorProfile profile)
