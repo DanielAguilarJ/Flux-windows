@@ -67,12 +67,45 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private Visibility _resumeButtonVisibility = Visibility.Collapsed;
 
+    // Circular timeline properties
+    [ObservableProperty]
+    private string _currentTemperature = "6500K";
+    
+    [ObservableProperty]
+    private string _currentPhase = "Día";
+    
+    [ObservableProperty]
+    private string _nextEvent = "Calculando...";
+    
+    [ObservableProperty]
+    private string _sunriseTime = "--:--";
+    
+    [ObservableProperty]
+    private string _sunsetTime = "--:--";
+    
+    [ObservableProperty]
+    private string _dayLength = "--h --m";
+    
+    [ObservableProperty]
+    private string _activeProfileName = "Clásico";
+    
+    [ObservableProperty]
+    private string _dayTemperature = "6500K";
+    
+    [ObservableProperty]
+    private string _nightTemperature = "2700K";
+    
+    [ObservableProperty]
+    private string _currentLocation = "Detectando ubicación...";
+
     // Solar data properties for dashboard
     [ObservableProperty]
     private string _solarElevation = "--°";
 
     [ObservableProperty]
-    private string _timeUntilSunset = "--h --m";    [ObservableProperty]
+    private string _timeUntilSunset = "--h --m";
+
+    [ObservableProperty]
     private string _applicationUptime = "0h 0m";
 
     // ...existing code...
@@ -361,6 +394,7 @@ Más información: https://github.com/chronoguard/chronoguard";
             if (location != null)
             {
                 UpdateLocationDisplay(location);
+                await UpdateCircularTimelineAsync(location);
             }
 
             // Get current profile
@@ -368,6 +402,9 @@ Más información: https://github.com/chronoguard/chronoguard";
             if (profile != null)
             {
                 CurrentProfileName = profile.Name;
+                ActiveProfileName = profile.Name;
+                DayTemperature = $"{profile.DayTemperature}K";
+                NightTemperature = $"{profile.NightTemperature}K";
             }
 
             // Get current state from background service
@@ -384,14 +421,127 @@ Más información: https://github.com/chronoguard/chronoguard";
                 ManualTemperature = currentTemp.Kelvin;
                 CurrentColorTemperature = currentTemp.Kelvin;
                 CurrentTemperatureText = $"{currentTemp.Kelvin}K";
+                CurrentTemperature = $"{currentTemp.Kelvin}K";
             }
 
-            // Initialize solar data
+            // Initialize solar data and circular timeline
             await UpdateSolarDataAsync();
+            await UpdateCircularTimelineDataAsync();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error during ViewModel initialization");
+        }
+    }
+
+    /// <summary>
+    /// Updates the circular timeline with current location data
+    /// </summary>
+    private async Task UpdateCircularTimelineAsync(Location location)
+    {
+        try
+        {
+            CurrentLocation = location.City ?? $"{location.Latitude:F2}, {location.Longitude:F2}";
+            
+            var solarTimes = await _solarCalculatorService.CalculateSolarTimesAsync(location, DateTime.Today);
+            if (solarTimes != null)
+            {
+                SunriseTime = solarTimes.Sunrise.ToString("HH:mm");
+                SunsetTime = solarTimes.Sunset.ToString("HH:mm");
+                DayLength = $"{solarTimes.DayLength.Hours}h {solarTimes.DayLength.Minutes}m";
+                
+                UpdateCurrentPhaseAndNextEvent(solarTimes);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating circular timeline data");
+        }
+    }
+
+    /// <summary>
+    /// Updates circular timeline data periodically
+    /// </summary>
+    private async Task UpdateCircularTimelineDataAsync()
+    {
+        try
+        {
+            var location = await _locationService.GetCurrentLocationAsync();
+            if (location != null)
+            {
+                var solarTimes = await _solarCalculatorService.CalculateSolarTimesAsync(location, DateTime.Today);
+                if (solarTimes != null)
+                {
+                    UpdateCurrentPhaseAndNextEvent(solarTimes);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating circular timeline data");
+        }
+    }
+
+    /// <summary>
+    /// Updates current phase and next event based on solar times
+    /// </summary>
+    private void UpdateCurrentPhaseAndNextEvent(SolarTimes solarTimes)
+    {
+        var now = DateTime.Now;
+        var phase = solarTimes.GetDayPhase(now);
+        
+        CurrentPhase = phase switch
+        {
+            DayPhase.Night => "Noche",
+            DayPhase.Sunrise => "Amanecer",
+            DayPhase.Day => "Día",
+            DayPhase.Sunset => "Atardecer",
+            _ => "Desconocido"
+        };
+
+        // Calculate next event
+        var nowTime = now.TimeOfDay;
+        var sunrise = solarTimes.Sunrise.TimeOfDay;
+        var sunset = solarTimes.Sunset.TimeOfDay;
+
+        TimeSpan timeToNext;
+        string eventName;
+
+        if (nowTime < sunrise)
+        {
+            timeToNext = sunrise - nowTime;
+            eventName = "Amanecer";
+        }
+        else if (nowTime < sunset)
+        {
+            timeToNext = sunset - nowTime;
+            eventName = "Atardecer";
+        }
+        else
+        {
+            timeToNext = TimeSpan.FromDays(1) - nowTime + sunrise;
+            eventName = "Amanecer";
+        }
+
+        NextEvent = $"{eventName} en {FormatTimeSpan(timeToNext)}";
+    }
+
+    /// <summary>
+    /// Formats a timespan for display
+    /// </summary>
+    private string FormatTimeSpan(TimeSpan timeSpan)
+    {
+        if (timeSpan.TotalDays >= 1)
+        {
+            return $"{(int)timeSpan.TotalHours}h {timeSpan.Minutes}m";
+        }
+        else if (timeSpan.TotalHours >= 1)
+        {
+            return $"{timeSpan.Hours}h {timeSpan.Minutes}m";
+        }
+        else
+        {
+            return $"{timeSpan.Minutes}m";
         }
     }private void OnLocationChanged(object? sender, Location location)
     {
@@ -400,6 +550,8 @@ Más información: https://github.com/chronoguard/chronoguard";
             UpdateLocationDisplay(location);
             // Update solar data with new location
             _ = UpdateSolarDataAsync();
+            // Update circular timeline with new location
+            _ = UpdateCircularTimelineAsync(location);
         });
     }
 
@@ -408,6 +560,12 @@ Más información: https://github.com/chronoguard/chronoguard";
         WpfApp.Current.Dispatcher.Invoke(() =>
         {
             CurrentProfileName = profile.Name;
+            ActiveProfileName = profile.Name;
+            DayTemperature = $"{profile.DayTemperature}K";
+            NightTemperature = $"{profile.NightTemperature}K";
+            
+            // Update circular timeline data
+            _ = UpdateCircularTimelineDataAsync();
         });
     }    private void OnBackgroundServiceStateChanged(object? sender, AppState state)
     {
@@ -421,6 +579,7 @@ Más información: https://github.com/chronoguard/chronoguard";
         {
             CurrentColorTemperature = temperature.Kelvin;
             CurrentTemperatureText = $"{temperature.Kelvin}K";
+            CurrentTemperature = $"{temperature.Kelvin}K";
             
             // Sync manual temperature with current temperature (unless user is actively changing it)
             ManualTemperature = temperature.Kelvin;
@@ -502,6 +661,9 @@ Más información: https://github.com/chronoguard/chronoguard";
 
             // Update solar data asynchronously
             _ = UpdateSolarDataAsync();
+            
+            // Update circular timeline data
+            _ = UpdateCircularTimelineDataAsync();
         }
         catch (Exception ex)
         {

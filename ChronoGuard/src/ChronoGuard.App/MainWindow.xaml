@@ -409,19 +409,134 @@
                             </StackPanel>
                         </Border>
                         
-                        <!-- Solar Chart -->
+                        <!-- Circular Timeline -->
                         <Border Grid.Row="1" Grid.ColumnSpan="3" Style="{StaticResource GlassCard}" 
-                                Padding="24" Margin="0,0,0,12" Height="200">
+                                Padding="24" Margin="0,0,0,12" Height="350">
                             <Grid>
-                                <TextBlock Text="Curva Solar del Día" Style="{StaticResource HeadingSmall}" 
-                                           HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                                <!-- Placeholder for solar curve chart -->
-                                <Canvas Background="Transparent">
-                                    <Path Data="M 0,150 Q 150,50 300,100 Q 450,75 600,130" 
-                                          Stroke="{StaticResource AccentGradient}" 
-                                          StrokeThickness="3"
-                                          Fill="Transparent"/>
-                                </Canvas>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="350"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <!-- Circular Timeline Control -->
+                                <Grid Grid.Column="0">
+                                    <TextBlock Text="Timeline Circadiano de 24 Horas" 
+                                               Style="{StaticResource HeadingSmall}" 
+                                               HorizontalAlignment="Center" 
+                                               VerticalAlignment="Top"
+                                               Margin="0,0,0,12"/>
+                                    <!-- Circular Timeline will be integrated here -->
+                                    <Ellipse Width="280" Height="280" 
+                                             Stroke="{StaticResource TemperatureGradient}" 
+                                             StrokeThickness="8" 
+                                             Fill="Transparent"
+                                             Margin="0,30,0,0">
+                                        <Ellipse.Effect>
+                                            <DropShadowEffect Color="#667EEA" BlurRadius="15" Opacity="0.6" ShadowDepth="0"/>
+                                        </Ellipse.Effect>
+                                    </Ellipse>
+                                    
+                                    <!-- Current time indicator -->
+                                    <Ellipse Width="16" Height="16" Fill="#F093FB" 
+                                             HorizontalAlignment="Center" 
+                                             VerticalAlignment="Top"
+                                             Margin="0,34,0,0">
+                                        <Ellipse.Effect>
+                                            <DropShadowEffect Color="#F093FB" BlurRadius="10" Opacity="0.8" ShadowDepth="0"/>
+                                        </Ellipse.Effect>
+                                    </Ellipse>
+                                    
+                                    <!-- Center information -->
+                                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,30,0,0">
+                                        <TextBlock Text="{Binding CurrentTemperature}" 
+                                                   FontFamily="Segoe UI Variable Display"
+                                                   FontSize="28" 
+                                                   FontWeight="SemiBold"
+                                                   Foreground="#CDD6F4"
+                                                   HorizontalAlignment="Center"/>
+                                        <TextBlock Text="{Binding CurrentPhase}" 
+                                                   FontFamily="Segoe UI Variable Text"
+                                                   FontSize="16" 
+                                                   Foreground="#9399B2"
+                                                   HorizontalAlignment="Center"/>
+                                        <TextBlock Text="{Binding NextEvent}" 
+                                                   FontFamily="Segoe UI Variable Text"
+                                                   FontSize="12" 
+                                                   Foreground="#6C7086"
+                                                   HorizontalAlignment="Center"
+                                                   TextWrapping="Wrap"
+                                                   TextAlignment="Center"
+                                                   Margin="0,8,0,0"/>
+                                    </StackPanel>
+                                </Grid>
+                                
+                                <!-- Timeline Information Panel -->
+                                <StackPanel Grid.Column="1" Margin="24,0,0,0">
+                                    <TextBlock Text="Información del Ciclo" Style="{StaticResource HeadingSmall}" Margin="0,0,0,16"/>
+                                    
+                                    <Grid Margin="0,0,0,12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Ellipse Grid.Column="0" Width="12" Height="12" Fill="#FFD700" 
+                                                 VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock Text="Amanecer" Style="{StaticResource BodyText}" FontWeight="SemiBold"/>
+                                            <TextBlock Text="{Binding SunriseTime}" Style="{StaticResource CaptionText}"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    
+                                    <Grid Margin="0,0,0,12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Ellipse Grid.Column="0" Width="12" Height="12" Fill="#FF6B47" 
+                                                 VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock Text="Atardecer" Style="{StaticResource BodyText}" FontWeight="SemiBold"/>
+                                            <TextBlock Text="{Binding SunsetTime}" Style="{StaticResource CaptionText}"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    
+                                    <Grid Margin="0,0,0,12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Rectangle Grid.Column="0" Width="12" Height="3" Fill="{StaticResource TemperatureGradient}" 
+                                                   VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock Text="Duración del Día" Style="{StaticResource BodyText}" FontWeight="SemiBold"/>
+                                            <TextBlock Text="{Binding DayLength}" Style="{StaticResource CaptionText}"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    
+                                    <Separator Margin="0,16,0,16" Background="#30FFFFFF"/>
+                                    
+                                    <TextBlock Text="Configuración Actual" Style="{StaticResource HeadingSmall}" Margin="0,0,0,12"/>
+                                    
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                        <TextBlock Text="Perfil activo:" Style="{StaticResource BodyText}" Width="100"/>
+                                        <TextBlock Text="{Binding ActiveProfileName}" Style="{StaticResource BodyText}" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                    
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                        <TextBlock Text="Temp. día:" Style="{StaticResource BodyText}" Width="100"/>
+                                        <TextBlock Text="{Binding DayTemperature}" Style="{StaticResource BodyText}" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                    
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                        <TextBlock Text="Temp. noche:" Style="{StaticResource BodyText}" Width="100"/>
+                                        <TextBlock Text="{Binding NightTemperature}" Style="{StaticResource BodyText}" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                    
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                        <TextBlock Text="Ubicación:" Style="{StaticResource BodyText}" Width="100"/>
+                                        <TextBlock Text="{Binding CurrentLocation}" Style="{StaticResource BodyText}" FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </StackPanel>
                             </Grid>
                         </Border>
                         
