@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:converters="clr-namespace:ChronoGuard.App.Converters"
+        xmlns:controls="clr-namespace:ChronoGuard.App.Controls"
         mc:Ignorable="d"
         Title="ChronoGuard" 
         Height="700" 
@@ -455,13 +456,9 @@
                             <Grid>
                                 <TextBlock Text="Curva Solar del Día" Style="{StaticResource HeadingSmall}" 
                                            HorizontalAlignment="Left" VerticalAlignment="Top"/>
-                                <!-- Placeholder for solar curve chart -->
-                                <Canvas Background="Transparent">
-                                    <Path Data="M 0,150 Q 150,50 300,100 Q 450,75 600,130" 
-                                          Stroke="{StaticResource AccentGradient}" 
-                                          StrokeThickness="3"
-                                          Fill="Transparent"/>
-                                </Canvas>
+                                <controls:SolarCurveControl Margin="0,16,0,0"
+                                                            SolarTimes="{Binding TodaySolarTimes}"
+                                                            Now="{Binding NowTime}"/>
                             </Grid>
                         </Border>
                         

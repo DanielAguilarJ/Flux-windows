@@ -1,5 +1,7 @@
 namespace ChronoGuard.Domain.Entities;
 
+using System.Drawing;
+
 /// <summary>
 /// Easing algorithms for color temperature transitions
 /// </summary>
@@ -15,6 +17,27 @@ public enum TransitionEasingType
     SigmoidSmooth,      // Perceptually optimal sigmoid curve
     CircadianAdaptive,  // Adaptive based on time of day
     ExponentialDecay    // Natural exponential transition
+}
+
+/// <summary>
+/// Public easing type expected by tests
+/// </summary>
+public enum EasingType
+{
+    Linear,
+    EaseInOut,
+    Exponential,
+    CircadianRhythm,
+    Smooth
+}
+
+/// <summary>
+/// RGB interpolation modes expected by tests
+/// </summary>
+public enum InterpolationMode
+{
+    LinearRGB,
+    PerceptualLab
 }
 
 /// <summary>
@@ -199,7 +222,7 @@ public class ColorTransition
     /// Circadian rhythm adaptive easing - adjusts transition speed based on time of day
     /// Faster transitions during active hours, slower during rest periods
     /// </summary>
-    private double CircadianAdaptive(double t)
+    private static double CircadianAdaptive(double t)
     {
         var currentHour = DateTime.Now.Hour;
         var circadianFactor = GetCircadianFactor(currentHour);
@@ -235,12 +258,14 @@ public class ColorTransition
 
     /// <summary>
     /// Exponential decay transition - mimics natural adaptation processes
-    /// Faster initial change, gradually slowing down
+    /// Faster initial change, gradually slowing down. Normalized so f(0)=0, f(1)=1
     /// </summary>
     private static double ExponentialDecay(double t)
     {
         var decayRate = 3.0; // Optimal for visual adaptation
-        return 1.0 - Math.Exp(-decayRate * t);
+        var denom = 1.0 - Math.Exp(-decayRate);
+        if (denom <= 1e-9) return t; // fallback to linear if degenerate
+        return (1.0 - Math.Exp(-decayRate * t)) / denom;
     }
 
     #endregion
@@ -249,4 +274,200 @@ public class ColorTransition
     /// Checks if the transition is completed
     /// </summary>
     public bool IsCompleted => GetProgress() >= 1.0;
+
+    // ====== Public static helpers expected by tests ======
+
+    /// <summary>
+    /// Applies an easing function to a progress value in the range [0,1].
+    /// Throws ArgumentOutOfRangeException for invalid progress values.
+    /// </summary>
+    public static double ApplyEasing(double progress, global::ChronoGuard.Domain.Entities.EasingType easing)
+    {
+        if (progress < 0 || progress > 1)
+            throw new ArgumentOutOfRangeException(nameof(progress), "Progress must be within [0,1]");
+
+        return easing switch
+        {
+            global::ChronoGuard.Domain.Entities.EasingType.Linear => progress,
+            global::ChronoGuard.Domain.Entities.EasingType.EaseInOut => EaseInOutCubic(progress),
+            global::ChronoGuard.Domain.Entities.EasingType.Exponential => ExponentialDecay(progress),
+            global::ChronoGuard.Domain.Entities.EasingType.CircadianRhythm => CircadianAdaptive(progress),
+            global::ChronoGuard.Domain.Entities.EasingType.Smooth => SigmoidSmooth(progress),
+            _ => progress
+        };
+    }
+
+    /// <summary>
+    /// Interpolates color temperature using the specified easing.
+    /// </summary>
+    public static ColorTemperature InterpolateTemperature(
+        ColorTemperature from, ColorTemperature to, double progress, global::ChronoGuard.Domain.Entities.EasingType easing)
+    {
+        var eased = ApplyEasing(progress, easing);
+        // Interpolate in Kelvin space for predictable behavior in tests
+        return ColorTemperature.Interpolate(from, to, eased);
+    }
+
+    /// <summary>
+    /// Interpolates between two RGB colors.
+    /// </summary>
+    public static Color InterpolateRGB(Color c1, Color c2, double progress, InterpolationMode mode)
+    {
+        if (progress < 0 || progress > 1)
+            throw new ArgumentOutOfRangeException(nameof(progress), "Progress must be within [0,1]");
+
+        return mode switch
+        {
+            InterpolationMode.LinearRGB =>
+                Color.FromArgb(
+                    ClampToByte(c1.R + (int)((c2.R - c1.R) * progress)),
+                    ClampToByte(c1.G + (int)((c2.G - c1.G) * progress)),
+                    ClampToByte(c1.B + (int)((c2.B - c1.B) * progress))
+                ),
+            InterpolationMode.PerceptualLab =>
+                InterpolatePerceptualColor(c1, c2, progress),
+            _ => throw new ArgumentOutOfRangeException(nameof(mode))
+        };
+    }
+
+    /// <summary>
+    /// Calculates blue light reduction between two temperatures (0..1)
+    /// </summary>
+    public static double CalculateBlueReduction(ColorTemperature from, ColorTemperature to)
+    {
+        var fromBlue = from.RGB.B;
+        var toBlue = to.RGB.B;
+        if (fromBlue == 0) return 0.0;
+        var reduction = (double)(fromBlue - toBlue) / Math.Max(1.0, fromBlue);
+        return Math.Max(0.0, Math.Min(1.0, reduction));
+    }
+
+    /// <summary>
+    /// Chooses an adaptive easing based on delta, blue reduction and time of day.
+    /// </summary>
+    public static global::ChronoGuard.Domain.Entities.EasingType CalculateAdaptiveEasing(
+        ColorTemperature from,
+        ColorTemperature to,
+        DateTime currentTime,
+        DateTime sunrise,
+        DateTime sunset)
+    {
+        var deltaK = Math.Abs(to.Kelvin - from.Kelvin);
+        var blueReduction = CalculateBlueReduction(from, to);
+
+        // Small changes can be linear/ease-in-out
+        if (deltaK <= 250)
+            return global::ChronoGuard.Domain.Entities.EasingType.Linear;
+
+        // Around evening/morning, favor gentler curves
+        var oneHour = TimeSpan.FromHours(1);
+        var nearSunset = currentTime >= sunset - oneHour && currentTime <= sunset + oneHour;
+        var nearSunrise = currentTime >= sunrise - oneHour && currentTime <= sunrise + oneHour;
+
+        if (nearSunset || nearSunrise)
+        {
+            if (blueReduction >= 0.3)
+                return global::ChronoGuard.Domain.Entities.EasingType.Smooth; // very gentle
+            return global::ChronoGuard.Domain.Entities.EasingType.EaseInOut;
+        }
+
+        // Daytime: allow faster adaptation for larger changes
+        var dayPeriod = currentTime.TimeOfDay;
+        if (dayPeriod > sunrise.TimeOfDay + TimeSpan.FromHours(2) &&
+            dayPeriod < sunset.TimeOfDay - TimeSpan.FromHours(2))
+        {
+            return global::ChronoGuard.Domain.Entities.EasingType.Exponential;
+        }
+
+        return global::ChronoGuard.Domain.Entities.EasingType.EaseInOut;
+    }
+
+    // ====== Internal helpers ======
+
+    private static int ClampToByte(int v) => v < 0 ? 0 : v > 255 ? 255 : v;
+
+    private static Color InterpolatePerceptualColor(Color c1, Color c2, double t)
+    {
+        // Convert to Lab
+        var (l1, a1, b1) = RgbToLab(c1);
+        var (l2, a2, b2) = RgbToLab(c2);
+
+        // Interpolate in Lab
+        var l = l1 + (l2 - l1) * t;
+        var a = a1 + (a2 - a1) * t;
+        var b = b1 + (b2 - b1) * t;
+
+        // Convert back
+        return LabToRgb(l, a, b);
+    }
+
+    // Minimal sRGB <-> Lab conversion utilities (D65 reference)
+    private static (double L, double A, double B) RgbToLab(Color c)
+    {
+        // sRGB to linear
+        double rl = SrgbToLinear(c.R / 255.0);
+        double gl = SrgbToLinear(c.G / 255.0);
+        double bl = SrgbToLinear(c.B / 255.0);
+
+        // Linear RGB to XYZ (sRGB D65)
+        double x = rl * 0.4124564 + gl * 0.3575761 + bl * 0.1804375;
+        double y = rl * 0.2126729 + gl * 0.7151522 + bl * 0.0721750;
+        double z = rl * 0.0193339 + gl * 0.1191920 + bl * 0.9503041;
+
+        // Normalize by D65 white
+        const double Xn = 0.95047;
+        const double Yn = 1.00000;
+        const double Zn = 1.08883;
+
+        double fx = Fxyz(x / Xn);
+        double fy = Fxyz(y / Yn);
+        double fz = Fxyz(z / Zn);
+
+        double L = 116 * fy - 16;
+        double A = 500 * (fx - fy);
+        double B = 200 * (fy - fz);
+        return (L, A, B);
+    }
+
+    private static Color LabToRgb(double L, double A, double B)
+    {
+        // Lab to XYZ
+        double fy = (L + 16.0) / 116.0;
+        double fx = A / 500.0 + fy;
+        double fz = fy - B / 200.0;
+
+        const double Xn = 0.95047;
+        const double Yn = 1.00000;
+        const double Zn = 1.08883;
+
+        double xr = InvFxyz(fx);
+        double yr = InvFxyz(fy);
+        double zr = InvFxyz(fz);
+
+        double x = xr * Xn;
+        double y = yr * Yn;
+        double z = zr * Zn;
+
+        // XYZ to linear RGB
+        double rl = x * 3.2404542 + y * -1.5371385 + z * -0.4985314;
+        double gl = x * -0.9692660 + y * 1.8760108 + z * 0.0415560;
+        double bl = x * 0.0556434 + y * -0.2040259 + z * 1.0572252;
+
+        // Linear to sRGB
+        byte r = (byte)ClampToByte((int)Math.Round(LinearToSrgb(rl) * 255.0));
+        byte g = (byte)ClampToByte((int)Math.Round(LinearToSrgb(gl) * 255.0));
+        byte b = (byte)ClampToByte((int)Math.Round(LinearToSrgb(bl) * 255.0));
+        return Color.FromArgb(r, g, b);
+    }
+
+    private static double SrgbToLinear(double c) => c <= 0.04045 ? c / 12.92 : Math.Pow((c + 0.055) / 1.055, 2.4);
+    private static double LinearToSrgb(double c) => c <= 0.0031308 ? 12.92 * c : 1.055 * Math.Pow(c, 1 / 2.4) - 0.055;
+
+    private static double Fxyz(double t) => t > Math.Pow(6.0 / 29.0, 3) ? Math.Pow(t, 1.0 / 3.0) : (1.0 / 3.0) * Math.Pow(29.0 / 6.0, 2) * t + 4.0 / 29.0;
+    private static double InvFxyz(double t)
+    {
+        double t3 = t * t * t;
+        double threshold = Math.Pow(6.0 / 29.0, 3);
+        return t3 > threshold ? t3 : 3 * Math.Pow(6.0 / 29.0, 2) * (t - 4.0 / 29.0);
+    }
 }

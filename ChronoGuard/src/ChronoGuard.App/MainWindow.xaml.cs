@@ -18,6 +18,22 @@ public partial class MainWindow : Window
         {
             DataContext = App.ServiceProvider.GetRequiredService<MainWindowViewModel>();
         }
+
+        // When window is loaded/activated, force immediate UI refresh for solar curve and temperature
+        Loaded += async (_, __) =>
+        {
+            if (DataContext is MainWindowViewModel vm)
+            {
+                await vm.ForceImmediateUpdateAsync();
+            }
+        };
+        Activated += async (_, __) =>
+        {
+            if (DataContext is MainWindowViewModel vm)
+            {
+                await vm.ForceImmediateUpdateAsync();
+            }
+        };
     }
 
     protected override void OnStateChanged(EventArgs e)

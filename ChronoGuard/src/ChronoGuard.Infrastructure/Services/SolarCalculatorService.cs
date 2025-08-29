@@ -1,6 +1,7 @@
 using ChronoGuard.Domain.Entities;
 using ChronoGuard.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace ChronoGuard.Infrastructure.Services;
 
@@ -12,7 +13,7 @@ namespace ChronoGuard.Infrastructure.Services;
 public class SolarCalculatorService : ISolarCalculatorService
 {
     private readonly ILogger<SolarCalculatorService> _logger;
-    private readonly ILocationService _locationService;
+    private readonly ILocationService? _locationService;
     
     // Enhanced precision constants
     private const double CIVIL_TWILIGHT_ANGLE = 96.0;        // Civil twilight (6° below horizon)
@@ -28,8 +29,12 @@ public class SolarCalculatorService : ISolarCalculatorService
         _locationService = locationService;
     }
 
+    // Added for test convenience: parameterless constructor with NullLogger and no location service
+    public SolarCalculatorService() : this(NullLogger<SolarCalculatorService>.Instance, null!) { }
+
     public Task<SolarTimes> CalculateSolarTimesAsync(Location location, DateTime date)
     {
+        if (location is null) throw new ArgumentNullException(nameof(location));
         try
         {
             var (sunrise, sunset) = CalculateSunriseSunset(location.Latitude, location.Longitude, date);
@@ -44,6 +49,12 @@ public class SolarCalculatorService : ISolarCalculatorService
 
     public async Task<SolarTimes?> GetTodaySolarTimesAsync()
     {
+        if (_locationService is null)
+        {
+            _logger.LogWarning("Cannot calculate solar times: no location service available");
+            return null;
+        }
+
         var location = await _locationService.GetCurrentLocationAsync();
         if (location == null)
         {

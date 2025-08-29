@@ -171,6 +171,10 @@ public class PerformanceMonitoringService : IPerformanceMonitoringService
             var snapshot = CollectPerformanceSnapshot();
             ProcessPerformanceSnapshot(snapshot);
             
+            // Emit metrics updated event
+            var metrics = ConvertToSystemMetrics(snapshot);
+            MetricsUpdated?.Invoke(this, metrics);
+            
             // Keep only last 720 snapshots (1 hour at 5-second intervals)
             while (_performanceHistory.Count > 720)
             {
@@ -431,6 +435,7 @@ public class PerformanceMonitoringService : IPerformanceMonitoringService
         foreach (var alert in alerts)
         {
             PerformanceAlertRaised?.Invoke(this, alert);
+            PerformanceAlertTriggered?.Invoke(this, alert);
             _logger.LogWarning("Performance alert: {AlertType} - {Message}", alert.Type, alert.Message);
         }
     }

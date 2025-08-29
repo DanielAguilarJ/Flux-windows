@@ -112,7 +112,7 @@ namespace ChronoGuard.Tests.Services
             _mockColorService
                 .Setup(c => c.ApplyTemperatureAsync(It.IsAny<ColorTemperature>()))
                 .Callback<ColorTemperature>(temp => appliedTemperatures.Add(temp))
-                .Returns(Task.CompletedTask);
+                .ReturnsAsync(true);
 
             // Act - Simulate high-frequency updates during transition
             await _backgroundService.InitializePredictiveCacheAsync(location, profile);
@@ -234,7 +234,7 @@ namespace ChronoGuard.Tests.Services
             _mockColorService
                 .Setup(c => c.ApplyTemperatureAsync(It.IsAny<ColorTemperature>()))
                 .Callback<ColorTemperature>(temp => appliedTemperature = temp)
-                .Returns(Task.CompletedTask);
+                .ReturnsAsync(true);
 
             // Act
             await _backgroundService.InitializePredictiveCacheAsync(location, profile1);

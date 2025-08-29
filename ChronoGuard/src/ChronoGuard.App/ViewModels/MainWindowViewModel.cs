@@ -72,6 +72,14 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private string _solarElevation = "--°";
 
+    // New: expose today's solar times for UI bindings (solar curve)
+    [ObservableProperty]
+    private SolarTimes? _todaySolarTimes;
+
+    // New: expose current time so the UI control can animate the sun position
+    [ObservableProperty]
+    private DateTime _nowTime = DateTime.Now;
+
     [ObservableProperty]
     private string _timeUntilSunset = "--h --m";
 
@@ -804,7 +812,7 @@ Más información: https://github.com/chronoguard/chronoguard";
     {
         try
         {
-            if (!AutomaticTemperatureEnabled || CurrentLocation == null)
+            if (!AutomaticTemperatureEnabled || CurrentLocation == null || !IsActive)
                 return;
 
             var solarTimes = await GetSolarTimesAsync(CurrentLocation);
@@ -1167,6 +1175,9 @@ Más información: https://github.com/chronoguard/chronoguard";
             var uptime = DateTime.Now - _applicationStartTime;
             ApplicationUptime = $"{(int)uptime.TotalHours}h {uptime.Minutes % 60}m";
 
+            // Update current time for solar curve animation
+            NowTime = DateTime.Now;
+
             // Update solar data asynchronously
             _ = UpdateSolarDataAsync();
         }
@@ -1185,6 +1196,9 @@ Más información: https://github.com/chronoguard/chronoguard";
 
             var solarTimes = await _solarCalculatorService.CalculateSolarTimesAsync(currentLocation, DateTime.Today);
             if (solarTimes == null) return;
+
+            // New: publish today solar times for the UI control
+            TodaySolarTimes = solarTimes;
 
             // Calculate current solar elevation (simplified)
             var now = DateTime.Now;
@@ -1232,12 +1246,53 @@ Más información: https://github.com/chronoguard/chronoguard";
 
             // Update solar phase display
             UpdateSolarPhaseDisplay(solarTimes);
+
+            // New: during sunrise/sunset transitions, tighten updates to 1-minute by applying temperature here
+            if (AutomaticTemperatureEnabled && IsActive && IsWithinTransitionWindow(now, solarTimes))
+            {
+                await ApplyAutomaticTemperatureAsync();
+            }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error updating solar data");
             SolarElevation = "--°";
             TimeUntilSunset = "--h --m";
+        }
+    }
+
+    /// <summary>
+    /// Returns true if current time is within the configured sunrise/sunset transition windows
+    /// </summary>
+    private bool IsWithinTransitionWindow(DateTime now, SolarTimes solarTimes)
+    {
+        var sunrise = solarTimes.Sunrise.TimeOfDay;
+        var sunset = solarTimes.Sunset.TimeOfDay;
+        var t = now.TimeOfDay;
+        var d = TimeSpan.FromMinutes(TransitionDurationMinutes);
+
+        var inSunrise = t >= (sunrise - d) && t <= (sunrise + d);
+        var inSunset = t >= (sunset - d) && t <= (sunset + d);
+        return inSunrise || inSunset;
+    }
+
+    /// <summary>
+    /// Forces an immediate UI and automatic temperature refresh (used when window is activated)
+    /// </summary>
+    public async Task ForceImmediateUpdateAsync()
+    {
+        try
+        {
+            NowTime = DateTime.Now;
+            await UpdateSolarDataAsync();
+            if (AutomaticTemperatureEnabled && IsActive)
+            {
+                await ApplyAutomaticTemperatureAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error forcing immediate update");
         }
     }
 

@@ -13,6 +13,32 @@
 			"group": "build",
 			"isBackground": false,
 			"problemMatcher": []
+		},
+		{
+			"label": "build-app",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"ChronoGuard/src/ChronoGuard.App/ChronoGuard.App.csproj",
+				"-v",
+				"minimal"
+			],
+			"group": "build",
+			"problemMatcher": ["$msCompile"]
+		},
+		{
+			"label": "run-app",
+			"type": "shell",
+			"command": "dotnet",
+			"args": [
+				"run",
+				"--project",
+				"ChronoGuard/src/ChronoGuard.App"
+			],
+			"group": "none",
+			"isBackground": false,
+			"problemMatcher": []
 		}
 	]
 }
